@@ -19,7 +19,7 @@ impl<C> RenderOnce for Layout<C> where C: RenderOnce {
 
             html {
                 head {
-                    title : title;
+                    title : format!("Busy Bee Life | {}", title);
                 }
 
                 header {

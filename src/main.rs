@@ -1,7 +1,7 @@
-use horrorshow::{html, Template};
+use chrono::Utc;
 use warp::Filter;
 
-use ::busybees::{pages, Layout};
+use ::busybees::pages;
 
 
 #[tokio::main]
@@ -17,19 +17,19 @@ async fn main() {
                 pages::about::AboutPage.into()
             )))
 
-        .or(warp::path!("hello" / String)
+        .or(warp::path!("articles" / String)
             .and(warp::get())
-            .map(|name| {
-                let greeting = format!("Hello, {}!", name);
+            .map(|title: String| {
 
-                let h1 = html! {
-                    h1 : greeting.clone();
+                let now = Utc::now();
+                let post = pages::post::Post {
+                    title: title.clone(),
+                    body: "<p style='color: red'>some content</p>".into(),
+                    created_at: now.clone(),
+                    updated_at: now,
                 };
 
-                return warp::reply::html(Layout {
-                    title: greeting.clone(),
-                    content: h1,
-                }.into_string().unwrap());
+                return warp::reply::html::<String>(post.into());
             }));
 
     warp::serve(routes)
