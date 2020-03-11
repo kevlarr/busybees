@@ -22,10 +22,14 @@ impl<C> RenderOnce for Layout<C> where C: RenderOnce {
                     title : title;
                 }
 
+                header {
+                    p : "busy bee life";
+                }
+
                 body : content;
 
                 footer {
-                    span : "Some footer"
+                    p : "powered by Rust";
                 }
             }
         };

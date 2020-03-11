@@ -19,7 +19,7 @@ impl RenderOnce for AboutPage {
 impl Into<String> for AboutPage {
     fn into(self) -> String {
         Layout {
-            title: "About us busy bees".into(),
+            title: "About the life of us busy bees".into(),
             content: self,
         }.into_string().unwrap()
     }

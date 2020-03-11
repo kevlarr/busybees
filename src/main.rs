@@ -6,9 +6,10 @@ use ::busybees::{pages, Layout};
 
 #[tokio::main]
 async fn main() {
-    let routes = warp::path("public")
-        .and(warp::get())
-        .and(warp::fs::dir("www/public"))
+    let routes =
+        warp::path("public")
+            .and(warp::get())
+            .and(warp::fs::dir("www/public"))
 
         .or(warp::path!("about")
             .and(warp::get())
