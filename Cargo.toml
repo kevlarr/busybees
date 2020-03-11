@@ -5,5 +5,6 @@ authors = ["kevlarr"]
 edition = "2018"
 
 [dependencies]
+horrorshow = "0.8.1"
 tokio = { version = "0.2", features = ["macros"] }
 warp = "0.2"
