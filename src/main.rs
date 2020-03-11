@@ -6,33 +6,32 @@ use ::busybees::{pages, Layout};
 
 #[tokio::main]
 async fn main() {
-    let public = warp::path("public")
+    let routes = warp::path("public")
         .and(warp::get())
-        .and(warp::fs::dir("www/public"));
+        .and(warp::fs::dir("www/public"))
 
-    let about = warp::path!("about")
-        .and(warp::get())
-        .map(|| warp::reply::html::<String>(
-            pages::about::AboutPage.into()
-        ));
+        .or(warp::path!("about")
+            .and(warp::get())
+            .map(|| warp::reply::html::<String>(
+                pages::about::AboutPage.into()
+            )))
 
-    let hello = warp::path!("hello" / String)
-        .and(warp::get())
-        .map(|name| {
-            let greeting = format!("Hello, {}!", name);
+        .or(warp::path!("hello" / String)
+            .and(warp::get())
+            .map(|name| {
+                let greeting = format!("Hello, {}!", name);
 
-            let h1 = html! {
-                h1 : greeting.clone();
-            };
+                let h1 = html! {
+                    h1 : greeting.clone();
+                };
 
-            return warp::reply::html(Layout {
-                title: greeting.clone(),
-                content: h1,
-            }.into_string().unwrap());
-        });
+                return warp::reply::html(Layout {
+                    title: greeting.clone(),
+                    content: h1,
+                }.into_string().unwrap());
+            }));
 
-
-    warp::serve(hello.or(public).or(about))
+    warp::serve(routes)
         .run(([127, 0, 0, 1], 3030))
         .await;
 }
