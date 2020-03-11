@@ -28,11 +28,16 @@ impl<C> RenderOnce for Page<C> where C: RenderOnce {
 
 #[tokio::main]
 async fn main() {
+    let public = warp::path("public")
+        .and(warp::get())
+        .and(warp::fs::dir("www/public"));
+
     let hello = warp::path!("hello" / String)
+        .and(warp::get())
         .map(|name| {
             let greeting = format!("Hello, {}!", name);
 
-            let h1 = html!  {
+            let h1 = html! {
                 h1 : greeting.clone();
             };
 
@@ -43,7 +48,7 @@ async fn main() {
         });
 
 
-    warp::serve(hello)
+    warp::serve(hello.or(public))
         .run(([127, 0, 0, 1], 3030))
         .await;
 }
