@@ -11,10 +11,16 @@ async fn main() {
             .and(warp::get())
             .and(warp::fs::dir("www/public"))
 
+        .or(warp::path!("sandbox")
+            .and(warp::get())
+            .map(|| warp::reply::html::<String>(
+                pages::Sandbox.into()
+            )))
+
         .or(warp::path!("about")
             .and(warp::get())
             .map(|| warp::reply::html::<String>(
-                pages::about::AboutPage.into()
+                pages::About.into()
             )))
 
         .or(warp::path!("articles" / String)
@@ -22,7 +28,7 @@ async fn main() {
             .map(|title: String| {
 
                 let now = Utc::now();
-                let post = pages::post::Post {
+                let post = pages::Post {
                     title: title.clone(),
                     body: "<p style='color: red'>some content</p>".into(),
                     created_at: now.clone(),

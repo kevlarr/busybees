@@ -20,16 +20,26 @@ impl<C> RenderOnce for Layout<C> where C: RenderOnce {
             html {
                 head {
                     title : format!("Busy Bee Life | {}", title);
+                    link(rel = "stylesheet", type = "text/css", href = "/public/app.css");
+
+                    // Header font family
+                    link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");
+
+                    // Body font families
+                    link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:600|Raleway:300&display=swap")
                 }
 
-                header {
-                    p : "busy bee life";
-                }
+                body {
+                    header {
+                        img(src = "/public/images/honeycomb1.png", class="logo-main");
+                        span(class = "site-title") : "The busy bee life";
+                    }
 
-                body : content;
+                    main : content;
 
-                footer {
-                    p : "powered by Rust";
+                    footer {
+                        p : "© 2020 | Powered by Rust, PostgreSQL, and 🐝s";
+                    }
                 }
             }
         };

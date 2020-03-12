@@ -1,0 +1,63 @@
+html {
+    height: 100%;
+}
+
+body {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Raleway', sans-serif;
+    font-size: 18px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', serif;
+    line-height: 1em;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+h1 { font-size: 52px; }
+h2 { font-size: 44px; }
+h3 { font-size: 38px; }
+h4 { font-size: 34px; }
+h5 { font-size: 30px; }
+h6 { font-size: 24px; }
+
+p {
+    line-height: 1.5em;
+}
+
+header {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+}
+
+main {
+    flex: 1;
+    overflow: auto;
+    padding: 10px 50px;
+}
+
+footer {
+    font-size: 12px;
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+}
+
+.site-title {
+    font-family: 'Damion', cursive;
+    font-size: 42px;
+}
+
+.logo-main {
+    height: 40px;
+    margin-right: 10px;
+    /*width: 150px;*/
+}

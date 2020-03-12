@@ -6,9 +6,9 @@ use horrorshow::{
 };
 use super::layout::Layout;
 
-pub struct AboutPage;
+pub struct About;
 
-impl RenderOnce for AboutPage {
+impl RenderOnce for About {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         tmpl << html! {
             h1 : "About us";
@@ -17,7 +17,7 @@ impl RenderOnce for AboutPage {
     }
 }
 
-impl Into<String> for AboutPage {
+impl Into<String> for About {
     fn into(self) -> String {
         Layout {
             title: "About Us".into(),
