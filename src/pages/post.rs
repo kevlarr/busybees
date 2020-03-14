@@ -33,6 +33,7 @@ impl Into<String> for Post {
     fn into(self) -> String {
         Layout {
             title: self.title.clone(),
+            main_id: "Post".into(),
             content: self,
         }
         .into_string()
@@ -47,6 +48,9 @@ impl RenderOnce for NewPost {
         tmpl << html! {
             div(id = "editor");
 
+            // WYSIWYG editor
+            link(rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");
+
             script(src = "https://code.jquery.com/jquery-3.4.1.min.js");
             script(src = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.js");
             script(src = "/public/assets/editor.js");
@@ -58,6 +62,7 @@ impl Into<String> for NewPost {
     fn into(self) -> String {
         Layout {
             title: "Say something!".into(),
+            main_id: "NewPost".into(),
             content: self,
         }
         .into_string()

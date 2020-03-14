@@ -2,6 +2,7 @@ use horrorshow::{helper::doctype, html, RenderOnce, TemplateBuffer};
 
 pub struct Layout<C> {
     pub title: String,
+    pub main_id: String,
     pub content: C,
 }
 
@@ -10,7 +11,7 @@ where
     C: RenderOnce,
 {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Layout { title, content } = self;
+        let Layout { title, main_id, content } = self;
 
         tmpl << html! {
             : doctype::HTML;
@@ -22,14 +23,9 @@ where
 
                     link(rel = "stylesheet", type = "text/css", href = "/public/assets/app.css");
 
-                    // Header font family
+                    // Font families
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");
-
-                    // Body font families
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:600|Raleway:300&display=swap");
-
-                    // WYSIWYG editor
-                    link(rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");
                 }
 
                 body {
@@ -38,8 +34,8 @@ where
                         span(class = "site-title") : "The busy bee life";
                     }
 
-                    main {
-                        div(id = "innerMain") : content;
+                    div(id = "MainWrapper") {
+                        main(id = main_id) : content;
                     }
 
                     footer {

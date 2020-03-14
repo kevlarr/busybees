@@ -4,7 +4,7 @@ use actix_files::Files;
 use actix_multipart::{Field, Multipart, MultipartError};
 use actix_web::{
     middleware::Logger,
-    web::{self, get, post, scope, Path},
+    web::{self, get, post, route, scope, Path},
     App, Error, HttpResponse, HttpServer, Responder,
 };
 use chrono::Utc;
@@ -23,6 +23,10 @@ async fn about() -> impl Responder {
 
 async fn new_post() -> impl Responder {
     render(pages::NewPost)
+}
+
+async fn not_found() -> impl Responder {
+    render(pages::NotFound)
 }
 
 async fn show_post(path: Path<(String,)>) -> impl Responder {
@@ -46,7 +50,7 @@ struct UploadedImages {
     filepaths: Vec<String>,
 }
 
-async fn upload_images(mut payload: Multipart) -> Result<HttpResponse, Error> {
+async fn upload_images(mut payload: Multipart) -> Result<HttpResponse, Error>  {
     let mut filepaths = Vec::new();
 
     while let Some(item) = payload.next().await {
@@ -82,11 +86,11 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
     pretty_env_logger::init();
 
-    // FIXME CORS?
-
     HttpServer::new(|| {
         App::new()
             .wrap(Logger::default())
+            .default_service(route().to(not_found))
+
             .route("/about", get().to(about))
             .route("/images", post().to(upload_images))
             .route("/sandbox", get().to(sandbox))

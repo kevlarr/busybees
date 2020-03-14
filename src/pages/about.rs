@@ -15,7 +15,8 @@ impl RenderOnce for About {
 impl Into<String> for About {
     fn into(self) -> String {
         Layout {
-            title: "About Us".into(),
+            title: "About us busy bees".into(),
+            main_id: "About".into(),
             content: self,
         }
         .into_string()

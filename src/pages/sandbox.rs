@@ -38,6 +38,7 @@ impl Into<String> for Sandbox {
     fn into(self) -> String {
         Layout {
             title: "Sandbox".into(),
+            main_id: "Sandbox".into(),
             content: self,
         }
         .into_string()
