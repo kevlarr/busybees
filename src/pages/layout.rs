@@ -20,13 +20,17 @@ impl<C> RenderOnce for Layout<C> where C: RenderOnce {
             html {
                 head {
                     title : format!("Busy Bee Life | {}", title);
-                    link(rel = "stylesheet", type = "text/css", href = "/public/app.css");
+                    link(rel = "stylesheet", type = "text/css", href = "/public/assets/app.css");
 
                     // Header font family
-                    link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");
+                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");
 
                     // Body font families
-                    link(rel = "stylesheet", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:600|Raleway:300&display=swap")
+                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:600|Raleway:300&display=swap");
+
+                    // WYSIWYG editor
+                    //link(rel = "stylesheet", type = "text/css", href = "https://cdnjs.cloudflare.com/ajax/libs/jodit/3.3.24/jodit.min.css");
+                    link(rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");
                 }
 
                 body {

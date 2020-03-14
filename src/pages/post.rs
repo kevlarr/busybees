@@ -36,3 +36,26 @@ impl Into<String> for Post {
             .unwrap_or_else(|_| "There was an error generating article page".into())
     }
 }
+
+pub struct NewPost;
+
+impl RenderOnce for NewPost {
+    fn render_once(self, tmpl: &mut TemplateBuffer) {
+        tmpl << html! {
+            div(id = "editor");
+
+            //script(src = "https://cdnjs.cloudflare.com/ajax/libs/jodit/3.3.24/jodit.min.js");
+            script(src = "https://code.jquery.com/jquery-3.4.1.min.js");
+            script(src = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.js");
+            script(src = "/public/assets/editor.js");
+        };
+    }
+}
+
+impl Into<String> for NewPost {
+    fn into(self) -> String {
+        Layout { title: "Say something!".into(), content: self, }
+            .into_string()
+            .unwrap_or_else(|_| "There was an error generating new post page".into())
+    }
+}
