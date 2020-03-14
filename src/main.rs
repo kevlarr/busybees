@@ -46,16 +46,18 @@ struct UploadedImages {
     filepaths: Vec<String>,
 }
 
-async fn upload_images(mut payload: Multipart) -> Result<HttpResponse, Error>  {
+async fn upload_images(mut payload: Multipart) -> Result<HttpResponse, Error> {
     let mut filepaths = Vec::new();
 
     while let Some(item) = payload.next().await {
         let mut field: Field = item?;
 
-        let content_type = field.content_disposition()
+        let content_type = field
+            .content_disposition()
             .ok_or_else(|| MultipartError::Incomplete)?;
 
-        let filename = content_type.get_filename()
+        let filename = content_type
+            .get_filename()
             .ok_or_else(|| MultipartError::Incomplete)?;
 
         let filepath = format!("www/public/uploads/{}", filename);
@@ -85,7 +87,6 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .wrap(Logger::default())
-
             .route("/about", get().to(about))
             .route("/images", post().to(upload_images))
             .route("/sandbox", get().to(sandbox))
