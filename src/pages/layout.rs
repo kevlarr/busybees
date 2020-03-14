@@ -18,6 +18,8 @@ where
             html {
                 head {
                     title : format!("Busy Bee Life | {}", title);
+                    meta(charset = "utf-8");
+
                     link(rel = "stylesheet", type = "text/css", href = "/public/assets/app.css");
 
                     // Header font family

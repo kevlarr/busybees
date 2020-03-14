@@ -9,21 +9,20 @@ $('#editor').summernote({
         data.append('files', file, file.name);
       }
 
-      resp = fetch('/api/upload/image', {
+      resp = fetch('/images', {
         method: 'POST',
         body: data
       })
         .then(resp => {
-          // FIXME resp status
+          if (resp.status >= 400) {
+            throw new Error(JSON.stringify(resp));
+          }
           return resp.json()
         })
         .then(json => {
-          debugger;
+          //debugger;
 
-          $(this).summernote(
-            'insertImage',
-            'https://media1.tenor.com/images/a1dcc06e23e05ee5b47b992bd0fbd62e/tenor.gif'
-          );
+          json.filepaths.forEach(f => $(this).summernote('insertImage', `/${f}`));
         })
         .catch(e => {
           debugger;
