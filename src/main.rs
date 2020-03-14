@@ -80,6 +80,8 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
     pretty_env_logger::init();
 
+    // FIXME CORS?
+
     HttpServer::new(|| {
         App::new()
             .wrap(Logger::default())
