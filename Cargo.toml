@@ -5,11 +5,11 @@ authors = ["kevlarr"]
 edition = "2018"
 
 [dependencies]
+actix-web = "2.0"
+actix-files = "0.2"
+actix-rt = "1.0"
 chrono = "0.4"
-futures = "0.3"
 horrorshow = "0.8"
 serde = { version = "1.0", features = ["derive"] }
-tokio = { version = "0.2", features = ["macros"] }
-warp = "0.2"
 
 pretty_env_logger = "0.3"
