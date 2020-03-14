@@ -1,12 +1,6 @@
-use chrono::{DateTime, Utc};
-use horrorshow::{
-    html,
-    Raw,
-    RenderOnce,
-    TemplateBuffer,
-    Template,
-};
 use super::layout::Layout;
+use chrono::{DateTime, Utc};
+use horrorshow::{html, Raw, RenderOnce, Template, TemplateBuffer};
 
 pub struct Post {
     //id: i32,
@@ -18,7 +12,13 @@ pub struct Post {
 
 impl RenderOnce for Post {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Post { title, body, created_at, updated_at, .. } = self;
+        let Post {
+            title,
+            body,
+            created_at,
+            updated_at,
+            ..
+        } = self;
 
         tmpl << html! {
             h1 : title;
@@ -31,9 +31,12 @@ impl RenderOnce for Post {
 
 impl Into<String> for Post {
     fn into(self) -> String {
-        Layout { title: self.title.clone(), content: self, }
-            .into_string()
-            .unwrap_or_else(|_| "There was an error generating article page".into())
+        Layout {
+            title: self.title.clone(),
+            content: self,
+        }
+        .into_string()
+        .unwrap_or_else(|_| "There was an error generating article page".into())
     }
 }
 
@@ -54,8 +57,11 @@ impl RenderOnce for NewPost {
 
 impl Into<String> for NewPost {
     fn into(self) -> String {
-        Layout { title: "Say something!".into(), content: self, }
-            .into_string()
-            .unwrap_or_else(|_| "There was an error generating new post page".into())
+        Layout {
+            title: "Say something!".into(),
+            content: self,
+        }
+        .into_string()
+        .unwrap_or_else(|_| "There was an error generating new post page".into())
     }
 }

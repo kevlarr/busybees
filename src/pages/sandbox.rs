@@ -1,10 +1,5 @@
-use horrorshow::{
-    html,
-    RenderOnce,
-    TemplateBuffer,
-    Template,
-};
 use super::layout::Layout;
+use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
 
 pub struct Sandbox;
 
@@ -41,8 +36,11 @@ impl RenderOnce for Sandbox {
 
 impl Into<String> for Sandbox {
     fn into(self) -> String {
-        Layout { title: "Sandbox".into(), content: self }
-            .into_string()
-            .unwrap_or_else(|_| "There was an error generating sandbox page".into())
+        Layout {
+            title: "Sandbox".into(),
+            content: self,
+        }
+        .into_string()
+        .unwrap_or_else(|_| "There was an error generating sandbox page".into())
     }
 }

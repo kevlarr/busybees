@@ -86,18 +86,8 @@ async fn main() {
 
         .or(warp::path!("api" / "upload" / "image")
             .and(warp::post())
-            .and(multipart::form())
-            //.and(
-                //multipart::form()
-                    //.max_length(5 * 1024 * 1024)
-                    //.and_then(|f: multipart::FormData| {
-                    //})
-            //)
-
-            //.and_then(|f: multipart::FormData| "asdf"));
-            .map(|form: multipart::FormData| {
-
-                println!("{:?}", form);
+            .and(multipart::form().max_length(5 * 1024 * 1024))
+            .map(|_form: multipart::FormData| {
                 return warp::reply::json(&ImageUpload::new());
             }));
 
