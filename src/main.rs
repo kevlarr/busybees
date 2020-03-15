@@ -3,17 +3,48 @@ use ::busybees::pages;
 use actix_files::Files;
 use actix_multipart::{Field, Multipart, MultipartError};
 use actix_web::{
+    http,
     middleware::Logger,
-    web::{self, get, post, route, scope, Path},
+    web::{self, get, post, Path},
     App, Error, HttpResponse, HttpServer, Responder,
 };
 use chrono::Utc;
 use futures::{FutureExt, StreamExt};
 use serde::{Deserialize, Serialize};
-use std::io::{self, Write};
+use std::{cell::RefCell, io::{self, Write}, rc::Rc};
+
+
+struct State {
+    pool: Rc<RefCell<sqlx::PgPool>>,
+}
+
+impl State {
+    fn new() -> Self {
+        let pool = sqlx::PgPool::new("postgres://localhost:5432/busybees")
+            .now_or_never()
+            .unwrap()  // futures Option
+            .unwrap(); // sqlx Result
+
+        State { pool: Rc::new(RefCell::new(pool)) }
+    }
+}
+
+#[derive(Serialize)]
+struct UploadedImages {
+    filepaths: Vec<String>,
+}
+
+
+#[derive(Debug, Deserialize)]
+struct NewPostParams {
+    alpha_id: String,
+    title: String,
+    content: String,
+}
+
 
 // TODO these are *begging* for a trait
-fn render(s: impl Into<String>) -> impl Responder {
+fn render(s: impl Into<String>) -> HttpResponse {
     HttpResponse::Ok().body::<String>(s.into())
 }
 
@@ -29,36 +60,65 @@ async fn not_found() -> impl Responder {
     render(pages::NotFound)
 }
 
-async fn show_post(path: Path<(String,)>) -> impl Responder {
-    let now = Utc::now();
-    let post = pages::Post {
-        title: path.0.clone(),
-        body: "<p style='color: red'>some content</p>".into(),
-        created_at: now.clone(),
-        updated_at: now,
+async fn show_post(
+    path: Path<(String,)>,
+    state: web::Data<State>
+) -> Result<HttpResponse, Error>  {
+    let pool = &mut *state.pool.borrow_mut();
+    let alpha_id = match path.0.splitn(2, '-').next() {
+        Some(aid) => aid,
+        None => return Ok(HttpResponse::NotFound().finish()),
     };
 
-    render(post)
+    let result = sqlx::query!("
+        select title, content, published, created_at, updated_at
+        from posts where alphanumeric_id = $1
+    ", alpha_id.to_string())
+        .fetch_one(pool)
+        .await;
+
+    match result {
+        Ok(row) => {
+            let post = pages::Post {
+                content: row.content.clone(),
+                published: row.published,
+                created_at: row.created_at,
+                updated_at: row.updated_at,
+            };
+
+            Ok(render(post))
+        },
+        Err(_) => Ok(HttpResponse::NotFound().finish()),
+    }
 }
 
 async fn sandbox() -> impl Responder {
     render(pages::Sandbox)
 }
 
-#[derive(Deserialize, Serialize)]
-struct UploadedImages {
-    filepaths: Vec<String>,
-}
+async fn create_post(
+    form: web::Form<NewPostParams>,
+    state: web::Data<State>
+) -> Result<HttpResponse, Error>  {
+    let pool = &mut *state.pool.borrow_mut();
 
-async fn create_post() {
+    let now = Utc::now();
+    let result = sqlx::query!("
+        insert into posts
+        (alphanumeric_id, title, content, published, created_at, updated_at)
+            values ($1, $2, $3, $4, $5, $6)
+    ", form.alpha_id, form.title, form.content, false, now, now)
+        .execute(pool)
+        .await;
 
-    /*
-        id serial primary key,
-        title varchar not null,
-        body text not null,
-        created_at timestamptz not null,
-        updated_at timestamptz not null,
-    */
+    if let Err(e) = result {
+        return Ok(HttpResponse::BadRequest().body(e.to_string()));
+    }
+
+    Ok(HttpResponse::Found()
+        .header(http::header::LOCATION, format!("/posts/{}-{}", form.alpha_id, form.title))
+        .finish()
+        .into_body())
 }
 
 async fn upload_images(mut payload: Multipart) -> Result<HttpResponse, Error>  {
@@ -92,23 +152,8 @@ async fn upload_images(mut payload: Multipart) -> Result<HttpResponse, Error>  {
     Ok(HttpResponse::Ok().json(UploadedImages { filepaths }))
 }
 
-struct State {
-    pool: sqlx::PgPool,
-}
-
-impl State {
-    fn new() -> Self {
-        let pool = sqlx::PgPool::new("postgres://localhost:5432/busybees")
-            .now_or_never()
-            .unwrap()  // futures Option
-            .unwrap(); // sqlx Result
-
-        State { pool }
-    }
-}
-
 #[actix_rt::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
     pretty_env_logger::init();
 
@@ -116,14 +161,15 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(State::new())
             .wrap(Logger::default())
-            .default_service(route().to(not_found))
+            .default_service(web::route().to(not_found))
 
             .route("/about", get().to(about))
             .route("/images", post().to(upload_images))
             .route("/sandbox", get().to(sandbox))
             .service(
-                scope("/posts")
+                web::scope("/posts")
                     .route("/new", get().to(new_post))
+                    .route("/new", post().to(create_post))
                     .route("/{title}", get().to(show_post)),
             )
             .service(

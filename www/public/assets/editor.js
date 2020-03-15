@@ -2,7 +2,7 @@ function toBase36(byte) {
   return ('0' + byte.toString(36)).slice(-2);
 }
 
-function generateId(len = 8) {
+function generateId(len = 12) {
   const arr = new Uint8Array(len / 2);
   window.crypto.getRandomValues(arr);
   return Array.from(arr, toBase36).join("");
@@ -33,6 +33,8 @@ function generateId(len = 8) {
       ['insert', ['picture', 'link', 'video', 'table', 'hr']],
       ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
     ],
+
+    styleTags: ['h2', 'h3', 'h4', 'p', 'blockquote', 'code'],
 
     callbacks: {
       /**

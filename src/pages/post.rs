@@ -3,28 +3,21 @@ use chrono::{DateTime, Utc};
 use horrorshow::{html, Raw, RenderOnce, Template, TemplateBuffer};
 
 pub struct Post {
-    //id: i32,
-    pub title: String,
-    pub body: String,
+    pub content: String,
+    pub published: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
 
 impl RenderOnce for Post {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Post {
-            title,
-            body,
-            created_at,
-            updated_at,
-            ..
-        } = self;
+        let Post { content, published, created_at, updated_at } = self;
 
         tmpl << html! {
-            h1 : title;
+            p : format!("Published: {}", published);
             p : format!("Created: {}", created_at);
             p : format!("Updated: {}", updated_at);
-            p : Raw(body);
+            p : Raw(content);
         };
     }
 }
@@ -32,7 +25,7 @@ impl RenderOnce for Post {
 impl Into<String> for Post {
     fn into(self) -> String {
         Layout {
-            title: self.title.clone(),
+            title: self.content.chars().take(20).collect(),
             main_id: "Post".into(),
             content: self,
         }
