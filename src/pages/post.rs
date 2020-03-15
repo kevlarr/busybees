@@ -3,6 +3,7 @@ use chrono::{DateTime, Utc};
 use horrorshow::{html, Raw, RenderOnce, Template, TemplateBuffer};
 
 pub struct Post {
+    pub title: String,
     pub content: String,
     pub published: bool,
     pub created_at: DateTime<Utc>,
@@ -11,13 +12,14 @@ pub struct Post {
 
 impl RenderOnce for Post {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Post { content, published, created_at, updated_at } = self;
+        let Post { title, content, published, created_at, updated_at } = self;
 
         tmpl << html! {
+            h1 : title;
+            p : Raw(content);
             p : format!("Published: {}", published);
             p : format!("Created: {}", created_at);
             p : format!("Updated: {}", updated_at);
-            p : Raw(content);
         };
     }
 }
@@ -25,7 +27,7 @@ impl RenderOnce for Post {
 impl Into<String> for Post {
     fn into(self) -> String {
         Layout {
-            title: self.content.chars().take(20).collect(),
+            title: self.title.clone(),
             main_id: "Post".into(),
             content: self,
         }
@@ -40,9 +42,9 @@ impl RenderOnce for NewPost {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         tmpl << html! {
             form(id = "EditorForm", method = "post", action = "/posts/new") {
+                input(id = "PostAlpha", name = "alpha_id", hidden = "true", readonly = "true");
+                input(id = "PostTitle", name = "title", placeholder = "Some clever title here...", autofocus = "true");
                 textarea(id = "SummernoteEditor", name = "content");
-                input(id = "PostTitle", name = "title",    /* hidden = "true", */ readonly = "true");
-                input(id = "PostAlpha", name = "alpha_id", /* hidden = "true", */ readonly = "true");
 
                 div(id = "PostControls") {
                     button(id = "CancelEditor") : "Cancel";

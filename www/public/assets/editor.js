@@ -11,21 +11,18 @@ function generateId(len = 12) {
 (function() {
   const submitButton = document.getElementById('SubmitEditor');
   const cancelButton = document.getElementById('CancelEditor');
-
-  const postTitle = document.getElementById('PostTitle');
   const postAlphaId = document.getElementById('PostAlpha');
+  const postTitle = document.getElementById('PostTitle');
+
   postAlphaId.value = generateId();
 
   let textDisplay;
-  let timeout;
 
   function visibleText() {
       return (textDisplay && textDisplay.innerText.trim()) || '';
   }
 
   $('#SummernoteEditor').summernote({
-    focus: true,
-
     toolbar: [
       ['style', ['style']],
       ['font', ['forecolor', 'backcolor', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
@@ -45,33 +42,9 @@ function generateId(len = 12) {
         // There will always be markup in the base <textarea> so need to look in the visible display <div>
         const text = visibleText();
 
-        if (text) {
-          submitButton.removeAttribute('disabled');
-        } else {
-          postTitle.value = '';
+        text && postTitle.value ?
+          submitButton.removeAttribute('disabled') :
           submitButton.setAttribute('disabled', 'true');
-        }
-
-        if (timeout) {
-          window.clearTimeout(timeout);
-        }
-
-        if (!text) {
-          return;
-        }
-
-        timeout = window.setTimeout(function() {
-          const title = text
-            .substring(0, 64)
-            .replace(/[^a-z0-9\s]*/gi, "")
-            .replace(/\s{2,}/g, " ")
-            .trim()
-            .split(" ")
-            .slice(0, 12)
-            .join('-');
-
-          postTitle.value = encodeURIComponent(title);
-        }, 500);
       },
 
       /**
@@ -105,10 +78,13 @@ function generateId(len = 12) {
 
   textDisplay = document.getElementsByClassName('note-editable')[0];
 
+  postTitle.addEventListener('input', function(evt) {
+    evt.target.value && visibleText() ?
+      submitButton.removeAttribute('disabled') :
+      submitButton.setAttribute('disabled', 'true');
+  });
+
   cancelButton.addEventListener('click', function() {
-    if (timeout) {
-      window.clearTimeout(timeout);
-    }
     window.location.pathname = '';
   });
 })();

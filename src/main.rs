@@ -43,9 +43,20 @@ struct NewPostParams {
 }
 
 
+fn redirect(path: &str) -> HttpResponse {
+    HttpResponse::Found()
+        .header(http::header::LOCATION, path)
+        .finish()
+        .into_body()
+}
+
 // TODO these are *begging* for a trait
 fn render(s: impl Into<String>) -> HttpResponse {
     HttpResponse::Ok().body::<String>(s.into())
+}
+
+async fn sandbox() -> impl Responder {
+    render(pages::Sandbox)
 }
 
 async fn about() -> impl Responder {
@@ -80,6 +91,7 @@ async fn show_post(
     match result {
         Ok(row) => {
             let post = pages::Post {
+                title: row.title.clone(),
                 content: row.content.clone(),
                 published: row.published,
                 created_at: row.created_at,
@@ -88,12 +100,8 @@ async fn show_post(
 
             Ok(render(post))
         },
-        Err(_) => Ok(HttpResponse::NotFound().finish()),
+        Err(_) => Ok(render(pages::NotFound)),
     }
-}
-
-async fn sandbox() -> impl Responder {
-    render(pages::Sandbox)
 }
 
 async fn create_post(
@@ -115,10 +123,9 @@ async fn create_post(
         return Ok(HttpResponse::BadRequest().body(e.to_string()));
     }
 
-    Ok(HttpResponse::Found()
-        .header(http::header::LOCATION, format!("/posts/{}-{}", form.alpha_id, form.title))
-        .finish()
-        .into_body())
+    let slug = slug::slugify(&form.title);
+
+    Ok(redirect(&format!("/posts/{}-{}", form.alpha_id, slug)))
 }
 
 async fn upload_images(mut payload: Multipart) -> Result<HttpResponse, Error>  {
