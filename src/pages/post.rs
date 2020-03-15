@@ -46,7 +46,14 @@ pub struct NewPost;
 impl RenderOnce for NewPost {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         tmpl << html! {
-            div(id = "editor");
+            form(id = "EditorForm", method = "post", action = "/posts/new") {
+                textarea(id = "SummernoteEditor", name = "content");
+
+                div(id = "PostControls") {
+                    button(id = "CancelEditor") : "Cancel";
+                    button(id = "SubmitEditor", type = "submit", class = "primary", disabled = "true") : "Submit";
+                }
+            }
 
             // WYSIWYG editor
             link(rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");

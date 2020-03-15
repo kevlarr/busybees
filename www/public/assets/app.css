@@ -21,8 +21,8 @@ body {
     background: white;
     display: flex;
     flex-direction: column;
-    font-family: 'Raleway', sans-serif;
-    font-size: 18px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
     height: 100%;
     margin: 0;
     padding: 0;
@@ -44,6 +44,7 @@ h6 { font-size: 24px; }
 
 p {
     line-height: 1.5em;
+    margin-bottom: 1.5em;
 }
 
 header {
@@ -76,6 +77,10 @@ footer {
     text-align: center;
 }
 
+a, button:not([disabled]) {
+    cursor: pointer;
+}
+
 a {
     border-color: #DD9139;
     border-style: dotted ;
@@ -91,6 +96,39 @@ a:hover, a:focus, a:active {
     transition: border-color 0.15s, color 0.15s;
 }
 
+button:not(.note-btn) {
+    background-color: white;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 0px #ddd;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    margin: 0 10px;
+    padding: 10px 20px;
+    transition: background-color 0.15s;
+}
+
+button:not(.note-btn):not([disabled]):active,
+button:not(.note-btn):not([disabled]):focus,
+button:not(.note-btn):not([disabled]):hover {
+    background-color: #eee;
+    box-shadow: 0 0 10px 0px #999;
+    transition: background-color 0.15s;
+}
+
+button.primary {
+    background-color: #FFC23F;
+}
+
+button.primary[disabled] {
+    background-color: #eee;
+}
+
+button.primary:not(.note-btn):not([disabled]):active,
+button.primary:not(.note-btn):not([disabled]):focus,
+button.primary:not(.note-btn):not([disabled]):hover {
+    background-color: #F3A909;
+}
 
 /* ********************
  * Header
@@ -107,8 +145,18 @@ a:hover, a:focus, a:active {
 }
 
 /* ********************
- * WYSIWYG editor
+ * PAGE: New Post
  */
+
+#EditorForm {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+#PostControls {
+    text-align: right;
+}
 
 .note-modal-footer {
     box-sizing: content-box;
@@ -118,7 +166,8 @@ a:hover, a:focus, a:active {
     display: flex;
     flex: 1;
     flex-direction: column;
-    font-family: 'Raleway', sans-serif;
+    font-family: 'Open Sans', sans-serif;
+    margin-bottom: 20px;
 }
 
 .note-editor .note-editing-area {
@@ -137,7 +186,7 @@ a:hover, a:focus, a:active {
 
 
 /* ********************
- * Page: Not Found
+ * PAGE: Not Found
  */
 
 main#NotFound {
