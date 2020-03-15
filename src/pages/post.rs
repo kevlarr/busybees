@@ -48,6 +48,8 @@ impl RenderOnce for NewPost {
         tmpl << html! {
             form(id = "EditorForm", method = "post", action = "/posts/new") {
                 textarea(id = "SummernoteEditor", name = "content");
+                input(id = "PostTitle", name = "title",    /* hidden = "true", */ readonly = "true");
+                input(id = "PostAlpha", name = "alpha_id", /* hidden = "true", */ readonly = "true");
 
                 div(id = "PostControls") {
                     button(id = "CancelEditor") : "Cancel";

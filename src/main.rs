@@ -8,9 +8,9 @@ use actix_web::{
     App, Error, HttpResponse, HttpServer, Responder,
 };
 use chrono::Utc;
-use futures::StreamExt;
+use futures::{FutureExt, StreamExt};
 use serde::{Deserialize, Serialize};
-use std::io::Write;
+use std::io::{self, Write};
 
 // TODO these are *begging* for a trait
 fn render(s: impl Into<String>) -> impl Responder {
@@ -50,6 +50,17 @@ struct UploadedImages {
     filepaths: Vec<String>,
 }
 
+async fn create_post() {
+
+    /*
+        id serial primary key,
+        title varchar not null,
+        body text not null,
+        created_at timestamptz not null,
+        updated_at timestamptz not null,
+    */
+}
+
 async fn upload_images(mut payload: Multipart) -> Result<HttpResponse, Error>  {
     let mut filepaths = Vec::new();
 
@@ -81,6 +92,21 @@ async fn upload_images(mut payload: Multipart) -> Result<HttpResponse, Error>  {
     Ok(HttpResponse::Ok().json(UploadedImages { filepaths }))
 }
 
+struct State {
+    pool: sqlx::PgPool,
+}
+
+impl State {
+    fn new() -> Self {
+        let pool = sqlx::PgPool::new("postgres://localhost:5432/busybees")
+            .now_or_never()
+            .unwrap()  // futures Option
+            .unwrap(); // sqlx Result
+
+        State { pool }
+    }
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
@@ -88,6 +114,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
+            .data(State::new())
             .wrap(Logger::default())
             .default_service(route().to(not_found))
 
