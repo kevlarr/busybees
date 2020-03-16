@@ -1,7 +1,7 @@
 table! {
-    posts (id) {
+    post (id) {
         id -> Int4,
-        alphanumeric_id -> Text,
+        key -> Text,
         title -> Text,
         content -> Text,
         published -> Nullable<Bool>,

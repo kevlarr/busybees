@@ -1,11 +1,20 @@
+use actix_web::HttpResponse;
+
 mod about;
 mod layout;
 mod not_found;
 mod post;
 mod sandbox;
 
-pub use about::About;
-pub use layout::Layout;
-pub use not_found::NotFound;
-pub use post::{NewPost, Post};
-pub use sandbox::Sandbox;
+pub use about::AboutPage;
+pub use layout::LayoutPage;
+pub use not_found::NotFoundPage;
+pub use post::{NewPostPage, PostPage};
+pub use sandbox::SandboxPage;
+
+
+pub trait Renderable : Into<String> {
+    fn render(self) -> HttpResponse {
+        HttpResponse::Ok().body::<String>(self.into())
+    }
+}

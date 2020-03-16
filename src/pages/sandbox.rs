@@ -1,9 +1,9 @@
-use super::layout::Layout;
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
+use super::{layout::LayoutPage, Renderable};
 
-pub struct Sandbox;
+pub struct SandboxPage;
 
-impl RenderOnce for Sandbox {
+impl RenderOnce for SandboxPage {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         tmpl << html! {
             h1 : "This is an h1 header";
@@ -34,9 +34,9 @@ impl RenderOnce for Sandbox {
     }
 }
 
-impl Into<String> for Sandbox {
+impl Into<String> for SandboxPage {
     fn into(self) -> String {
-        Layout {
+        LayoutPage {
             title: "Sandbox".into(),
             main_id: "Sandbox".into(),
             content: self,
@@ -45,3 +45,5 @@ impl Into<String> for Sandbox {
         .unwrap_or_else(|_| "There was an error generating sandbox page".into())
     }
 }
+
+impl Renderable for SandboxPage {}

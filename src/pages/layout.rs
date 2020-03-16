@@ -1,17 +1,17 @@
 use horrorshow::{helper::doctype, html, RenderOnce, TemplateBuffer};
 
-pub struct Layout<C> {
+pub struct LayoutPage<C> {
     pub title: String,
     pub main_id: String,
     pub content: C,
 }
 
-impl<C> RenderOnce for Layout<C>
+impl<C> RenderOnce for LayoutPage<C>
 where
     C: RenderOnce,
 {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Layout { title, main_id, content } = self;
+        let LayoutPage { title, main_id, content } = self;
 
         tmpl << html! {
             : doctype::HTML;
