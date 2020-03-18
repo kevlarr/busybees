@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 
 #[derive(Debug, Deserialize)]
-pub struct NewPost {
+pub struct PostParams {
     pub title: String,
     pub content: String,
 }
