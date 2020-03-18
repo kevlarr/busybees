@@ -1,15 +1,18 @@
+/**
+ * Configuration for the embedded Summernote editor and listeners
+ * to enable and disable the submit button
+ */
 (function() {
   const submitButton = document.getElementById('SubmitEditor');
-  const cancelButton = document.getElementById('CancelEditor');
+  const postTitle = document.getElementById('PostTitle');
+
   let textDisplay;
 
-  cancelButton.addEventListener('click', function() {
-    window.location.pathname = '';
-  });
+  function visibleText() {
+      return (textDisplay && textDisplay.innerText.trim()) || '';
+  }
 
   $('#SummernoteEditor').summernote({
-    focus: true,
-
     toolbar: [
       ['style', ['style']],
       ['font', ['forecolor', 'backcolor', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
@@ -18,17 +21,18 @@
       ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
     ],
 
+    styleTags: ['h2', 'h3', 'h4', 'p', 'blockquote', 'code'],
+
     callbacks: {
       /**
        * Observes change event to determine whether `submit` button
        * should be enabled or disabled.
        */
       onChange(contents, $editable) {
-        // There will always be markup in the base <textarea>
-        // so need to look in the visible display <div>
-        const visibleText = textDisplay.innerText.trim();
+        // There will always be markup in the base <textarea> so need to look in the visible display <div>
+        const text = visibleText();
 
-        visibleText ?
+        text && postTitle.value ?
           submitButton.removeAttribute('disabled') :
           submitButton.setAttribute('disabled', 'true');
       },
@@ -63,4 +67,10 @@
   });
 
   textDisplay = document.getElementsByClassName('note-editable')[0];
+
+  postTitle.addEventListener('input', function(evt) {
+    evt.target.value && visibleText() ?
+      submitButton.removeAttribute('disabled') :
+      submitButton.setAttribute('disabled', 'true');
+  });
 })();

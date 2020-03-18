@@ -1,18 +1,9 @@
-use super::layout::Layout;
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
+use super::{layout::LayoutPage, Renderable};
 
-pub struct About;
+pub struct AboutPage;
 
-/*
- * We're Kevin and Stacey. We are parents of a toddler in New England, a practicing attorny, a
- * software engineer, home renovators, eco-conscious fanatics, and all around busy bees.
- *
- * We have spent decades changing and evolving to be the best versions of ourselves,
- * which is how we found each other. It hasn't been easy, and might be why we never. stop. moving.
- * But it suits us well! We hope you enjoy this journey as much as we do!
- */
-
-impl RenderOnce for About {
+impl RenderOnce for AboutPage {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         tmpl << html! {
             h1 : "Hey there!";
@@ -28,9 +19,9 @@ impl RenderOnce for About {
     }
 }
 
-impl Into<String> for About {
+impl Into<String> for AboutPage {
     fn into(self) -> String {
-        Layout {
+        LayoutPage {
             title: "About us busy bees".into(),
             main_id: "About".into(),
             content: self,
@@ -39,3 +30,5 @@ impl Into<String> for About {
         .unwrap_or_else(|_| "There was an error generating about page".into())
     }
 }
+
+impl Renderable for AboutPage {}

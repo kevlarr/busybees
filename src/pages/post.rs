@@ -1,38 +1,29 @@
-use super::layout::Layout;
-use chrono::{DateTime, Utc};
+use crate::models::Post;
 use horrorshow::{html, Raw, RenderOnce, Template, TemplateBuffer};
+use super::{layout::LayoutPage, Renderable};
 
-pub struct Post {
-    //id: i32,
-    pub title: String,
-    pub body: String,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+pub struct PostPage {
+    pub post: Post,
 }
 
-impl RenderOnce for Post {
+impl RenderOnce for PostPage {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Post {
-            title,
-            body,
-            created_at,
-            updated_at,
-            ..
-        } = self;
+        let Post { title, content, published, created_at, updated_at, .. } = self.post;
 
         tmpl << html! {
             h1 : title;
+            p : Raw(content);
+            p : format!("Published: {}", published);
             p : format!("Created: {}", created_at);
             p : format!("Updated: {}", updated_at);
-            p : Raw(body);
         };
     }
 }
 
-impl Into<String> for Post {
+impl Into<String> for PostPage {
     fn into(self) -> String {
-        Layout {
-            title: self.title.clone(),
+        LayoutPage {
+            title: self.post.title.clone(),
             main_id: "Post".into(),
             content: self,
         }
@@ -41,16 +32,20 @@ impl Into<String> for Post {
     }
 }
 
-pub struct NewPost;
+impl Renderable for PostPage {}
 
-impl RenderOnce for NewPost {
+
+pub struct NewPostPage;
+
+impl RenderOnce for NewPostPage {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         tmpl << html! {
             form(id = "EditorForm", method = "post", action = "/posts/new") {
+                input(id = "PostTitle", name = "title", placeholder = "Some clever title here...", autofocus = "true");
                 textarea(id = "SummernoteEditor", name = "content");
 
                 div(id = "PostControls") {
-                    button(id = "CancelEditor") : "Cancel";
+                    a (href = "/") { button(type = "button") : "Cancel"; }
                     button(id = "SubmitEditor", type = "submit", class = "primary", disabled = "true") : "Submit";
                 }
             }
@@ -65,9 +60,9 @@ impl RenderOnce for NewPost {
     }
 }
 
-impl Into<String> for NewPost {
+impl Into<String> for NewPostPage {
     fn into(self) -> String {
-        Layout {
+        LayoutPage {
             title: "Say something!".into(),
             main_id: "NewPost".into(),
             content: self,
@@ -76,3 +71,5 @@ impl Into<String> for NewPost {
         .unwrap_or_else(|_| "There was an error generating new post page".into())
     }
 }
+
+impl Renderable for NewPostPage {}
