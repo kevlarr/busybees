@@ -45,7 +45,7 @@ impl RenderOnce for NewPostPage {
                 textarea(id = "SummernoteEditor", name = "content");
 
                 div(id = "PostControls") {
-                    button(id = "CancelEditor") : "Cancel";
+                    a (href = "/") { button(type = "button") : "Cancel"; }
                     button(id = "SubmitEditor", type = "submit", class = "primary", disabled = "true") : "Submit";
                 }
             }

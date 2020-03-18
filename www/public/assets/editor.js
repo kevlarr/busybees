@@ -1,6 +1,9 @@
+/**
+ * Configuration for the embedded Summernote editor and listeners
+ * to enable and disable the submit button
+ */
 (function() {
   const submitButton = document.getElementById('SubmitEditor');
-  const cancelButton = document.getElementById('CancelEditor');
   const postTitle = document.getElementById('PostTitle');
 
   let textDisplay;
@@ -69,9 +72,5 @@
     evt.target.value && visibleText() ?
       submitButton.removeAttribute('disabled') :
       submitButton.setAttribute('disabled', 'true');
-  });
-
-  cancelButton.addEventListener('click', function() {
-    window.location.pathname = '';
   });
 })();

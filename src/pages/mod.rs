@@ -1,12 +1,14 @@
 use actix_web::HttpResponse;
 
 mod about;
+mod index;
 mod layout;
 mod not_found;
 mod post;
 mod sandbox;
 
 pub use about::AboutPage;
+pub use index::IndexPage;
 pub use layout::LayoutPage;
 pub use not_found::NotFoundPage;
 pub use post::{NewPostPage, PostPage};

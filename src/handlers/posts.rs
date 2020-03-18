@@ -19,20 +19,18 @@ fn redirect(path: &str) -> HttpResponse {
 }
 
 
-//pub async fn index(state: web::Data<State>) -> Result<HttpResponse, Error> {
-    //let pool = &mut *state.pool.borrow_mut();
+pub async fn index(state: web::Data<State>) -> Result<HttpResponse, Error> {
+    let pool = &mut *state.pool.borrow_mut();
 
-    //let result = sqlx::query!("
-        //select key, title, substring(content from 0 for 256), created_at
-        //from post
-    //")
-        //.fetch_one(pool)
-        //.await;
+    let result = sqlx::query_as!(models::PostPreview, "select key, title, created_at from post")
+        .fetch_all(pool)
+        .await;
 
-    //if let Err(e) = result {
-        //return Ok(HttpResponse::BadRequest().body(e.to_string()));
-    //}
-//}
+    match result {
+        Ok(posts) => Ok(pages::IndexPage{ posts }.render()),
+        Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
+    }
+}
 
 pub async fn show(
     path: Path<(String,)>,
@@ -61,7 +59,6 @@ pub async fn create(
     state: web::Data<State>
 ) -> Result<HttpResponse, Error>  {
     let pool = &mut *state.pool.borrow_mut();
-
     let now = Utc::now();
 
     let result = sqlx::query!("
@@ -76,7 +73,6 @@ pub async fn create(
     match result {
         Ok(row) => {
             let slug = slug::slugify(&form.title);
-
             Ok(redirect(&format!("/posts/{}-{}", row.key, slug)))
         },
         Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),

@@ -1,8 +1,8 @@
 create table post (
     id serial primary key,
     key text unique not null check (length(key) = 12),
-    title text not null check (length(title) <= 128),
-    content text not null,
+    title text not null check (length(title) > 0 and length(title) <= 128),
+    content text not null check (length(content) > 0),
     published boolean default false,
     created_at timestamptz not null,
     updated_at timestamptz not null,
@@ -21,7 +21,7 @@ begin
     key := replace(key, '/', 'l');
     key := replace(key, '=', '5');
 
-    return substring(key from 0 for $1);
+    return substring(key from 0 for $1 + 1);
 end;
 $$ language plpgsql;
 
@@ -42,7 +42,7 @@ begin
     loop
         exit when counter = 5;
 
-        key := gen_random_key();
+        key := gen_random_key(12);
 
         execute query || quote_literal(key) into found;
 

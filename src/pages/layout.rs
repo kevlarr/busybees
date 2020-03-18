@@ -31,24 +31,28 @@ where
 
                 body {
                     header {
-                        img(src = "/public/images/honeycomb1.png", class="logo-main");
-                        span(class = "site-title") : "The busy bee life";
+                        a (id = "HeaderLogo", href = "/") {
+                            img(src = "/public/images/honeycomb1.png", class="logo-main");
+                            span(class = "site-title") : "The busy bee life";
+                        }
                     }
 
                     div(id = "MainWrapper") {
                         main(id = main_id) : content;
+
+                        nav(id = "SidebarNav") {
+                            a (href = "/posts/new") : "➕ New post";
+                        }
                     }
 
                     footer {
-                        p {
-                            : "© 2020 | Powered by ";
-                            a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
-                            : ", ";
-                            a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
-                            : ", ";
-                            a(href = "https://summernote.org/", target = "_blank") : "Summernote";
-                            : ", and us 🐝s!";
-                        }
+                        : "© 2020 | Powered by ";
+                        a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
+                        : ", ";
+                        a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
+                        : ", ";
+                        a(href = "https://summernote.org/", target = "_blank") : "Summernote";
+                        : ", and us 🐝s!";
                     }
                 }
             }

@@ -26,6 +26,7 @@ async fn main() -> io::Result<()> {
             .wrap(Logger::default())
             .default_service(web::route().to(|| pages::NotFoundPage{}.render()))
 
+            .route("/", get().to(handlers::posts::index))
             .route("/about", get().to(|| pages::AboutPage{}.render()))
             .route("/images", post().to(handlers::images::upload))
             .route("/sandbox", get().to(|| pages::SandboxPage{}.render()))
