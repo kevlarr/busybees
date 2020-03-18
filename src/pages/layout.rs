@@ -11,7 +11,11 @@ where
     C: RenderOnce,
 {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let LayoutPage { title, main_id, content } = self;
+        let LayoutPage {
+            title,
+            main_id,
+            content,
+        } = self;
 
         tmpl << html! {
             : doctype::HTML;
@@ -25,8 +29,8 @@ where
 
                     // Font families
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");
-                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700&display=swap");
-                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:600&display=swap");
+                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Work+Sans:300,300i,600&display=swap");
+                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:400&display=swap");
                 }
 
                 body {
@@ -41,7 +45,9 @@ where
                         main(id = main_id) : content;
 
                         nav(id = "SidebarNav") {
-                            a (href = "/posts/new") : "➕ New post";
+                            a (href = "/posts/new") {
+                                button (class = "primary") : "➕ New post";
+                            }
                         }
                     }
 

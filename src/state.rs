@@ -1,7 +1,6 @@
+use futures::FutureExt;
 use sqlx::PgPool;
 use std::{cell::RefCell, env, rc::Rc};
-use futures::FutureExt;
-
 
 pub struct State {
     pub pool: Rc<RefCell<PgPool>>,
@@ -13,9 +12,11 @@ impl State {
 
         let pool = PgPool::new(&url)
             .now_or_never()
-            .unwrap()  // futures Option
+            .unwrap() // futures Option
             .unwrap(); // sqlx Result
 
-        State { pool: Rc::new(RefCell::new(pool)) }
+        State {
+            pool: Rc::new(RefCell::new(pool)),
+        }
     }
 }

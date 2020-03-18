@@ -9,6 +9,158 @@
     padding: 0;
 }
 
+header {
+    padding: 15px;
+}
+
+main {
+    padding: 30px 50px;
+}
+
+footer {
+    margin: 0;
+    padding: 10px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+p, ol, ul {
+    margin-bottom: 1.5em;
+    padding-left: 20px;
+}
+
+ol, ul {
+    margin-left: 20px;
+}
+
+main {
+    padding: 30px 50px;
+}
+
+footer {
+    margin: 0;
+    padding: 10px;
+}
+
+#MainWrapper {
+    margin: 0 20px;
+}
+
+#SidebarNav {
+    padding: 20px;
+}
+
+a {
+    color: #000;
+    text-decoration: none;
+}
+
+button:not(.note-btn) {
+    margin: 0 10px;
+    padding: 10px 20px;
+}
+
+a, button:not([disabled]) {
+    cursor: pointer;
+}
+
+.logo-main {
+    margin-right: 10px;
+}
+
+.note-editor.note-frame {
+    margin-bottom: 20px;
+}
+
+.not-found-header {
+    margin-bottom: 30px;
+}
+
+
+/* ********************
+ * Font applications and general text settings
+ */
+
+body {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 16px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    line-height: 1em;
+}
+
+h1 { font-size: 36px; }
+h2 { font-size: 28px; }
+h3 { font-size: 24px; }
+h4 { font-size: 22px; }
+h5 { font-size: 20px; }
+h6 { font-size: 18px; }
+
+p, ol, ul {
+    line-height: 1.5em;
+}
+
+strong {
+    font-weight: 600;
+}
+
+footer {
+    font-size: 12px;
+}
+
+a:not([id]):not([class]) {
+    border-color: #DD9139;
+    color: #DD9139;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+a:not([id]):hover, a:not([id]):focus, a:not([id]):active {
+    border-color: #A95A00;
+    color: #A95A00;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+button:not(.note-btn) {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 16px;
+}
+
+.site-title {
+    font-family: 'Damion', cursive;
+    font-size: 36px;
+}
+
+.note-editor.note-frame {
+    font-family: 'Work Sans', sans-serif;
+}
+
+.not-found-header {
+    color: #C7BDB2;
+    font-family: 'Damion', cursive;
+}
+
+
+/* ********************
+ * Border settings
+ */
+
+a:not([id]):not([class]) {
+    border-style: dotted ;
+    border-width: 0 0 1px 0;
+}
+
+button:not(.note-btn) {
+    border: none;
+    border-radius: 5px;
+}
+
+
 /* ********************
  * General element settings
  */
@@ -21,45 +173,20 @@ body {
     background: white;
     display: flex;
     flex-direction: column;
-    font-family: 'Open Sans', sans-serif;
-    font-size: 16px;
     height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Cormorant Garamond', serif;
-    line-height: 1em;
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-h1 { font-size: 52px; }
-h2 { font-size: 44px; }
-h3 { font-size: 38px; }
-h4 { font-size: 34px; }
-h5 { font-size: 30px; }
-h6 { font-size: 24px; }
-
-p {
-    line-height: 1.5em;
-    margin-bottom: 1.5em;
 }
 
 header {
     align-items: center;
     display: flex;
     justify-content: center;
-    padding: 15px;
 }
 
 #MainWrapper {
-    box-shadow: 0px -5px 30px 10px #EBE7E2;
+    box-shadow: 0px -5px 15px 10px #F0F0F0;
     display: flex;
     flex: 1;
-    flex-direction: column;
-    margin: 0 20px;
+    flex-direction: row;
     overflow: auto;
 }
 
@@ -67,44 +194,15 @@ main {
     display: flex;
     flex: 1;
     flex-direction: column;
-    padding: 30px 50px;
 }
 
 footer {
-    font-size: 12px;
-    margin: 0;
-    padding: 10px;
     text-align: center;
-}
-
-a, button:not([disabled]) {
-    cursor: pointer;
-}
-
-a {
-    border-color: #DD9139;
-    border-style: dotted ;
-    border-width: 0 0 1px 0;
-    color: #DD9139;
-    transition: border-color 0.15s, color 0.15s;
-    text-decoration: none;
-}
-
-a:hover, a:focus, a:active {
-    border-color: #A95A00;
-    color: #A95A00;
-    transition: border-color 0.15s, color 0.15s;
 }
 
 button:not(.note-btn) {
     background-color: white;
-    border: none;
-    border-radius: 5px;
     box-shadow: 0 0 10px 0px #ddd;
-    font-family: 'Open Sans', sans-serif;
-    font-size: 16px;
-    margin: 0 10px;
-    padding: 10px 20px;
     transition: background-color 0.15s;
 }
 
@@ -130,22 +228,43 @@ button.primary:not(.note-btn):not([disabled]):hover {
     background-color: #F3A909;
 }
 
-/* ********************
- * Header
- */
-
-.site-title {
-    font-family: 'Damion', cursive;
-    font-size: 36px;
-}
-
 .logo-main {
     height: 35px;
-    margin-right: 10px;
 }
 
 /* ********************
- * PAGE: New Post
+ * PAGE: Index
+ */
+
+#Content {
+    display: flex;
+    flex-direction: row;
+}
+
+#PrimaryPost {
+    flex: 3;
+}
+
+#SecondaryPosts {
+    flex: 1;
+}
+
+#NoContent {
+}
+
+.post {
+    border: 1px dotted #eee;
+}
+
+.primary.post {
+}
+
+.secondary.post {
+}
+
+
+/* ********************
+ * PAGE: Post form
  */
 
 #EditorForm {
@@ -166,8 +285,6 @@ button.primary:not(.note-btn):not([disabled]):hover {
     display: flex;
     flex: 1;
     flex-direction: column;
-    font-family: 'Open Sans', sans-serif;
-    margin-bottom: 20px;
 }
 
 .note-editor .note-editing-area {
@@ -195,9 +312,6 @@ main#NotFound {
 }
 
 .not-found-header {
-    color: #C7BDB2;
-    font-family: 'Damion', cursive;
-    margin-bottom: 30px;
     width: 250px;
 }
 

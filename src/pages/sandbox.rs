@@ -1,5 +1,5 @@
-use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
 use super::{layout::LayoutPage, Renderable};
+use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
 
 pub struct SandboxPage;
 

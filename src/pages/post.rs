@@ -1,6 +1,6 @@
+use super::{layout::LayoutPage, Renderable};
 use crate::models::Post;
 use horrorshow::{html, Raw, RenderOnce, Template, TemplateBuffer};
-use super::{layout::LayoutPage, Renderable};
 
 pub struct PostPage {
     pub post: Post,
@@ -8,7 +8,14 @@ pub struct PostPage {
 
 impl RenderOnce for PostPage {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Post { title, content, published, created_at, updated_at, .. } = self.post;
+        let Post {
+            title,
+            content,
+            published,
+            created_at,
+            updated_at,
+            ..
+        } = self.post;
 
         tmpl << html! {
             h1 : title;
@@ -34,7 +41,6 @@ impl Into<String> for PostPage {
 
 impl Renderable for PostPage {}
 
-
 pub struct PostFormPage {
     pub post: Option<Post>,
 }
@@ -42,16 +48,13 @@ pub struct PostFormPage {
 impl RenderOnce for PostFormPage {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         let (action, title, content) = match self.post {
-            Some(Post { key, title, content, .. }) => (
-                format!("/posts/{}/edit", key),
+            Some(Post {
+                key,
                 title,
                 content,
-            ),
-            None => (
-                "/posts/new".to_string(),
-                String::new(),
-                String::new(),
-            ),
+                ..
+            }) => (format!("/posts/{}/edit", key), title, content),
+            None => ("/posts/new".to_string(), String::new(), String::new()),
         };
 
         tmpl << html! {
