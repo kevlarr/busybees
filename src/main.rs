@@ -20,6 +20,7 @@ async fn main() -> io::Result<()> {
 
     dotenv::dotenv().ok();
 
+    // TODO use .to_async for handlers..?
     HttpServer::new(|| {
         App::new()
             .data(State::new())
@@ -32,9 +33,11 @@ async fn main() -> io::Result<()> {
             .route("/sandbox", get().to(|| pages::SandboxPage{}.render()))
             .service(
                 web::scope("/posts")
-                    .route("/new", get().to(|| pages::NewPostPage{}.render()))
+                    .route("/new", get().to(|| pages::PostFormPage{ post: None }.render()))
                     .route("/new", post().to(handlers::posts::create))
-                    .route("/{title}", get().to(handlers::posts::show)),
+                    .route("/{key}/edit", get().to(handlers::posts::edit))
+                    .route("/{key}/edit", post().to(handlers::posts::update))
+                    .route("/{key}/read/{slug}", get().to(handlers::posts::read))
             )
             .service(
                 Files::new("/public", "www/public")

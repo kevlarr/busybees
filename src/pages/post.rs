@@ -35,14 +35,29 @@ impl Into<String> for PostPage {
 impl Renderable for PostPage {}
 
 
-pub struct NewPostPage;
+pub struct PostFormPage {
+    pub post: Option<Post>,
+}
 
-impl RenderOnce for NewPostPage {
+impl RenderOnce for PostFormPage {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
+        let (action, title, content) = match self.post {
+            Some(Post { key, title, content, .. }) => (
+                format!("/posts/{}/edit", key),
+                title,
+                content,
+            ),
+            None => (
+                "/posts/new".to_string(),
+                String::new(),
+                String::new(),
+            ),
+        };
+
         tmpl << html! {
-            form(id = "EditorForm", method = "post", action = "/posts/new") {
-                input(id = "PostTitle", name = "title", placeholder = "Some clever title here...", autofocus = "true");
-                textarea(id = "SummernoteEditor", name = "content");
+            form(id = "EditorForm", method = "post", action = action) {
+                input(id = "PostTitle", name = "title", placeholder = "Some clever title here...", autofocus = "true", value = title);
+                textarea(id = "SummernoteEditor", name = "content") : content;
 
                 div(id = "PostControls") {
                     a (href = "/") { button(type = "button") : "Cancel"; }
@@ -60,11 +75,11 @@ impl RenderOnce for NewPostPage {
     }
 }
 
-impl Into<String> for NewPostPage {
+impl Into<String> for PostFormPage {
     fn into(self) -> String {
         LayoutPage {
             title: "Say something!".into(),
-            main_id: "NewPost".into(),
+            main_id: "PostForm".into(),
             content: self,
         }
         .into_string()
@@ -72,4 +87,4 @@ impl Into<String> for NewPostPage {
     }
 }
 
-impl Renderable for NewPostPage {}
+impl Renderable for PostFormPage {}

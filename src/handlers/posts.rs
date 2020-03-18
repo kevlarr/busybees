@@ -5,24 +5,17 @@ use actix_web::{
 };
 use chrono::Utc;
 use crate::{
-    models,
+    models::{Post, PostPreview, PostParams},
     pages::{self, Renderable},
     State,
 };
-
-
-fn redirect(path: &str) -> HttpResponse {
-    HttpResponse::Found()
-        .header(http::header::LOCATION, path)
-        .finish()
-        .into_body()
-}
+use sqlx::PgPool;
 
 
 pub async fn index(state: web::Data<State>) -> Result<HttpResponse, Error> {
     let pool = &mut *state.pool.borrow_mut();
 
-    let result = sqlx::query_as!(models::PostPreview, "select key, title, created_at from post")
+    let result = sqlx::query_as!(PostPreview, "select key, title, created_at from post")
         .fetch_all(pool)
         .await;
 
@@ -32,49 +25,91 @@ pub async fn index(state: web::Data<State>) -> Result<HttpResponse, Error> {
     }
 }
 
-pub async fn show(
-    path: Path<(String,)>,
+pub async fn read(
+    path: Path<(String, String)>,
     state: web::Data<State>
 ) -> Result<HttpResponse, Error>  {
     let pool = &mut *state.pool.borrow_mut();
-    let key = match path.0.splitn(2, '-').next() {
-        Some(k) => k,
-        None => return Ok(HttpResponse::NotFound().finish()),
-    };
 
-    let result = sqlx::query_as!(models::Post, "
-        select key, title, content, published, created_at, updated_at
-        from post where key = $1
-    ", key.to_string()).fetch_one(pool).await;
-
-    match result {
+    match load_post(pool, path.0.clone()).await {
         Ok(post) => Ok(pages::PostPage{ post }.render()),
         Err(_) => Ok(pages::NotFoundPage{}.render()),
     }
 }
 
+pub async fn edit(
+    path: Path<(String,)>,
+    state: web::Data<State>
+) -> Result<HttpResponse, Error>  {
+    let pool = &mut *state.pool.borrow_mut();
+
+    match load_post(pool, path.0.clone()).await {
+        Ok(post) => Ok(pages::PostFormPage{ post: Some(post) }.render()),
+        Err(_) => Ok(pages::NotFoundPage{}.render()),
+    }
+}
+
+async fn load_post(pool: &mut PgPool, key: String) -> Result<Post, String> {
+    sqlx::query_as!(Post, "
+        select key, title, content, published, created_at, updated_at
+        from post where key = $1
+    ", key).fetch_one(pool).await.map_err(|e| e.to_string())
+}
+
 
 pub async fn create(
-    form: web::Form<models::NewPost>,
+    form: web::Form<PostParams>,
     state: web::Data<State>
 ) -> Result<HttpResponse, Error>  {
     let pool = &mut *state.pool.borrow_mut();
     let now = Utc::now();
 
-    let result = sqlx::query!("
-        insert into post
-        (title, content, published, created_at, updated_at)
-            values ($1, $2, $3, $4, $5)
-        returning key
-    ", form.title, form.content, false, now, now)
+    let result = sqlx::query!(
+        "insert into post (title, content, published, created_at, updated_at) values ($1, $2, $3, $4, $5) returning key",
+        form.title, form.content, false, now, now
+    )
         .fetch_one(pool)
         .await;
 
     match result {
         Ok(row) => {
             let slug = slug::slugify(&form.title);
-            Ok(redirect(&format!("/posts/{}-{}", row.key, slug)))
+            Ok(redirect(&format!("/posts/{}/read/{}", row.key, slug)))
         },
         Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
     }
+}
+
+
+pub async fn update(
+    path: Path<(String,)>,
+    form: web::Form<PostParams>,
+    state: web::Data<State>
+) -> Result<HttpResponse, Error> {
+    let pool = &mut *state.pool.borrow_mut();
+
+    let result = sqlx::query!(
+        "update post set title = $1, content = $2, updated_at = now() where key = $3",
+        form.title, form.content, path.0
+    )
+        .execute(pool)
+        .await;
+
+    Ok(match result {
+        Ok(_) => redirect_to_post(&path.0, &form.title),
+        Err(e) => HttpResponse::BadRequest().body(e.to_string()),
+    })
+}
+
+fn redirect_to_post(key: &str, title: &str) -> HttpResponse {
+    let slug = slug::slugify(title);
+    redirect(&format!("/posts/{}/read/{}", key, slug))
+}
+
+
+fn redirect(path: &str) -> HttpResponse {
+    HttpResponse::Found()
+        .header(http::header::LOCATION, path)
+        .finish()
+        .into_body()
 }

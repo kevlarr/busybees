@@ -11,7 +11,7 @@ pub use about::AboutPage;
 pub use index::IndexPage;
 pub use layout::LayoutPage;
 pub use not_found::NotFoundPage;
-pub use post::{NewPostPage, PostPage};
+pub use post::{PostPage, PostFormPage};
 pub use sandbox::SandboxPage;
 
 

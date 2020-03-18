@@ -8,13 +8,11 @@ pub struct IndexPage {
 
 impl RenderOnce for IndexPage {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        //let Post { title, content, published, created_at, updated_at, .. } = self.post;
-
         tmpl << html! {
             h1 : "Newest articles";
 
             @ for preview in self.posts {
-                a (href = format!("/posts/{}", preview.key)) {
+                a (href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title))) {
                     h2 : preview.title;
                 }
                 p : preview.created_at.to_string();
