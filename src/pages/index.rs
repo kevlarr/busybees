@@ -12,24 +12,31 @@ impl RenderOnce for IndexPage {
         let first = posts.next();
 
         match first {
-            Some(post) => tmpl << html! {
+            Some(first) => tmpl << html! {
                 section (id = "Content") {
                     section (id = "PrimaryPost") {
                         article (class = "primary post") {
-                            h1 : &post.title;
+                            img (src = &first.first_src);
+                            a (
+                                href = format!("/posts/{}/read/{}", first.key, slug::slugify(&first.title)),
+                                class = "post-link"
+                            ) {
+                                h1 : &first.title;
+                            }
                         }
                     }
 
                     section (id = "SecondaryPosts") {
                         @ for preview in posts {
                             article (class = "secondary post") {
+                                img (src = &preview.first_src);
                                 a (
                                     href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
                                     class = "post-link"
                                 ) {
                                     h2 : &preview.title;
                                 }
-                                p : preview.created_at.to_string();
+                                //p : preview.created_at.to_string();
                             }
                         }
                     }

@@ -45,38 +45,17 @@ footer {
     padding: 10px;
 }
 
+
+/* ********************
+ * General layout
+ */
+
 #MainWrapper {
     margin: 0 20px;
 }
 
 #SidebarNav {
     padding: 20px;
-}
-
-a {
-    color: #000;
-    text-decoration: none;
-}
-
-button:not(.note-btn) {
-    margin: 0 10px;
-    padding: 10px 20px;
-}
-
-a, button:not([disabled]) {
-    cursor: pointer;
-}
-
-.logo-main {
-    margin-right: 10px;
-}
-
-.note-editor.note-frame {
-    margin-bottom: 20px;
-}
-
-.not-found-header {
-    margin-bottom: 30px;
 }
 
 
@@ -114,23 +93,6 @@ footer {
     font-size: 12px;
 }
 
-a:not([id]):not([class]) {
-    border-color: #DD9139;
-    color: #DD9139;
-    transition: border-color 0.15s, color 0.15s;
-}
-
-a:not([id]):hover, a:not([id]):focus, a:not([id]):active {
-    border-color: #A95A00;
-    color: #A95A00;
-    transition: border-color 0.15s, color 0.15s;
-}
-
-button:not(.note-btn) {
-    font-family: 'Work Sans', sans-serif;
-    font-size: 16px;
-}
-
 .site-title {
     font-family: 'Damion', cursive;
     font-size: 36px;
@@ -147,17 +109,80 @@ button:not(.note-btn) {
 
 
 /* ********************
- * Border settings
+ * Links and buttons
  */
 
-a:not([id]):not([class]) {
-    border-style: dotted ;
-    border-width: 0 0 1px 0;
+a {
+    color: #000;
+    text-decoration: none;
 }
 
 button:not(.note-btn) {
+    margin: 0 10px;
+    padding: 10px 20px;
+}
+
+a, button:not([disabled]) {
+    cursor: pointer;
+}
+
+a:not([id]):not([class]) {
+    border-color: #0076CF;
+    border-style: dotted ;
+    border-width: 0 0 1px 0;
+    color: #0076CF;
+    transition: border-color 0.15s, border-style 0.15s, color 0.15s;
+}
+
+a:not([id]):hover,
+a:not([id]):focus,
+a:not([id]):active {
+    border: 0;
+    color: #CF9400;
+    transition: border-color 0.15s, border-style 0.15s, color 0.15s;
+}
+
+
+a:not([id]):not([class]):hover,
+a:not([id]):not([class]):focus,
+a:not([id]):not([class]):active {
+    border-color: #CF9400;
+    border-style: solid;
+}
+
+button:not(.note-btn) {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 16px;
+}
+
+button:not(.note-btn) {
+    background-color: white;
     border: none;
     border-radius: 5px;
+    box-shadow: 0 0 10px 0px #ddd;
+    transition: background-color 0.15s;
+}
+
+button:not(.note-btn):not([disabled]):active,
+button:not(.note-btn):not([disabled]):focus,
+button:not(.note-btn):not([disabled]):hover {
+    background-color: #eee;
+    box-shadow: 0 0 10px 0px #999;
+    transition: background-color 0.15s;
+}
+
+button.primary {
+    background-color: #FFC23F;
+}
+
+button.primary[disabled] {
+    background-color: #eee;
+}
+
+button.primary:not(.note-btn):not([disabled]):active,
+button.primary:not(.note-btn):not([disabled]):focus,
+button.primary:not(.note-btn):not([disabled]):hover {
+    background-color: #F3A909;
 }
 
 
@@ -200,37 +225,16 @@ footer {
     text-align: center;
 }
 
-button:not(.note-btn) {
-    background-color: white;
-    box-shadow: 0 0 10px 0px #ddd;
-    transition: background-color 0.15s;
-}
 
-button:not(.note-btn):not([disabled]):active,
-button:not(.note-btn):not([disabled]):focus,
-button:not(.note-btn):not([disabled]):hover {
-    background-color: #eee;
-    box-shadow: 0 0 10px 0px #999;
-    transition: background-color 0.15s;
-}
-
-button.primary {
-    background-color: #FFC23F;
-}
-
-button.primary[disabled] {
-    background-color: #eee;
-}
-
-button.primary:not(.note-btn):not([disabled]):active,
-button.primary:not(.note-btn):not([disabled]):focus,
-button.primary:not(.note-btn):not([disabled]):hover {
-    background-color: #F3A909;
-}
+/* ********************
+ * Header
+ */
 
 .logo-main {
     height: 35px;
+    margin-right: 10px;
 }
+
 
 /* ********************
  * PAGE: Index
@@ -239,27 +243,58 @@ button.primary:not(.note-btn):not([disabled]):hover {
 #Content {
     display: flex;
     flex-direction: row;
+    flex: 1;
+}
+
+main#Index article {
+    display: flex;
+    flex-direction: column;
 }
 
 #PrimaryPost {
-    flex: 3;
+    flex: 5;
 }
 
 #SecondaryPosts {
-    flex: 1;
+    display: flex;
+    flex: 2;
+    flex-direction: column;
+    /*justify-content: space-between;*/
 }
 
 #NoContent {
 }
 
 .post {
-    border: 1px dotted #eee;
+    padding: 5px;
+    margin: 5px;
 }
 
 .primary.post {
+    height: 100%;
 }
 
-.secondary.post {
+.primary.post h1 {
+    font-size: 28px;
+}
+
+.secondary.post h2 {
+    font-size: 20px;
+}
+
+.primary.post img,
+.secondary.post img {
+    width: 100%;
+}
+
+.primary.post img {
+    height: 60%;
+    object-fit: cover;
+}
+
+.secondary.post img {
+    height: 30%;
+    object-fit: cover;
 }
 
 
@@ -285,6 +320,7 @@ button.primary:not(.note-btn):not([disabled]):hover {
     display: flex;
     flex: 1;
     flex-direction: column;
+    margin-bottom: 20px;
 }
 
 .note-editor .note-editing-area {
@@ -312,6 +348,7 @@ main#NotFound {
 }
 
 .not-found-header {
+    margin-bottom: 30px;
     width: 250px;
 }
 

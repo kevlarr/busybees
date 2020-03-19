@@ -16,7 +16,8 @@ pub async fn index(state: web::Data<State>) -> Result<HttpResponse, Error> {
 
     let result = sqlx::query_as!(
         PostPreview,
-        "select key, title, created_at from post order by created_at desc",
+        r#"select key, title, created_at, substring(content, 'src="([a-zA-Z0-9\.\-_~:\/%\?#=]+)"') as first_src
+            from post order by created_at desc limit 4"#,
     )
         .fetch_all(pool)
         .await;

@@ -10,6 +10,7 @@ pub struct PostParams {
 pub struct PostPreview {
     pub key: String,
     pub title: String,
+    pub first_src: Option<String>,
     pub created_at: DateTime<Utc>,
 }
 
