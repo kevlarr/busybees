@@ -9,19 +9,6 @@
     padding: 0;
 }
 
-header {
-    padding: 15px;
-}
-
-main {
-    padding: 30px 50px;
-}
-
-footer {
-    margin: 0;
-    padding: 10px;
-}
-
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     margin-bottom: 10px;
@@ -34,28 +21,6 @@ p, ol, ul {
 
 ol, ul {
     margin-left: 20px;
-}
-
-main {
-    padding: 30px 50px;
-}
-
-footer {
-    margin: 0;
-    padding: 10px;
-}
-
-
-/* ********************
- * General layout
- */
-
-#MainWrapper {
-    margin: 0 20px;
-}
-
-#SidebarNav {
-    padding: 20px;
 }
 
 
@@ -191,11 +156,15 @@ button.primary:not(.note-btn):not([disabled]):hover {
  */
 
 html {
+    background: white;
+    background-image: url('/public/images/hive-gs.svg');
+    background-size: cover;
     height: 100%;
 }
 
 body {
-    background: white;
+    /*align-items: center;*/
+    background-color: rgba(255, 255, 255, .5);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -203,26 +172,45 @@ body {
 
 header {
     align-items: center;
+    background: white;
     display: flex;
     justify-content: center;
+    /*width: 100%;*/
+    z-index: 1;
+    padding: 15px;
 }
 
 #MainWrapper {
+    /*align-self: center;*/
+    background: rgba(255, 255, 255, .7);
     box-shadow: 0px -5px 15px 10px #F0F0F0;
     display: flex;
     flex: 1;
     flex-direction: row;
     overflow: auto;
+    z-index: 2;
+
+    margin: 0 20px;
+    max-width: 1600px;
+}
+
+#SidebarNav {
+    padding: 20px;
 }
 
 main {
     display: flex;
     flex: 1;
     flex-direction: column;
+    padding: 30px 50px;
 }
 
 footer {
+    margin: 0;
+    padding: 10px;
+    background: white;
     text-align: center;
+    z-index: 1;
 }
 
 
