@@ -23,11 +23,6 @@ ol, ul {
     margin-left: 20px;
 }
 
-
-/* ********************
- * Font applications and general text settings
- */
-
 body {
     font-family: 'Work Sans', sans-serif;
     font-size: 16px;
@@ -56,20 +51,6 @@ strong {
 
 footer {
     font-size: 12px;
-}
-
-.site-title {
-    font-family: 'Damion', cursive;
-    font-size: 36px;
-}
-
-.note-editor.note-frame {
-    font-family: 'Work Sans', sans-serif;
-}
-
-.not-found-header {
-    color: #C7BDB2;
-    font-family: 'Damion', cursive;
 }
 
 
@@ -223,16 +204,15 @@ footer {
     margin-right: 10px;
 }
 
+.site-title {
+    font-family: 'Damion', cursive;
+    font-size: 36px;
+}
+
 
 /* ********************
  * PAGE: Index
  */
-
-#Content {
-    display: flex;
-    flex-direction: row;
-    flex: 1;
-}
 
 main#Index article {
     display: flex;
@@ -240,13 +220,13 @@ main#Index article {
 }
 
 #PrimaryPost {
-    flex: 5;
+    flex: 3;
 }
 
 #SecondaryPosts {
     display: flex;
-    flex: 2;
-    flex-direction: column;
+    flex: 1;
+    /*flex-direction: column;*/
     /*justify-content: space-between;*/
 }
 
@@ -259,7 +239,10 @@ main#Index article {
 }
 
 .primary.post {
-    height: 100%;
+}
+
+.secondary.post {
+    flex: 1;
 }
 
 .primary.post h1 {
@@ -276,12 +259,12 @@ main#Index article {
 }
 
 .primary.post img {
-    height: 60%;
+    height: 30vh;
     object-fit: cover;
 }
 
 .secondary.post img {
-    height: 30%;
+    /*height: 30%;*/
     object-fit: cover;
 }
 
@@ -308,6 +291,7 @@ main#Index article {
     display: flex;
     flex: 1;
     flex-direction: column;
+    font-family: 'Work Sans', sans-serif;
     margin-bottom: 20px;
 }
 
@@ -336,6 +320,8 @@ main#NotFound {
 }
 
 .not-found-header {
+    color: #C7BDB2;
+    font-family: 'Damion', cursive;
     margin-bottom: 30px;
     width: 250px;
 }
