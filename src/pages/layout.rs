@@ -34,31 +34,29 @@ where
                 }
 
                 body {
-                    header {
-                        a (id = "HeaderLogo", href = "/") {
-                            img(src = "/public/images/honeycomb1.png", class="logo-main");
-                            span(class = "site-title") : "The busy bee life";
+                    main(id = main_id) : content;
+
+                    nav {
+                        a (id = "Header", href = "/") {
+                            header : "The busy bee life";
                         }
-                    }
-
-                    div(id = "MainWrapper") {
-                        main(id = main_id) : content;
-
-                        nav(id = "SidebarNav") {
-                            a (href = "/posts/new") {
-                                button (class = "primary") : "➕ New post";
-                            }
+                        ul (id = "AdminPages") {
+                            li { a (href = "/posts/new", class = "admin page-link") : "New post"; }
+                            li { a (href = "/drafts", class = "admin page-link") : "Drafts"; }
                         }
-                    }
-
-                    footer {
-                        : "© 2020 | Powered by ";
-                        a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
-                        : ", ";
-                        a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
-                        : ", ";
-                        a(href = "https://summernote.org/", target = "_blank") : "Summernote";
-                        : ", and us 🐝s!";
+                        ul (id = "Pages") {
+                            li { a (href = "/about", class = "page-link") : "About us"; }
+                            li { a (href = "/sandbox", class = "page-link") : "Sandbox"; }
+                        }
+                        footer {
+                            : "© 2020 | Powered by ";
+                            a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
+                            : ", ";
+                            a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
+                            : ", ";
+                            a(href = "https://summernote.org/", target = "_blank") : "Summernote";
+                            : ", and us 🐝s!";
+                        }
                     }
                 }
             }

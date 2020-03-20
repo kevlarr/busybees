@@ -14,15 +14,15 @@ impl RenderOnce for IndexPage {
         match first {
             Some(preview) => tmpl << html! {
                 section (id = "PrimaryPost") {
-                    article (class = "primary post") {
-                        img (src = match &preview.first_src {
-                            Some(s) => s.to_string(),
-                            None => format!("https://picsum.photos/seed/{}/600/300", &preview.key),
-                        });
-                        a (
-                            href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
-                            class = "post-link"
-                        ) {
+                    a (
+                        href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
+                        class = "primary post-link"
+                    ) {
+                        article (class = "primary post") {
+                            img (src = match &preview.first_src {
+                                Some(s) => s.to_string(),
+                                None => format!("https://picsum.photos/seed/{}/600/300", &preview.key),
+                            });
                             h1 : &preview.title;
                         }
                     }
@@ -30,19 +30,17 @@ impl RenderOnce for IndexPage {
 
                 section (id = "SecondaryPosts") {
                     @ for preview in posts {
-                        article (class = "secondary post") {
-                            img (src = match &preview.first_src {
-                                Some(s) => s.to_string(),
-                                None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
-                            });
-
-                            a (
-                                href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
-                                class = "post-link"
-                            ) {
+                        a (
+                            href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
+                            class = "secondary post-link"
+                        ) {
+                            article (class = "secondary post") {
+                                img (src = match &preview.first_src {
+                                    Some(s) => s.to_string(),
+                                    None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
+                                });
                                 h2 : &preview.title;
                             }
-                            ////p : preview.created_at.to_string();
                         }
                     }
                 }
