@@ -179,7 +179,7 @@ a#Logotype:hover {
  * PAGE: Index
  */
 
-main#Index article {
+main#Index preview {
     display: flex;
     flex-direction: column;
 }
@@ -200,9 +200,6 @@ main#Index article {
 #NoContent {
 }
 
-.post {
-}
-
 .post-link {
     display: inline-block;
     transition: transform 0.15s ease-in-out;
@@ -218,26 +215,36 @@ main#Index article {
     width: 30%;
 }
 
-.primary.post h1 {
+preview[type="primary"] footer {
+    padding: 15px;
+}
+
+preview[type="secondary"] footer {
+    padding: 10px 0;
+}
+
+preview[type="primary"] h1 {
     font-size: 28px;
 }
 
-.secondary.post h2 {
+preview[type="secondary"] h2 {
     font-size: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
-.primary.post img,
-.secondary.post img {
+preview img {
     width: 100%;
 }
 
-.primary.post img {
+preview[type="primary"] img {
     height: 40vh;
     object-fit: cover;
 }
 
-.secondary.post img {
-    /*height: 30%;*/
+preview[type="secondary"] img {
+    height: 20vh;
     object-fit: cover;
 }
 

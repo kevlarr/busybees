@@ -18,12 +18,15 @@ impl RenderOnce for IndexPage {
                         href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
                         class = "primary post-link"
                     ) {
-                        article (class = "primary post") {
+                        preview (type = "primary") {
                             img (src = match &preview.first_src {
                                 Some(s) => s.to_string(),
                                 None => format!("https://picsum.photos/seed/{}/600/300", &preview.key),
                             });
-                            h1 : &preview.title;
+                            footer {
+                                h1 : &preview.title;
+                                time : &preview.created_at.to_string();
+                            }
                         }
                     }
                 }
@@ -34,12 +37,15 @@ impl RenderOnce for IndexPage {
                             href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
                             class = "secondary post-link"
                         ) {
-                            article (class = "secondary post") {
+                            preview (type = "secondary") {
                                 img (src = match &preview.first_src {
                                     Some(s) => s.to_string(),
                                     None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
                                 });
-                                h2 : &preview.title;
+                                footer {
+                                    h2 : &preview.title;
+                                    time : &preview.created_at.to_string();
+                                }
                             }
                         }
                     }
