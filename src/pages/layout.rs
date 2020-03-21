@@ -37,17 +37,18 @@ where
                     main(id = main_id) : content;
 
                     nav {
-                        a (id = "Header", href = "/") {
-                            header : "The busy bee life";
-                        }
-                        ul (id = "AdminPages") {
+                        a (id = "Logotype", href = "/") : "The busy bee life";
+
+                        ul (id = "AdminLinks") {
                             li { a (href = "/posts/new", class = "admin page-link") : "New post"; }
                             li { a (href = "/drafts", class = "admin page-link") : "Drafts"; }
                         }
+
                         ul (id = "Pages") {
                             li { a (href = "/about", class = "page-link") : "About us"; }
                             li { a (href = "/sandbox", class = "page-link") : "Sandbox"; }
                         }
+
                         footer {
                             : "© 2020 | Powered by ";
                             a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
