@@ -50,13 +50,19 @@ where
                         }
 
                         footer {
-                            : "© 2020 | Powered by ";
-                            a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
-                            : ", ";
-                            a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
-                            : ", ";
-                            a(href = "https://summernote.org/", target = "_blank") : "Summernote";
-                            : ", and us 🐝s!";
+                            p : "© 2020";
+                            p {
+                                :"Powered by ";
+                                a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
+                                : ", ";
+                                a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
+                                : ", ";
+                                a(href = "https://summernote.org/", target = "_blank") : "Summernote";
+                                : ", and us 🐝s!";
+                            }
+                            p {
+                                : "Images courtesy of ...";
+                            }
                         }
                     }
                 }

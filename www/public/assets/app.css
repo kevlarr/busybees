@@ -153,6 +153,12 @@ body > nav {
     z-index: 0;
 }
 
+body > nav > footer {
+    margin: 0;
+    padding: 5px 15px;
+    background: white;
+}
+
 a#Logotype {
     background-color: white;
     box-shadow: 0 0 25px 0 #aaa;
@@ -166,12 +172,6 @@ a#Logotype {
 a#Logotype:hover {
     background-color: #FFC23F;
     transition: background-color 0.15s;
-}
-
-nav > footer {
-    margin: 0;
-    padding: 5px 15px;
-    background: white;
 }
 
 
