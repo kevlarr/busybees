@@ -1,6 +1,7 @@
-use super::{layout::LayoutPage, Renderable};
-use crate::models::PostPreview;
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
+
+use crate::models::PostPreview;
+use super::{layout::LayoutPage, Renderable};
 
 pub struct IndexPage {
     pub posts: Vec<PostPreview>,
@@ -25,7 +26,7 @@ impl RenderOnce for IndexPage {
                             });
                             footer {
                                 h1 : &preview.title;
-                                time : &preview.created_at.to_string();
+                                time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
                             }
                         }
                     }
@@ -44,7 +45,7 @@ impl RenderOnce for IndexPage {
                                 });
                                 footer {
                                     h2 : &preview.title;
-                                    time : &preview.created_at.to_string();
+                                    time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
                                 }
                             }
                         }
