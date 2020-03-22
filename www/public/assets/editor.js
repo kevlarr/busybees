@@ -3,13 +3,24 @@
  * to enable and disable the submit button
  */
 (function() {
+
   const submitButton = document.getElementById('SubmitEditor');
   const postTitle = document.getElementById('PostTitle');
 
+  let uploading = 0;
   let textDisplay;
+  let statusBar;
 
   function visibleText() {
       return (textDisplay && textDisplay.innerText.trim()) || '';
+  }
+
+  function setSubmitState() {
+    // TODO This might be too much for every keypress...
+    // There will always be markup in the base <textarea> so need to look in the visible display <div>
+    !uploading && visibleText() && postTitle.value ?
+      submitButton.removeAttribute('disabled') :
+      submitButton.setAttribute('disabled', 'true');
   }
 
   $('#SummernoteEditor').summernote({
@@ -24,28 +35,27 @@
     styleTags: ['h2', 'h3', 'h4', 'p', 'blockquote', 'code'],
 
     callbacks: {
-      /**
-       * Observes change event to determine whether `submit` button
-       * should be enabled or disabled.
-       */
       onChange(contents, $editable) {
-        // There will always be markup in the base <textarea> so need to look in the visible display <div>
-        const text = visibleText();
-
-        text && postTitle.value ?
-          submitButton.removeAttribute('disabled') :
-          submitButton.setAttribute('disabled', 'true');
+        setSubmitState();
       },
 
-      /**
-       * Posts file(s) to server and inserts image nodes with returned URL(s).
-       */
       onImageUpload(files) {
+        submitButton.setAttribute('disabled', 'true');
+        uploading++;
+
         const data = new FormData()
 
         for (const file of files) {
           data.append('files', file, file.name);
         }
+
+        let filenames = Array.from(files).map(f => f.name).join(', ');
+        let uploadingAlert = document.createElement('div');
+
+        uploadingAlert.classList.add('alert', 'alert-primary');
+        uploadingAlert.innerHTML = `<progress value=1 max=2></progress> Uploading ${filenames}`;
+
+        statusBar.appendChild(uploadingAlert);
 
         resp = fetch('/images', { method: 'POST', body: data })
           .then(resp => {
@@ -60,16 +70,28 @@
             });
           })
           .catch(e => {
-            alert(`there was an err: ${e}... tell Kevin to fix his shit`);
+            let errorAlert = document.createElement('div');
+
+            errorAlert.classList.add('alert', 'alert-danger');
+            errorAlert.innerHTML = `There was an err: ${e}... tell Kevin to fix his shit`;
+
+            statusBar.appendChild(errorAlert);
+          })
+          .finally(() => {
+            uploadingAlert.remove();
+            uploading--;
+
+            setSubmitState();
           });
       },
     },
   });
 
   textDisplay = document.getElementsByClassName('note-editable')[0];
+  statusBar = document.getElementsByClassName('note-status-output')[0];
 
   postTitle.addEventListener('input', function(evt) {
-    evt.target.value && visibleText() ?
+    !isUploading && evt.target.value && visibleText() ?
       submitButton.removeAttribute('disabled') :
       submitButton.setAttribute('disabled', 'true');
   });
