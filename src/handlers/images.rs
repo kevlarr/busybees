@@ -4,14 +4,12 @@ use futures::StreamExt;
 use serde::Serialize;
 use std::io::Write;
 
-
 #[derive(Serialize)]
 pub struct UploadedImages {
     filepaths: Vec<String>,
 }
 
-
-pub async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error>  {
+pub async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error> {
     let mut filepaths = Vec::new();
 
     while let Some(item) = payload.next().await {

@@ -1,5 +1,6 @@
-use crate::models::PostPreview;
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
+
+use crate::models::PostPreview;
 use super::{layout::LayoutPage, Renderable};
 
 pub struct IndexPage {
@@ -8,17 +9,53 @@ pub struct IndexPage {
 
 impl RenderOnce for IndexPage {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        tmpl << html! {
-            h1 : "Newest articles";
+        let mut posts = self.posts.iter();
+        let first = posts.next();
 
-            @ for preview in self.posts {
-                a (href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title))) {
-                    h2 : preview.title;
+        match first {
+            Some(preview) => tmpl << html! {
+                section (id = "PrimaryPost") {
+                    a (
+                        href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
+                        class = "primary post-link"
+                    ) {
+                        preview (type = "primary") {
+                            img (src = match &preview.first_src {
+                                Some(s) => s.to_string(),
+                                None => format!("https://picsum.photos/seed/{}/600/300", &preview.key),
+                            });
+                            footer {
+                                h1 : &preview.title;
+                                time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
+                            }
+                        }
+                    }
                 }
-                p : preview.created_at.to_string();
-                hr;
-            }
-        };
+
+                section (id = "SecondaryPosts") {
+                    @ for preview in posts {
+                        a (
+                            href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
+                            class = "secondary post-link"
+                        ) {
+                            preview (type = "secondary") {
+                                img (src = match &preview.first_src {
+                                    Some(s) => s.to_string(),
+                                    None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
+                                });
+                                footer {
+                                    h2 : &preview.title;
+                                    time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            None => tmpl << html! {
+                section (id = "NoContent"): "No posts to display";
+            },
+        }
     }
 }
 
@@ -26,11 +63,11 @@ impl Into<String> for IndexPage {
     fn into(self) -> String {
         LayoutPage {
             title: "New posts".into(),
-            main_id: "Post".into(),
+            main_id: "Index".into(),
             content: self,
         }
         .into_string()
-        .unwrap_or_else(|_| "There was an error generating article page".into())
+        .unwrap_or_else(|_| "Error generating index".into())
     }
 }
 

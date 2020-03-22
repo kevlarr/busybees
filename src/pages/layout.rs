@@ -11,7 +11,11 @@ where
     C: RenderOnce,
 {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let LayoutPage { title, main_id, content } = self;
+        let LayoutPage {
+            title,
+            main_id,
+            content,
+        } = self;
 
         tmpl << html! {
             : doctype::HTML;
@@ -25,34 +29,41 @@ where
 
                     // Font families
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");
-                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700&display=swap");
-                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:600&display=swap");
+                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Work+Sans:300,300i,600&display=swap");
+                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:400&display=swap");
                 }
 
                 body {
-                    header {
-                        a (id = "HeaderLogo", href = "/") {
-                            img(src = "/public/images/honeycomb1.png", class="logo-main");
-                            span(class = "site-title") : "The busy bee life";
+                    main(id = main_id) : content;
+
+                    nav {
+                        a (id = "Logotype", href = "/") : "The busy bee life";
+
+                        ul (id = "AdminLinks") {
+                            li { a (href = "/posts/new", class = "admin page-link") : "New post"; }
+                            li { a (href = "/drafts", class = "admin page-link") : "Drafts"; }
                         }
-                    }
 
-                    div(id = "MainWrapper") {
-                        main(id = main_id) : content;
-
-                        nav(id = "SidebarNav") {
-                            a (href = "/posts/new") : "➕ New post";
+                        ul (id = "Pages") {
+                            li { a (href = "/about", class = "page-link") : "About us"; }
+                            li { a (href = "/sandbox", class = "page-link") : "Sandbox"; }
                         }
-                    }
 
-                    footer {
-                        : "© 2020 | Powered by ";
-                        a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
-                        : ", ";
-                        a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
-                        : ", ";
-                        a(href = "https://summernote.org/", target = "_blank") : "Summernote";
-                        : ", and us 🐝s!";
+                        footer {
+                            p : "© 2020";
+                            p {
+                                :"Powered by ";
+                                a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
+                                : ", ";
+                                a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
+                                : ", ";
+                                a(href = "https://summernote.org/", target = "_blank") : "Summernote";
+                                : ", and us 🐝s!";
+                            }
+                            p {
+                                : "Images courtesy of ...";
+                            }
+                        }
                     }
                 }
             }
