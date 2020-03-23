@@ -81,39 +81,60 @@ a:not([id]):active {
     transition: color 0.15s;
 }
 
-/* Default styles for all non-Summernote buttons */
-button:not(.note-btn) {
-    background-color: white;
-    border: none;
-    border-radius: 5px;
-    box-shadow: 0 0 10px 0px #ddd;
-    font-family: 'Work Sans', sans-serif;
-    font-size: 16px;
-    margin: 0 10px;
-    padding: 10px 20px;
-    transition: background-color 0.1s;
+button,
+button:hover,
+button:focus,
+button:active,
+button.note-btn,
+button.note-btn.focus,
+button.note-btn.active,
+button.note-btn:hover,
+button.note-btn:focus,
+button.note-btn:active {
+    border: 0;
+    color: white;
+    transition: background-color 0.15s, scale 0.05s;
 }
 
-button:not(.note-btn):not([disabled]):active,
-button:not(.note-btn):not([disabled]):focus,
-button:not(.note-btn):not([disabled]):hover {
-    background-color: #eee;
-    box-shadow: 0 0 10px 0px #999;
-    transition: background-color 0.1s;
+button, button.note-btn {
+    background-color: #BFBBB4;
+    border: 0;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 16px;
+}
+
+button:not(.note-btn) {
+    font-weight: 600;
+    margin: 0 10px;
+    padding: 10px 20px;
+}
+
+button:not([disabled]):active {
+    transform: scale(0.95);
+}
+
+button.note-btn:not([disabled]):active {
+    transform: scale(0.9);
+}
+
+button:not([disabled]):active,
+button:not([disabled]):focus,
+button:not([disabled]):hover {
+    background-color: #A8A298;
 }
 
 button.primary {
-    background-color: #FFC23F;
+    background-color: #585650;
 }
 
 button.primary[disabled] {
     background-color: #eee;
 }
 
-button.primary:not(.note-btn):not([disabled]):active,
-button.primary:not(.note-btn):not([disabled]):focus,
-button.primary:not(.note-btn):not([disabled]):hover {
-    background-color: #F3A909;
+button.primary:not([disabled]):active,
+button.primary:not([disabled]):focus,
+button.primary:not([disabled]):hover {
+    background-color: #D9A600;
 }
 
 
@@ -308,6 +329,9 @@ preview[type="secondary"] img {
 
 #EditorForm .note-toolbar {
     border: 0;
+}
+
+.note-dropdown-menu {
 }
 
 .note-editor .note-editing-area {
