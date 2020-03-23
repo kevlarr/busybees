@@ -32,6 +32,10 @@
       ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
     ],
 
+    placeholder: 'First step: Lie about having stopped it...',
+
+    dialogsInBody: true,
+
     styleTags: ['h2', 'h3', 'h4', 'p', 'blockquote', 'code'],
 
     callbacks: {
@@ -91,7 +95,7 @@
   statusBar = document.getElementsByClassName('note-status-output')[0];
 
   postTitle.addEventListener('input', function(evt) {
-    !isUploading && evt.target.value && visibleText() ?
+    !uploading && evt.target.value && visibleText() ?
       submitButton.removeAttribute('disabled') :
       submitButton.setAttribute('disabled', 'true');
   });

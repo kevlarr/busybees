@@ -59,7 +59,7 @@ impl RenderOnce for PostFormPage {
 
         tmpl << html! {
             form(id = "EditorForm", method = "post", action = action) {
-                input(id = "PostTitle", name = "title", placeholder = "Some clever title here...", autofocus = "true", value = title);
+                input(id = "PostTitle", name = "title", placeholder = "How I stopped the zombie apocalypse...", autofocus = "true", value = title);
                 textarea(id = "SummernoteEditor", name = "content") : content;
 
                 div(id = "PostControls") {
