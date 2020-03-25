@@ -22,3 +22,9 @@ pub struct Post {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+pub struct Author {
+    pub name: String,
+    pub email: String,
+    pub password_hash: String,
+}

@@ -64,7 +64,7 @@ impl RenderOnce for PostFormPage {
 
                 div(id = "PostControls") {
                     a (href = "/") { button(type = "button") : "Cancel"; }
-                    button(id = "SubmitEditor", type = "submit", class = "primary", disabled = "true") : "Submit";
+                    button(id = "SubmitEditor", type = "submit", class = "primary", disabled) : "Submit";
                 }
             }
 

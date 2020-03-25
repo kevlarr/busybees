@@ -27,8 +27,10 @@ async fn main() -> io::Result<()> {
             .default_service(web::route().to(|| pages::NotFoundPage {}.render()))
             .route("/", get().to(handlers::posts::index))
             .route("/about", get().to(|| pages::AboutPage {}.render()))
+            .route("/auth", get().to(|| pages::AuthPage {}.render()))
             .route("/images", post().to(handlers::images::upload))
             .route("/sandbox", get().to(|| pages::SandboxPage {}.render()))
+            //.route("/sign-in", post().to(|| handlers::auth::sign_in)
             .service(
                 web::scope("/posts")
                     .route(

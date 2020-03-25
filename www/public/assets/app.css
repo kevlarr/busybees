@@ -18,7 +18,7 @@ ol, ul {
     margin-left: 20px;
 }
 
-body {
+body, input {
     color: #504B40;
     font-family: 'Work Sans', sans-serif;
     font-size: 16px;
@@ -119,8 +119,13 @@ button.note-btn:not([disabled]):active {
 
 button:not([disabled]):active,
 button:not([disabled]):focus,
-button:not([disabled]):hover {
-    background-color: #A8A298;
+button:not([disabled]):hover,
+button.note-btn.active,
+button.note-btn.focus,
+button.note-btn:active,
+button.note-btn:focus,
+button.note-btn:hover {
+    background-color: #958E81;
 }
 
 button.primary {
@@ -134,7 +139,7 @@ button.primary[disabled] {
 button.primary:not([disabled]):active,
 button.primary:not([disabled]):focus,
 button.primary:not([disabled]):hover {
-    background-color: #D9A600;
+    background-color: #0990E3;
 }
 
 
@@ -288,20 +293,33 @@ preview[type="secondary"] img {
     text-align: right;
 }
 
-#PostTitle {
+input {
     border: 0;
+    line-height: 1.25em;
+    margin-top: 0;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    transition: box-shadow .2s;
+}
+
+input:focus, input:active {
+    box-shadow: inset 0px 0px 5px 0px #73CAE6;
+    transition: box-shadow .2s;
+}
+
+#PostTitle {
     font-size: 36px;
     font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
     line-height: 1.25em;
     margin-top: 0;
     margin-bottom: 10px;
-    padding: 10px;
+    padding: 5px 15px;
 }
 
 #PostTitle,
 .note-editable {
-    box-shadow: inset 3px -1px 8px 0px #eee;
+    box-shadow: inset 3px -1px 9px 0px #ddd;
     transition: box-shadow .2s;
 }
 
@@ -309,7 +327,7 @@ preview[type="secondary"] img {
 #PostTitle:active,
 .note-editable:focus,
 .note-editable:active {
-    box-shadow: inset 3px -1px 8px 0px #F5DEAF;
+    box-shadow: inset 0px 0px 9px 0px #73CAE6;
     transition: box-shadow .2s;
 }
 
@@ -328,6 +346,7 @@ preview[type="secondary"] img {
 }
 
 #EditorForm .note-toolbar {
+    background-color: #E3E0DB;
     border: 0;
 }
 
@@ -354,6 +373,50 @@ preview[type="secondary"] img {
 
 .note-modal-footer {
     box-sizing: content-box;
+}
+
+
+/* ********************
+ * PAGE: Auth
+ */
+
+main#Auth {
+    align-items: center;
+    justify-content: center;
+}
+
+main#Auth > form {
+    align-items: center;
+    background-color: #E3E0DB;
+    border-radius: 50px;
+    display: flex;
+    flex-direction: column;
+    padding: 50px;
+}
+
+main#Auth > form input {
+    margin-bottom: 40px;
+}
+
+box-cursor {
+    border: 3px solid #BFBBB4;
+    display: inline-block;
+    height: 1em;
+    vertical-align: sub;
+    width: 0.5em;
+    /*-webkit-animation: cursor-blink 1s infinite;  [> Safari 4+ <]*/
+    /*-moz-animation: cursor-blink 1s infinite;  [> Fx 5+ <]*/
+    /*-o-animation: cursor-blink 1s infinite;  [> Opera 12+ <]*/
+    animation: cursor-blink 1.5s infinite;  /* IE 10+, Fx 29+ */
+}
+
+@-webkit-keyframes cursor-blink {
+  0%, 49% {
+    border-color: #BFBBB4;
+  }
+  50%, 100% {
+    border-color: #E3E0DB;
+  }
 }
 
 
