@@ -19,7 +19,6 @@ async fn main() -> io::Result<()> {
 
     dotenv::dotenv().ok();
 
-    // TODO use .to_async for handlers..?
     HttpServer::new(|| {
         App::new()
             .data(State::new())
@@ -27,10 +26,13 @@ async fn main() -> io::Result<()> {
             .default_service(web::route().to(|| pages::NotFoundPage {}.render()))
             .route("/", get().to(handlers::posts::index))
             .route("/about", get().to(|| pages::AboutPage {}.render()))
-            .route("/auth", get().to(|| pages::AuthPage {}.render()))
             .route("/images", post().to(handlers::images::upload))
             .route("/sandbox", get().to(|| pages::SandboxPage {}.render()))
-            //.route("/sign-in", post().to(|| handlers::auth::sign_in)
+            .service(
+                web::resource("/auth")
+                    .route(get().to(|| pages::AuthPage::new().render()))
+                    .route(post().to(handlers::auth::sign_in))
+            )
             .service(
                 web::scope("/posts")
                     .route(
@@ -40,7 +42,7 @@ async fn main() -> io::Result<()> {
                     .route("/new", post().to(handlers::posts::create))
                     .route("/{key}/edit", get().to(handlers::posts::edit))
                     .route("/{key}/edit", post().to(handlers::posts::update))
-                    .route("/{key}/read/{slug}", get().to(handlers::posts::read)),
+                    .route("/{key}/read/{slug}", get().to(handlers::posts::read))
             )
             .service(
                 Files::new("/public", "www/public")

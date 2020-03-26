@@ -395,6 +395,7 @@ main#Auth > form {
 }
 
 main#Auth > form input {
+    font-size: 20px;
     margin-bottom: 40px;
 }
 
