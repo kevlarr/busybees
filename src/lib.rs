@@ -1,3 +1,4 @@
+pub mod encryption;
 pub mod handlers;
 pub mod models;
 pub mod pages;

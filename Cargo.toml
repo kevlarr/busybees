@@ -9,11 +9,14 @@ actix-web = "2.0"
 actix-files = "0.2"
 actix-multipart = "0.2"
 actix-rt = "1.0"
+actix-session = "0.3"
+argonautica = "0.2"
 chrono = {version = "0.4", features = ["serde"]}
 dotenv = "0.15"
 futures = "0.3"
-horrorshow = "0.8"
+horrorshow = "0.8.3"
 pretty_env_logger = "0.3"
+rand = "0.7"
 slug = "0.1"
 serde = {version = "1.0", features = ["derive"]}
 sqlx = {version = "0.2", default-features = false, features = ["runtime-tokio", "macros", "postgres", "chrono"]}

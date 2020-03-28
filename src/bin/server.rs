@@ -1,4 +1,5 @@
 use actix_files::Files;
+use actix_session::CookieSession;
 use actix_web::{
     middleware::Logger,
     web::{self, get, post},
@@ -19,16 +20,27 @@ async fn main() -> io::Result<()> {
 
     dotenv::dotenv().ok();
 
-    // TODO use .to_async for handlers..?
     HttpServer::new(|| {
+        let state = State::new();
+
         App::new()
-            .data(State::new())
             .wrap(Logger::default())
+            .wrap(
+                CookieSession::private(&state.secret_key.as_bytes())
+                    .name("busybees")
+                    .secure(false),
+            )
+            .data(state)
             .default_service(web::route().to(|| pages::NotFoundPage {}.render()))
             .route("/", get().to(handlers::posts::index))
             .route("/about", get().to(|| pages::AboutPage {}.render()))
             .route("/images", post().to(handlers::images::upload))
             .route("/sandbox", get().to(|| pages::SandboxPage {}.render()))
+            .service(
+                web::resource("/auth")
+                    .route(get().to(|| pages::AuthPage::new().render()))
+                    .route(post().to(handlers::auth::sign_in)),
+            )
             .service(
                 web::scope("/posts")
                     .route(
