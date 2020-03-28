@@ -9,6 +9,7 @@ actix-web = "2.0"
 actix-files = "0.2"
 actix-multipart = "0.2"
 actix-rt = "1.0"
+actix-session = "0.3"
 argonautica = "0.2"
 chrono = {version = "0.4", features = ["serde"]}
 dotenv = "0.15"

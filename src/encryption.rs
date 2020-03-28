@@ -1,5 +1,4 @@
 use argonautica::{Hasher, Verifier};
-use rand::{self, Rng};
 
 pub fn hash(secret: &str, password: &str) -> Result<String, String> {
     Ok(Hasher::default()

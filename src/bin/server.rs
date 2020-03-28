@@ -1,4 +1,5 @@
 use actix_files::Files;
+use actix_session::CookieSession;
 use actix_web::{
     middleware::Logger,
     web::{self, get, post},
@@ -20,9 +21,16 @@ async fn main() -> io::Result<()> {
     dotenv::dotenv().ok();
 
     HttpServer::new(|| {
+        let state = State::new();
+
         App::new()
-            .data(State::new())
             .wrap(Logger::default())
+            .wrap(
+                CookieSession::private(&state.secret_key.as_bytes())
+                    .name("busybees")
+                    .secure(false)
+            )
+            .data(state)
             .default_service(web::route().to(|| pages::NotFoundPage {}.render()))
             .route("/", get().to(handlers::posts::index))
             .route("/about", get().to(|| pages::AboutPage {}.render()))
