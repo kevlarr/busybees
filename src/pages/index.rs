@@ -1,7 +1,7 @@
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
 
-use crate::models::PostPreview;
 use super::{layout::LayoutPage, Renderable};
+use crate::models::PostPreview;
 
 pub struct IndexPage {
     pub posts: Vec<PostPreview>,
@@ -13,48 +13,52 @@ impl RenderOnce for IndexPage {
         let first = posts.next();
 
         match first {
-            Some(preview) => tmpl << html! {
-                section (id = "PrimaryPost") {
-                    a (
-                        href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
-                        class = "primary post-link"
-                    ) {
-                        preview (type = "primary") {
-                            img (src = match &preview.first_src {
-                                Some(s) => s.to_string(),
-                                None => format!("https://picsum.photos/seed/{}/600/300", &preview.key),
-                            });
-                            footer {
-                                h1 : &preview.title;
-                                time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
-                            }
-                        }
-                    }
-                }
-
-                section (id = "SecondaryPosts") {
-                    @ for preview in posts {
+            Some(preview) => {
+                tmpl << html! {
+                    section (id = "PrimaryPost") {
                         a (
                             href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
-                            class = "secondary post-link"
+                            class = "primary post-link"
                         ) {
-                            preview (type = "secondary") {
+                            preview (type = "primary") {
                                 img (src = match &preview.first_src {
                                     Some(s) => s.to_string(),
-                                    None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
+                                    None => format!("https://picsum.photos/seed/{}/600/300", &preview.key),
                                 });
                                 footer {
-                                    h2 : &preview.title;
+                                    h1 : &preview.title;
                                     time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
                                 }
                             }
                         }
                     }
+
+                    section (id = "SecondaryPosts") {
+                        @ for preview in posts {
+                            a (
+                                href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
+                                class = "secondary post-link"
+                            ) {
+                                preview (type = "secondary") {
+                                    img (src = match &preview.first_src {
+                                        Some(s) => s.to_string(),
+                                        None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
+                                    });
+                                    footer {
+                                        h2 : &preview.title;
+                                        time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-            },
-            None => tmpl << html! {
-                section (id = "NoContent"): "No posts to display";
-            },
+            }
+            None => {
+                tmpl << html! {
+                    section (id = "NoContent"): "No posts to display";
+                }
+            }
         }
     }
 }

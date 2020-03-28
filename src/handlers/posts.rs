@@ -71,10 +71,14 @@ pub async fn create(
     let result = sqlx::query!(
         "insert into post (title, content, published, created_at, updated_at)
             values ($1, $2, $3, $4, $5) returning key",
-        form.title, form.content, false, now, now
+        form.title,
+        form.content,
+        false,
+        now,
+        now
     )
-        .fetch_one(pool)
-        .await;
+    .fetch_one(pool)
+    .await;
 
     match result {
         Ok(row) => {

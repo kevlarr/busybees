@@ -1,15 +1,11 @@
-use actix_session::Session;
-use actix_web::{
-    http,
-    web,
-    Error, HttpResponse,
-};
 use crate::{
     encryption,
     models::Author,
     pages::{AuthPage, Renderable},
     State,
 };
+use actix_session::Session;
+use actix_web::{http, web, Error, HttpResponse};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -26,11 +22,15 @@ pub async fn sign_in(
     let pool = &mut *state.pool.borrow_mut();
     let secret = &state.secret_key;
 
-    let result = sqlx::query_as!(Author, "
+    let result = sqlx::query_as!(
+        Author,
+        "
         select id, email, name, password_hash from author where email = $1
-    ", credentials.email)
-        .fetch_one(pool)
-        .await;
+    ",
+        credentials.email
+    )
+    .fetch_one(pool)
+    .await;
 
     let author = match result {
         Ok(author) => author,
@@ -42,7 +42,7 @@ pub async fn sign_in(
             let _ = encryption::hash(secret, &credentials.password);
 
             return Ok(AuthPage::with_error("Invalid credentials".into()).render());
-        },
+        }
     };
 
     let verified = encryption::verify(secret, &author.password_hash, &credentials.password);
@@ -54,7 +54,7 @@ pub async fn sign_in(
                 .finish()
                 .into_body(),
 
-            Err(e) => AuthPage::with_error(e.to_string()).render()
+            Err(e) => AuthPage::with_error(e.to_string()).render(),
         },
         Ok(_) => AuthPage::with_error("Invalid credentials".into()).render(),
         Err(e) => HttpResponse::BadRequest().body(e.to_string()),

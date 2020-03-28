@@ -28,7 +28,7 @@ async fn main() -> io::Result<()> {
             .wrap(
                 CookieSession::private(&state.secret_key.as_bytes())
                     .name("busybees")
-                    .secure(false)
+                    .secure(false),
             )
             .data(state)
             .default_service(web::route().to(|| pages::NotFoundPage {}.render()))
@@ -39,7 +39,7 @@ async fn main() -> io::Result<()> {
             .service(
                 web::resource("/auth")
                     .route(get().to(|| pages::AuthPage::new().render()))
-                    .route(post().to(handlers::auth::sign_in))
+                    .route(post().to(handlers::auth::sign_in)),
             )
             .service(
                 web::scope("/posts")
@@ -50,7 +50,7 @@ async fn main() -> io::Result<()> {
                     .route("/new", post().to(handlers::posts::create))
                     .route("/{key}/edit", get().to(handlers::posts::edit))
                     .route("/{key}/edit", post().to(handlers::posts::update))
-                    .route("/{key}/read/{slug}", get().to(handlers::posts::read))
+                    .route("/{key}/read/{slug}", get().to(handlers::posts::read)),
             )
             .service(
                 Files::new("/public", "www/public")

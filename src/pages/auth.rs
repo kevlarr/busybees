@@ -7,11 +7,15 @@ pub struct AuthPage {
 
 impl AuthPage {
     pub fn new() -> Self {
-        AuthPage { error_message: None }
+        AuthPage {
+            error_message: None,
+        }
     }
 
     pub fn with_error(msg: String) -> Self {
-        AuthPage { error_message: Some(msg) }
+        AuthPage {
+            error_message: Some(msg),
+        }
     }
 }
 
