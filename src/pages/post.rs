@@ -1,4 +1,4 @@
-use super::{layout::LayoutPage, Renderable};
+use super::{layout::Layout, Renderable};
 use crate::models::Post;
 use horrorshow::{html, Raw, RenderOnce, Template, TemplateBuffer};
 
@@ -29,10 +29,10 @@ impl RenderOnce for PostPage {
 
 impl Into<String> for PostPage {
     fn into(self) -> String {
-        LayoutPage {
-            title: self.post.title.clone(),
-            main_id: "Post".into(),
-            content: self,
+        Layout {
+            title: Some(self.post.title.clone()),
+            main_id: Some("Post".into()),
+            content: Some(self),
         }
         .into_string()
         .unwrap_or_else(|_| "There was an error generating article page".into())
@@ -80,10 +80,10 @@ impl RenderOnce for PostFormPage {
 
 impl Into<String> for PostFormPage {
     fn into(self) -> String {
-        LayoutPage {
-            title: "Say something!".into(),
-            main_id: "PostForm".into(),
-            content: self,
+        Layout {
+            title: Some("Say something!".into()),
+            main_id: Some("PostForm".into()),
+            content: Some(self),
         }
         .into_string()
         .unwrap_or_else(|_| "There was an error generating new post page".into())

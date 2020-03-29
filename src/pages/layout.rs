@@ -1,17 +1,39 @@
+use actix_web::{dev::Payload, Error, FromRequest, HttpRequest};
+use futures::future::{Ready, ready};
 use horrorshow::{helper::doctype, html, RenderOnce, TemplateBuffer};
 
-pub struct LayoutPage<C> {
-    pub title: String,
-    pub main_id: String,
-    pub content: C,
+pub struct Layout<C> {
+    pub title: Option<String>,
+    pub main_id: Option<String>,
+    pub content: Option<C>,
 }
 
-impl<C> RenderOnce for LayoutPage<C>
+impl<C> Layout<C> {
+    pub fn new() -> Self {
+        Layout {
+            title: None,
+            main_id: None,
+            content: None,
+        }
+    }
+}
+
+impl<C> FromRequest for Layout<C> {
+    type Config = ();
+    type Error = Error;
+    type Future = Ready<Result<Layout<C>, Error>>;
+
+    fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
+        ready(Ok(Layout::new()))
+    }
+}
+
+impl<C> RenderOnce for Layout<C>
 where
     C: RenderOnce,
 {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let LayoutPage {
+        let Layout {
             title,
             main_id,
             content,
@@ -22,7 +44,11 @@ where
 
             html {
                 head {
-                    title : format!("Busy Bee Life | {}", title);
+                    title : match title {
+                        Some(t) => format!("The Busy Bee Life | {}", t),
+                        None => "The Busy Bee Life".to_string(),
+                    };
+
                     meta(charset = "utf-8");
 
                     link(rel = "stylesheet", type = "text/css", href = "/public/assets/app.css");

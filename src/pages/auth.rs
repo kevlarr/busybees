@@ -1,4 +1,4 @@
-use super::{layout::LayoutPage, Renderable};
+use super::{layout::Layout, Renderable};
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
 
 pub struct AuthPage {
@@ -44,10 +44,10 @@ impl RenderOnce for AuthPage {
 
 impl Into<String> for AuthPage {
     fn into(self) -> String {
-        LayoutPage {
-            title: "Sign In".into(),
-            main_id: "Auth".into(),
-            content: self,
+        Layout {
+            title: Some("Sign In".into()),
+            main_id: Some("Auth".into()),
+            content: Some(self),
         }
         .into_string()
         .unwrap_or_else(|_| "There was an error generating auth page".into())

@@ -1,6 +1,6 @@
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
 
-use super::{layout::LayoutPage, Renderable};
+use super::{layout::Layout, Renderable};
 use crate::models::PostPreview;
 
 pub struct IndexPage {
@@ -65,10 +65,10 @@ impl RenderOnce for IndexPage {
 
 impl Into<String> for IndexPage {
     fn into(self) -> String {
-        LayoutPage {
-            title: "New posts".into(),
-            main_id: "Index".into(),
-            content: self,
+        Layout {
+            title: Some("New posts".into()),
+            main_id: Some("Index".into()),
+            content: Some(self),
         }
         .into_string()
         .unwrap_or_else(|_| "Error generating index".into())
