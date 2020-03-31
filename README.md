@@ -5,44 +5,46 @@ Server to support the (upcoming) blog at http://busybee.life
 ## Why Rust?
 
 I know a lot of people say Rust is ridiculous for web development because "we don't need that level of performance".
-My response would be...
+That's a fair viewpoint. It's also a complicated language, the compiler is harder to please than my dad, and it can be tough to build the same kind of 'feature momentum' compared to using, well, virtually any other language.
 
-### 1. We should **always** strive for that level of performance
+But I really do think it's a viable web language, because...
 
-I'm busy, you're busy, most of us are busy - we are all busy bees.
-We don't have time to wait for the slow-butt servers that infest the modern web.
+### 1. we should **always** strive for 'that level of performance'
+
+I'm busy, you're busy, most of us are busy, busy bees.
+We have to wait far too long when viewing far too many sites, both from server speed and the bloat (and blight) of modern JS-heavy "apps". Between bundle fetching, parsing, network requests to build a data 'store' on the client-side, and DOM manipulation, modern apps have a lot of overhead.
 
 We deserve better, and it's sad that we (as users) have become used to slow, bloated, memory-hogging software
 despite having radically powerful hardware.
 
-### 2. Lightening cpu and memory loads as well as decreasing processing time
+### 2. lightening cpu and memory loads is a Good Thing
 
 All of these contribute to less energy and a lower environmental footprint.
 (Because, yes, I care about that. **Small improvements are still improvements.**)
 
-And it's about giving someone fewer of my dollars to for virtual hosting.
-Less memory required means less I have to pay.
+And it's about giving someone fewer of my dollars for virtual hosting.
+Substantially less memory and marginally less computation time means less I have to pay.
 
-### 3. Server-rendered HTML is still good
+### 3. server-rendered HTML is still good
 
-Server-rendered HTML with minimal JavaScript is often considered antiquated. And that's sad.
+Server-rendered HTML with minimal JavaScript is often considered antiquated or even an anti-pattern, and that's sad.
+HTML is great for content-based sites, and most of the Web is content-based.
 
-This server, rendering HTML on every new path, is still **significantly faster** than most of the load-time heavy SPAs out there
-that then need to make dozens of slow requests to some slow API to render a page.
+This server, rendering HTML on every new path, is still **significantly faster** than most of the load-time heavy SPAs out there. HTML size is about as small as JSON requests that would need to happen on every page,
+and rendering server-side means *no subsequent requests*, unlike SPAs.
 
-*Minimal JavaScript is maximal user experience.*
+**Minimal JavaScript is maximal user experience.**
 
-### 4. It's more than just performance
+### 4. rust is more than just performance
 
 Rust gives me some big promises that the vast majority of other languages can't.
+Beyond performance, Rust is...
 
-It isn't just performance, it's about the **type and trait system**.
+- ... the wonderful abstractions possible from the type/trait system
+- ... the impossibility of null-pointer exceptions in safe (ie. normal) code
+- ... the requirement for me to *handle* all possible errors
+- ... the compiler forcing me to write better code, because bad abstractions *are hard to write* (unlike in most other languages)
+- ... knowing that if it compiles, it will run
+- ... worry-free application-wide refactoring
 
-It's about the absolute *impossibility of null-pointer exceptions*,
-and it's about me being *forced to write better code*,
-because it's *hard* to write the kind of garbage abstractions we so quickly throw together in other languages.
-
-It's about **the compiler** that, while slow and very mean, forces me to be a better programmer.
-It's about knowing that *if it compiles, it will run*.
-
-And, honestly, it's about the community, too.
+And, honestly, it's about the community, too. From my limited experience, it's been fantastic so far.
