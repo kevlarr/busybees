@@ -41,6 +41,7 @@ Rust gives me some big promises that the vast majority of other languages can't.
 Beyond performance, Rust is...
 
 - ... the wonderful abstractions possible from the type/trait system
+- ... a macro system that makes compile-time checks on HTML/ SQL DSLs possible
 - ... the impossibility of null-pointer exceptions in safe (ie. normal) code
 - ... the requirement for me to *handle* all possible errors
 - ... the compiler forcing me to write better code, because bad abstractions *are hard to write* (unlike in most other languages)
