@@ -1,4 +1,4 @@
-use super::{layout::Layout, Renderable};
+use super::{page::Page, Renderable};
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
 
 pub struct AuthPage {
@@ -44,7 +44,7 @@ impl RenderOnce for AuthPage {
 
 impl Into<String> for AuthPage {
     fn into(self) -> String {
-        Layout {
+        Page {
             title: Some("Sign In".into()),
             main_id: Some("Auth".into()),
             content: Some(self),

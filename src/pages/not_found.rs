@@ -1,4 +1,4 @@
-use super::{layout::Layout, Renderable};
+use super::{page::Page, Renderable};
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
 
 pub struct NotFoundPage;
@@ -14,7 +14,7 @@ impl RenderOnce for NotFoundPage {
 
 impl Into<String> for NotFoundPage {
     fn into(self) -> String {
-        Layout {
+        Page {
             title: Some("There's nothing here".into()),
             main_id: Some("NotFound".into()),
             content: Some(self),

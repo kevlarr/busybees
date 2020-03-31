@@ -1,4 +1,4 @@
-use super::{layout::Layout, Renderable};
+use super::{page::Page, Renderable};
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
 
 pub struct SandboxPage;
@@ -36,7 +36,7 @@ impl RenderOnce for SandboxPage {
 
 impl Into<String> for SandboxPage {
     fn into(self) -> String {
-        Layout {
+        Page {
             title: Some("Sandbox".into()),
             main_id: Some("Sandbox".into()),
             content: Some(self),

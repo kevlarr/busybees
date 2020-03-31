@@ -23,9 +23,17 @@ pub struct Post {
     pub updated_at: DateTime<Utc>,
 }
 
+#[derive(Clone)]
 pub struct Author {
     pub id: i32,
     pub name: String,
     pub email: String,
     pub password_hash: String,
+}
+
+#[derive(Clone)]
+pub struct AuthorWithoutPassword {
+    pub id: i32,
+    pub name: String,
+    pub email: String,
 }

@@ -1,42 +1,60 @@
-use actix_web::{dev::Payload, Error, FromRequest, HttpRequest};
-use futures::future::{Ready, ready};
-use horrorshow::{helper::doctype, html, RenderOnce, TemplateBuffer};
+use crate::models::Author;
 
-pub struct Layout<C> {
+use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, HttpResponse, Responder};
+use futures::{future::{ok, Ready}, FutureExt};
+use horrorshow::{helper::doctype, html, RenderOnce, Template, TemplateBuffer};
+
+pub struct Page {
+    pub user: Option<Author>,
     pub title: Option<String>,
     pub main_id: Option<String>,
-    pub content: Option<C>,
+    content: Option<String>,
 }
 
-impl<C> Layout<C> {
-    pub fn new() -> Self {
-        Layout {
+impl Page {
+    pub fn new(user: Option<Author>) -> Self {
+        Page {
+            user,
             title: None,
             main_id: None,
             content: None,
         }
     }
-}
 
-impl<C> FromRequest for Layout<C> {
-    type Config = ();
-    type Error = Error;
-    type Future = Ready<Result<Layout<C>, Error>>;
-
-    fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
-        ready(Ok(Layout::new()))
+    pub fn with_content(self, content: impl RenderOnce) -> Self {
+        self.content = Some(content.into_string().unwrap_or_else(|e| e.to_string()));
+        self
     }
 }
 
-impl<C> RenderOnce for Layout<C>
-where
-    C: RenderOnce,
-{
+impl Responder for Page {
+    type Error = Error;
+    type Future = Ready<Result<HttpResponse, Error>>;
+
+    fn respond_to(self, _: &HttpRequest) -> Self::Future {
+        ok(HttpResponse::Ok().body("wat".to_string()))
+    }
+}
+
+impl FromRequest for Page {
+    type Config = ();
+    type Error = Error;
+    type Future = Ready<Result<Page, Error>>;
+
+    fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
+        let user = req.extensions().get::<Author>().cloned();
+
+        ok(Page::new(user))
+    }
+}
+
+impl RenderOnce for Page {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Layout {
+        let Page {
             title,
             main_id,
             content,
+            user,
         } = self;
 
         tmpl << html! {

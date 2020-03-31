@@ -1,4 +1,4 @@
-use super::{layout::Layout, Renderable};
+use super::{page::Page, Renderable};
 use actix_web::{error::Error, HttpRequest, HttpResponse, Responder};
 use futures::future::{self, Ready};
 use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
@@ -32,7 +32,7 @@ impl RenderOnce for AboutPage {
 
 impl Into<String> for AboutPage {
     fn into(self) -> String {
-        Layout {
+        Page {
             title: Some("About us busy bees".into()),
             main_id: Some("About".into()),
             content: Some(self),

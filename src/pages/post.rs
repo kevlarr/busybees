@@ -1,4 +1,4 @@
-use super::{layout::Layout, Renderable};
+use super::{page::Page, Renderable};
 use crate::models::Post;
 use horrorshow::{html, Raw, RenderOnce, Template, TemplateBuffer};
 
@@ -29,7 +29,7 @@ impl RenderOnce for PostPage {
 
 impl Into<String> for PostPage {
     fn into(self) -> String {
-        Layout {
+        Page {
             title: Some(self.post.title.clone()),
             main_id: Some("Post".into()),
             content: Some(self),
@@ -80,7 +80,7 @@ impl RenderOnce for PostFormPage {
 
 impl Into<String> for PostFormPage {
     fn into(self) -> String {
-        Layout {
+        Page {
             title: Some("Say something!".into()),
             main_id: Some("PostForm".into()),
             content: Some(self),
