@@ -49,11 +49,7 @@ async fn main() -> io::Result<()> {
             .route("/about", get().to(|| pages::AboutPage {}.render()))
             .route("/images", post().to(handlers::images::upload))
             .route("/sandbox", get().to(|| pages::SandboxPage {}.render()))
-            .service(
-                web::resource("/auth")
-                    .route(get().to(pages::Auth::get))
-                    .route(post().to(pages::Auth::post)),
-            )
+            .service(pages::auth::resource("/auth"))
             .service(
                 web::scope("/posts")
                     .route("/new", get().to(|| pages::PostFormPage { post: None }.render()))

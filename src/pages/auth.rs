@@ -7,14 +7,21 @@ use crate::{
 use actix_session::Session;
 use actix_web::{
     http::header::LOCATION,
-    web::{Data, Form},
+    web::{self, Data, Form},
     Either,
     Error,
     HttpResponse,
-
+    Resource,
 };
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 use serde::Deserialize;
+
+
+pub fn resource(path: &str) -> Resource {
+    web::resource(path)
+        .route(web::get().to(Auth::get))
+        .route(web::post().to(Auth::post))
+}
 
 
 #[derive(Deserialize)]

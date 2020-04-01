@@ -2,7 +2,7 @@ use actix_web::HttpResponse;
 
 
 pub mod about;
-mod auth;
+pub mod auth;
 mod index;
 mod page;
 mod not_found;
@@ -10,7 +10,6 @@ mod post;
 mod sandbox;
 
 pub use about::AboutPage;
-pub use auth::Auth;
 pub use index::IndexPage;
 pub use page::Page;
 pub use not_found::NotFoundPage;
