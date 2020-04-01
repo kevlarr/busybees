@@ -9,7 +9,8 @@ use std::io;
 
 use ::busybees::{
     handlers,
-    pages::{self, Renderable},
+    middleware,
+    pages,
     State,
 };
 
@@ -50,14 +51,7 @@ async fn main() -> io::Result<()> {
             .route("/images", post().to(handlers::images::upload))
             .route("/sandbox", get().to(pages::sandbox::get))
             .service(pages::auth::resource("/auth"))
-            .service(
-                web::scope("/posts")
-                    .route("/new", get().to(pages::posts::PostForm::new))
-                    .route("/new", post().to(handlers::posts::create))
-                    .route("/{key}/edit", get().to(pages::posts::PostForm::edit))
-                    .route("/{key}/edit", post().to(handlers::posts::update))
-                    .route("/{key}/read/{slug}", get().to(handlers::posts::read)),
-            )
+            .service(pages::posts::resource("/posts"))
     })
     .bind("127.0.0.1:3030")?
     .run()

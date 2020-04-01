@@ -44,23 +44,25 @@ where
     }
 
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
-        let exts = req.head().extensions();
+        {
+            let mut exts = req.head().extensions_mut();
 
-        let author_id: Option<i32> = exts.get::<Session>()
-            .map(|session| session.get("auth").ok())
-            .flatten()
-            .flatten();
+            let author_id: Option<i32> = exts.get::<Session>()
+                .map(|session| session.get("auth").ok())
+                .flatten()
+                .flatten();
 
-        if let (Some(id), Some(state)) = (author_id, req.app_data::<Data<State>>()) {
-            let pool = &mut *state.pool.borrow_mut();
-            let result = sqlx::query_as!(
-                AuthorWithoutPassword,
-                "select id, email, name from author where id = $1",
-                id,
-            ).fetch_one(pool).now_or_never();
+            if let (Some(id), Some(state)) = (author_id, req.app_data::<Data<State>>()) {
+                let pool = &mut *state.pool.borrow_mut();
+                let result = sqlx::query_as!(
+                    AuthorWithoutPassword,
+                    "select id, email, name from author where id = $1",
+                    id,
+                ).fetch_one(pool).now_or_never();
 
-            if let (Some(Ok(author)), Some(assigns)) = (result, exts.get::<Assigns>()) {
-                assigns.user = Some(author);
+                if let (Some(Ok(author)), Some(assigns)) = (result, exts.get_mut::<Assigns>()) {
+                    assigns.user = Some(author);
+                }
             }
         }
 

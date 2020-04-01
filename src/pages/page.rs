@@ -1,7 +1,7 @@
 use crate::models::Author;
 
 use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, HttpResponse, Responder};
-use futures::{future::{ok, Ready}, FutureExt};
+use futures::future::{ok, Ready};
 use horrorshow::{helper::doctype, html, RenderOnce, Template, TemplateBuffer};
 
 pub struct Page {
@@ -21,7 +21,7 @@ impl Page {
         }
     }
 
-    pub fn content(self, content: impl RenderOnce) -> Self {
+    pub fn content(mut self, content: impl RenderOnce) -> Self {
         self.content = Some(content
             .into_string()
             .unwrap_or_else(|e| e.to_string())
@@ -29,12 +29,12 @@ impl Page {
         self
     }
 
-    pub fn title(self, title: impl Into<String>) -> Self {
+    pub fn title(mut self, title: impl Into<String>) -> Self {
         self.title = Some(title.into());
         self
     }
 
-    pub fn id(self, id: impl Into<String>) -> Self {
+    pub fn id(mut self, id: impl Into<String>) -> Self {
         self.main_id = Some(id.into());
         self
     }
@@ -54,7 +54,7 @@ impl FromRequest for Page {
     type Error = Error;
     type Future = Ready<Result<Page, Error>>;
 
-    fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
+    fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
         let user = req.extensions().get::<Author>().cloned();
 
         ok(Page::new(user))
