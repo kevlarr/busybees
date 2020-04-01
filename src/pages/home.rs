@@ -1,13 +1,38 @@
-use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
+use crate::{models::PostPreview, pages::Page, ActixResult, State};
 
-use super::{page::Page, Renderable};
-use crate::models::PostPreview;
+use actix_web::{web::Data, Either, HttpResponse};
+use horrorshow::{html, RenderOnce, TemplateBuffer};
 
-pub struct IndexPage {
+
+pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
+    let pool = &mut *state.pool.borrow_mut();
+
+    let result = sqlx::query_as!(
+        PostPreview,
+        r#"select key, title, created_at, substring(content, 'src="([a-zA-Z0-9\.\-_~:\/%\?#=]+)"') as first_src
+            from post order by created_at desc limit 4"#,
+    )
+        .fetch_all(pool)
+        .await;
+
+    match result {
+        Ok(posts) => Either::A(
+            page.id("Home")
+                .title("Latest Posts")
+                .content(Home { posts })
+        ),
+        Err(e) => Either::B(
+            // TODO This should be an actual page
+            Ok(HttpResponse::BadRequest().body(e.to_string()))
+        ),
+    }
+}
+
+pub struct Home {
     pub posts: Vec<PostPreview>,
 }
 
-impl RenderOnce for IndexPage {
+impl RenderOnce for Home {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         let mut posts = self.posts.iter();
         let first = posts.next();
@@ -62,17 +87,3 @@ impl RenderOnce for IndexPage {
         }
     }
 }
-
-impl Into<String> for IndexPage {
-    fn into(self) -> String {
-        Page {
-            title: Some("New posts".into()),
-            main_id: Some("Index".into()),
-            content: Some(self),
-        }
-        .into_string()
-        .unwrap_or_else(|_| "Error generating index".into())
-    }
-}
-
-impl Renderable for IndexPage {}

@@ -40,21 +40,21 @@ async fn main() -> io::Result<()> {
             .wrap(middleware::LoadUser)
 
             // Default 404 response
-            .default_service(web::route().to(|| pages::NotFoundPage {}.render()))
+            .default_service(web::route().to(pages::notfound::get))
 
             // Public assets
             .service(static_files)
 
-            .route("/", get().to(handlers::posts::index))
-            .route("/about", get().to(|| pages::AboutPage {}.render()))
+            .route("/", get().to(pages::home::get))
+            .route("/about", get().to(pages::about::get))
             .route("/images", post().to(handlers::images::upload))
-            .route("/sandbox", get().to(|| pages::SandboxPage {}.render()))
+            .route("/sandbox", get().to(pages::sandbox::get))
             .service(pages::auth::resource("/auth"))
             .service(
                 web::scope("/posts")
-                    .route("/new", get().to(|| pages::PostFormPage { post: None }.render()))
+                    .route("/new", get().to(pages::posts::PostForm::new))
                     .route("/new", post().to(handlers::posts::create))
-                    .route("/{key}/edit", get().to(handlers::posts::edit))
+                    .route("/{key}/edit", get().to(pages::posts::PostForm::edit))
                     .route("/{key}/edit", post().to(handlers::posts::update))
                     .route("/{key}/read/{slug}", get().to(handlers::posts::read)),
             )

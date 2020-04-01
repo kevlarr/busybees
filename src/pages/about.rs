@@ -1,11 +1,15 @@
-use super::{page::Page, Renderable};
-use actix_web::{error::Error, HttpRequest, HttpResponse, Responder};
-use futures::future::{self, Ready};
-use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
+use crate::pages::Page;
+use horrorshow::{html, RenderOnce, TemplateBuffer};
 
-pub struct AboutPage;
+pub async fn get(page: Page) -> Page {
+    page.id("About")
+        .title("About Us")
+        .content(About{})
+}
 
-impl RenderOnce for AboutPage {
+pub struct About;
+
+impl RenderOnce for About {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         tmpl << html! {
             h1 : "Hey there!";
@@ -29,17 +33,3 @@ impl RenderOnce for AboutPage {
         };
     }
 }
-
-impl Into<String> for AboutPage {
-    fn into(self) -> String {
-        Page {
-            title: Some("About us busy bees".into()),
-            main_id: Some("About".into()),
-            content: Some(self),
-        }
-        .into_string()
-        .unwrap_or_else(|_| "There was an error generating about page".into())
-    }
-}
-
-impl Renderable for AboutPage {}

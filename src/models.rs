@@ -1,8 +1,8 @@
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
-pub struct PostParams {
+#[derive(Deserialize)]
+pub struct NewPost {
     pub title: String,
     pub content: String,
 }

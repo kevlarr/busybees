@@ -1,20 +1,15 @@
 use actix_web::HttpResponse;
 
-
 pub mod about;
 pub mod auth;
-mod index;
-mod page;
-mod not_found;
-mod post;
-mod sandbox;
+pub mod home;
+pub mod notfound;
+pub mod posts;
+pub mod sandbox;
 
-pub use about::AboutPage;
-pub use index::IndexPage;
+mod page;
+
 pub use page::Page;
-pub use not_found::NotFoundPage;
-pub use post::{PostFormPage, PostPage};
-pub use sandbox::SandboxPage;
 
 
 pub trait Renderable: Into<String> {

@@ -1,9 +1,15 @@
-use super::{page::Page, Renderable};
-use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
+use crate::pages::Page;
+use horrorshow::{html, RenderOnce, TemplateBuffer};
 
-pub struct SandboxPage;
+pub async fn get(page: Page) -> Page {
+    page.id("Sandbox")
+        .title("Sandbox")
+        .content(Sandbox{})
+}
 
-impl RenderOnce for SandboxPage {
+pub struct Sandbox;
+
+impl RenderOnce for Sandbox {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         tmpl << html! {
             h1 : "This is an h1 header";
@@ -33,17 +39,3 @@ impl RenderOnce for SandboxPage {
         };
     }
 }
-
-impl Into<String> for SandboxPage {
-    fn into(self) -> String {
-        Page {
-            title: Some("Sandbox".into()),
-            main_id: Some("Sandbox".into()),
-            content: Some(self),
-        }
-        .into_string()
-        .unwrap_or_else(|_| "There was an error generating sandbox page".into())
-    }
-}
-
-impl Renderable for SandboxPage {}
