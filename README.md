@@ -17,7 +17,7 @@ We have to wait far too long when viewing far too many sites, both from server s
 We deserve better, and it's sad that we (as users) have become used to slow, bloated, memory-hogging software
 despite having radically powerful hardware.
 
-### 2. lightening cpu and memory loads is a Good Thing
+### 2. decreasing cpu and memory loads is more sustainable
 
 All of these contribute to less energy and a lower environmental footprint.
 (Because, yes, I care about that. **Small improvements are still improvements.**)
