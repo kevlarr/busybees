@@ -24,9 +24,10 @@ async fn main() -> io::Result<()> {
     HttpServer::new(|| {
         let state = State::new();
 
-        let cookie_session = CookieSession::private(&state.secret_key.as_bytes())
+        let cookie_session = CookieSession::signed(&state.secret_key.as_bytes())
             .name("busybees")
-            .secure(false);
+            .secure(false)
+            .http_only(false);
 
         let static_files = Files::new("/public", "www/public")
             .show_files_listing()
@@ -35,10 +36,12 @@ async fn main() -> io::Result<()> {
         App::new()
             .data(state)
 
-            .wrap(Logger::default())
-            .wrap(cookie_session)
-            .wrap(middleware::SetAssigns)
+            // First applied is last to execute, so user/session management needs to
+            // be applied prior to the cookie session backend
             .wrap(middleware::LoadUser)
+            .wrap(middleware::SetAssigns)
+            .wrap(cookie_session)
+            .wrap(Logger::default())
 
             // Default 404 response
             .default_service(web::route().to(pages::notfound::get))

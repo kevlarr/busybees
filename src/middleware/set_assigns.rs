@@ -44,10 +44,7 @@ where
     }
 
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
-        req.head().extensions_mut().insert(Assigns {
-            user: None,
-        });
-
+        req.head().extensions_mut().insert(Assigns{ user: None });
         self.service.call(req)
     }
 }

@@ -31,7 +31,7 @@ pub struct Author {
     pub password_hash: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AuthorWithoutPassword {
     pub id: i32,
     pub name: String,

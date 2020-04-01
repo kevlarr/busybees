@@ -1,18 +1,18 @@
-use crate::models::Author;
+use crate::{extensions::Assigns, models::AuthorWithoutPassword};
 
 use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, HttpResponse, Responder};
 use futures::future::{ok, Ready};
 use horrorshow::{helper::doctype, html, Raw, RenderOnce, Template, TemplateBuffer};
 
 pub struct Page {
-    pub user: Option<Author>,
+    pub user: Option<AuthorWithoutPassword>,
     title: Option<String>,
     main_id: Option<String>,
     content: Option<String>,
 }
 
 impl Page {
-    pub fn new(user: Option<Author>) -> Self {
+    pub fn new(user: Option<AuthorWithoutPassword>) -> Self {
         Page {
             user,
             title: None,
@@ -55,7 +55,7 @@ impl FromRequest for Page {
     type Future = Ready<Result<Page, Error>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
-        let user = req.extensions().get::<Author>().cloned();
+        let user = req.extensions().get::<Assigns>().map(|a| a.user.clone()).flatten();
 
         ok(Page::new(user))
     }
