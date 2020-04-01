@@ -6,8 +6,8 @@ use horrorshow::{helper::doctype, html, RenderOnce, Template, TemplateBuffer};
 
 pub struct Page {
     pub user: Option<Author>,
-    pub title: Option<String>,
-    pub main_id: Option<String>,
+    title: Option<String>,
+    main_id: Option<String>,
     content: Option<String>,
 }
 
@@ -21,8 +21,21 @@ impl Page {
         }
     }
 
-    pub fn with_content(self, content: impl RenderOnce) -> Self {
-        self.content = Some(content.into_string().unwrap_or_else(|e| e.to_string()));
+    pub fn content(self, content: impl RenderOnce) -> Self {
+        self.content = Some(content
+            .into_string()
+            .unwrap_or_else(|e| e.to_string())
+        );
+        self
+    }
+
+    pub fn title(self, title: impl Into<String>) -> Self {
+        self.title = Some(title.into());
+        self
+    }
+
+    pub fn id(self, id: impl Into<String>) -> Self {
+        self.main_id = Some(id.into());
         self
     }
 }
@@ -32,7 +45,7 @@ impl Responder for Page {
     type Future = Ready<Result<HttpResponse, Error>>;
 
     fn respond_to(self, _: &HttpRequest) -> Self::Future {
-        ok(HttpResponse::Ok().body("wat".to_string()))
+        ok(HttpResponse::Ok().body(self.into_string().unwrap_or_else(|e| e.to_string())))
     }
 }
 

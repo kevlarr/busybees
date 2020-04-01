@@ -37,7 +37,7 @@ async fn main() -> io::Result<()> {
             .wrap(Logger::default())
             .wrap(cookie_session)
             .wrap(middleware::SetAssigns)
-            .wrap(middleware::LoadCurrentUser)
+            .wrap(middleware::LoadUser)
 
             // Default 404 response
             .default_service(web::route().to(|| pages::NotFoundPage {}.render()))
@@ -51,8 +51,8 @@ async fn main() -> io::Result<()> {
             .route("/sandbox", get().to(|| pages::SandboxPage {}.render()))
             .service(
                 web::resource("/auth")
-                    .route(get().to(|| pages::AuthPage::new().render()))
-                    .route(post().to(handlers::auth::sign_in)),
+                    .route(get().to(pages::Auth::get))
+                    .route(post().to(pages::Auth::post)),
             )
             .service(
                 web::scope("/posts")
