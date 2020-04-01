@@ -2,7 +2,7 @@ use crate::{extensions::Assigns, models::AuthorWithoutPassword, State};
 
 use actix_service::{Service, Transform};
 use actix_session::Session;
-use actix_web::{dev::{ServiceRequest, ServiceResponse}, web::Data, FromRequest, Error};
+use actix_web::{dev::{ServiceRequest, ServiceResponse}, web::Data, Error};
 use futures::future::{ok, Ready, FutureExt};
 use std::task::{Context, Poll};
 
@@ -24,6 +24,31 @@ where
         ok(LoadUserMiddleware { service })
     }
 }
+
+
+//async fn set_author(
+    //req: HttpRequest,
+    //session: Session,
+    //state: Data<State>,
+//) {
+    //let author_id: Option<i32> = session.get("auth").ok()
+        //.flatten()
+        //.expect("no author id");
+
+    //if let Some(id) = author_id {
+        //let pool = &mut *state.pool.borrow_mut();
+        //let result = sqlx::query_as!(
+            //AuthorWithoutPassword,
+            //"select id, email, name from author where id = $1",
+            //id,
+        //).fetch_one(pool).now_or_never();
+
+        //if let (Some(Ok(author)), Some(assigns)) = (result, req.head().extensions_mut().get_mut::<Assigns>()) {
+            //assigns.user = Some(author);
+        //}
+    //}
+//}
+
 
 pub struct LoadUserMiddleware<S> {
     service: S,

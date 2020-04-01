@@ -2,7 +2,7 @@ use crate::models::Author;
 
 use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, HttpResponse, Responder};
 use futures::future::{ok, Ready};
-use horrorshow::{helper::doctype, html, RenderOnce, Template, TemplateBuffer};
+use horrorshow::{helper::doctype, html, Raw, RenderOnce, Template, TemplateBuffer};
 
 pub struct Page {
     pub user: Option<Author>,
@@ -91,14 +91,16 @@ impl RenderOnce for Page {
                 }
 
                 body {
-                    main(id = main_id) : content;
+                    main(id = main_id) : Raw(if let Some(c) = content { c } else { String::new() });
 
                     nav {
                         a (id = "Logotype", href = "/") : "The busy bee life";
 
-                        ul (id = "AdminLinks") {
-                            li { a (href = "/posts/new", class = "admin page-link") : "New post"; }
-                            li { a (href = "/drafts", class = "admin page-link") : "Drafts"; }
+                        @ if let Some(_) = user {
+                            ul (id = "AdminLinks") {
+                                li { a (href = "/posts/new", class = "admin page-link") : "New post"; }
+                                li { a (href = "/drafts", class = "admin page-link") : "Drafts"; }
+                            }
                         }
 
                         ul (id = "Pages") {
