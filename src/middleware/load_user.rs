@@ -5,6 +5,8 @@ use actix_session::{Session, UserSession};
 use actix_web::{dev::{ServiceRequest, ServiceResponse}, web::{self, Data}, Error};
 use futures::future::{ok, Ready};
 use std::task::{Context, Poll};
+use std::future::Future;
+use std::pin::Pin;
 
 pub struct LoadUser;
 
@@ -38,7 +40,9 @@ where
     type Request = ServiceRequest;
     type Response = ServiceResponse<B>;
     type Error = Error;
-    type Future = S::Future;
+    //type Future = S::Future;
+    //type Future = Box<dyn Future<Output = <<S as Service>::Future::Output>>;
+    type Future = Pin<Box<dyn Future<Output = <<S as Service>::Future as Future>::Output>>>;
 
 
     fn poll_ready(&mut self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
@@ -70,6 +74,6 @@ where
             //}
         }
 
-        self.service.call(req)
+        Box::pin(self.service.call(req))
     }
 }
