@@ -61,7 +61,7 @@
 
         statusBar.appendChild(uploadingAlert);
 
-        resp = fetch('/images', { method: 'POST', body: data })
+        resp = fetch('/api/images', { method: 'POST', body: data })
           .then(resp => {
             if (resp.status >= 400) {
               throw new Error(JSON.stringify(resp.statusText));

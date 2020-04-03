@@ -1,27 +1,111 @@
-use super::{layout::LayoutPage, Renderable};
-use horrorshow::{html, RenderOnce, Template, TemplateBuffer};
+use crate::{
+    encryption,
+    models::{Author, AuthorWithoutPassword},
+    pages::Page,
+    State,
+};
+use actix_session::Session;
+use actix_web::{
+    http::header::LOCATION,
+    web::{self, Data, Form},
+    Either,
+    Error,
+    HttpResponse,
+    Resource,
+};
+use horrorshow::{html, RenderOnce, TemplateBuffer};
+use serde::Deserialize;
 
-pub struct AuthPage {
+
+pub fn resource(path: &str) -> Resource {
+    web::resource(path)
+        .route(web::get().to(Auth::get))
+        .route(web::post().to(Auth::post))
+}
+
+
+#[derive(Deserialize)]
+pub struct Credentials {
+    email: String,
+    password: String,
+}
+
+
+pub struct Auth {
     error_message: Option<String>,
 }
 
-impl AuthPage {
+
+impl Auth {
     pub fn new() -> Self {
-        AuthPage {
+        Auth {
             error_message: None,
         }
     }
 
-    pub fn with_error(msg: String) -> Self {
-        AuthPage {
-            error_message: Some(msg),
+    pub fn with_error(msg: impl Into<String>) -> Self {
+        Auth {
+            error_message: Some(msg.into()),
         }
+    }
+
+    fn in_page(self, page: Page) -> Page {
+        page.title("Sign In")
+            .id("Auth")
+            .content(self)
+    }
+
+    pub async fn get(page: Page) -> Page {
+        Self::new().in_page(page)
+    }
+
+    pub async fn post(
+        credentials: Form<Credentials>,
+        state: Data<State>,
+        session: Session,
+        page: Page,
+    ) -> Either<Result<HttpResponse, Error>, Page> {
+        let pool = &mut *state.pool.borrow_mut();
+        let secret = &state.secret_key;
+
+        let result = sqlx::query_as!(
+            Author,
+            "select id, email, name, password_hash from author where email = $1",
+            credentials.email
+        ).fetch_one(pool).await;
+
+        let author = match result {
+            Ok(author) => author,
+
+            Err(_) => {
+                // Hash the password anyway to help prevent timing attacks
+                let _ = encryption::hash(secret, &credentials.password);
+
+                return Either::B(Auth::with_error("Invalid credentials").in_page(page));
+            }
+        };
+
+        Either::B(
+            match encryption::verify(secret, &author.password_hash, &credentials.password) {
+                Ok(true) => match session.set::<AuthorWithoutPassword>("auth", author.into()) {
+                    Ok(_) => return Either::A(Ok(HttpResponse::Found()
+                        .header(LOCATION, "/")
+                        .finish()
+                        .into_body())),
+
+                    Err(e) => Auth::with_error(e.to_string()).in_page(page),
+                },
+                Ok(_) => Auth::with_error("Invalid credentials").in_page(page),
+                Err(e) => Auth::with_error(e.to_string()).in_page(page),
+            }
+        )
     }
 }
 
-impl RenderOnce for AuthPage {
+
+impl RenderOnce for Auth {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let AuthPage { error_message } = self;
+        let Auth { error_message } = self;
 
         tmpl << html! {
             form (method = "post", action = "/auth") {
@@ -41,17 +125,3 @@ impl RenderOnce for AuthPage {
         };
     }
 }
-
-impl Into<String> for AuthPage {
-    fn into(self) -> String {
-        LayoutPage {
-            title: "Sign In".into(),
-            main_id: "Auth".into(),
-            content: self,
-        }
-        .into_string()
-        .unwrap_or_else(|_| "There was an error generating auth page".into())
-    }
-}
-
-impl Renderable for AuthPage {}

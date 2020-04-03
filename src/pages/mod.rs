@@ -1,23 +1,11 @@
-use actix_web::HttpResponse;
+pub mod about;
+pub mod admin;
+pub mod auth;
+pub mod home;
+pub mod notfound;
+pub mod posts;
+pub mod sandbox;
 
-mod about;
-mod auth;
-mod index;
-mod layout;
-mod not_found;
-mod post;
-mod sandbox;
+mod page;
 
-pub use about::AboutPage;
-pub use auth::AuthPage;
-pub use index::IndexPage;
-pub use layout::LayoutPage;
-pub use not_found::NotFoundPage;
-pub use post::{PostFormPage, PostPage};
-pub use sandbox::SandboxPage;
-
-pub trait Renderable: Into<String> {
-    fn render(self) -> HttpResponse {
-        HttpResponse::Ok().body::<String>(self.into())
-    }
-}
+pub use page::Page;

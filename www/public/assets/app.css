@@ -200,10 +200,10 @@ a#Logotype:hover {
 
 
 /* ********************
- * PAGE: Index
+ * PAGE: Home
  */
 
-main#Index preview {
+main#Home preview {
     display: flex;
     flex-direction: column;
 }

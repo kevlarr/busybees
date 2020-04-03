@@ -9,7 +9,8 @@ use std::io;
 
 use ::busybees::{
     handlers,
-    pages::{self, Renderable},
+    middleware,
+    pages,
     State,
 };
 
@@ -23,40 +24,38 @@ async fn main() -> io::Result<()> {
     HttpServer::new(|| {
         let state = State::new();
 
+        let cookie_session = CookieSession::private(&state.secret_key.as_bytes())
+            .name("busybeelife")
+            .http_only(true)
+            .secure(false);
+
+        let static_files = Files::new("/public", "www/public")
+            .show_files_listing()
+            .use_last_modified(true);
+
         App::new()
-            .wrap(Logger::default())
-            .wrap(
-                CookieSession::private(&state.secret_key.as_bytes())
-                    .name("busybees")
-                    .secure(false),
-            )
             .data(state)
-            .default_service(web::route().to(|| pages::NotFoundPage {}.render()))
-            .route("/", get().to(handlers::posts::index))
-            .route("/about", get().to(|| pages::AboutPage {}.render()))
-            .route("/images", post().to(handlers::images::upload))
-            .route("/sandbox", get().to(|| pages::SandboxPage {}.render()))
-            .service(
-                web::resource("/auth")
-                    .route(get().to(|| pages::AuthPage::new().render()))
-                    .route(post().to(handlers::auth::sign_in)),
-            )
-            .service(
-                web::scope("/posts")
-                    .route(
-                        "/new",
-                        get().to(|| pages::PostFormPage { post: None }.render()),
-                    )
-                    .route("/new", post().to(handlers::posts::create))
-                    .route("/{key}/edit", get().to(handlers::posts::edit))
-                    .route("/{key}/edit", post().to(handlers::posts::update))
-                    .route("/{key}/read/{slug}", get().to(handlers::posts::read)),
-            )
-            .service(
-                Files::new("/public", "www/public")
-                    .show_files_listing()
-                    .use_last_modified(true),
-            )
+
+            // First applied is last to execute, so user/session management needs to
+            // be applied prior to the cookie session backend
+            .wrap_fn(middleware::load_user)
+            .wrap_fn(middleware::set_assigns)
+            .wrap(cookie_session)
+            .wrap(Logger::default())
+
+            // Default 404 response
+            .default_service(web::route().to(pages::notfound::get))
+
+            // Public assets
+            .service(static_files)
+
+            .route("/", get().to(pages::home::get))
+            .route("/about", get().to(pages::about::get))
+            .route("/sandbox", get().to(pages::sandbox::get))
+            .service(pages::auth::resource("/auth"))
+            .service(pages::posts::resource("/posts"))
+            .service(pages::admin::resource("/admin"))
+            .route("/api/images", post().to(handlers::images::upload))
     })
     .bind("127.0.0.1:3030")?
     .run()

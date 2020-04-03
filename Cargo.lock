@@ -575,6 +575,7 @@ dependencies = [
  "actix-files",
  "actix-multipart",
  "actix-rt",
+ "actix-service",
  "actix-session",
  "actix-web",
  "argonautica",

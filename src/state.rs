@@ -2,6 +2,7 @@ use futures::FutureExt;
 use sqlx::PgPool;
 use std::{cell::RefCell, env, rc::Rc};
 
+#[derive(Debug)]
 pub struct State {
     pub pool: Rc<RefCell<PgPool>>,
     pub secret_key: String,
