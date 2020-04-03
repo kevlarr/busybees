@@ -55,7 +55,7 @@ impl FromRequest for Page {
     type Future = Ready<Result<Page, Error>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
-        let user = req.extensions().get::<Assigns>().map(|a| a.user.clone()).flatten();
+        let user = req.extensions().get::<Assigns>().map(|a| a.author.clone()).flatten();
 
         ok(Page::new(user))
     }

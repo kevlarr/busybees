@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
+use sqlx::PgPool;
 
 #[derive(Deserialize)]
 pub struct NewPost {
@@ -21,6 +22,20 @@ pub struct Post {
     pub published: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+}
+
+impl Post {
+    pub async fn load(pool: &mut PgPool, key: String) -> Result<Self, String> {
+        sqlx::query_as!(
+            Self,
+            "select key, title, content, published, created_at, updated_at
+                from post where key = $1",
+            key
+        )
+        .fetch_one(pool)
+        .await
+        .map_err(|e| e.to_string())
+    }
 }
 
 #[derive(Clone)]
