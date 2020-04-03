@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 
 #[derive(Deserialize)]
 pub struct NewPost {
@@ -31,7 +31,15 @@ pub struct Author {
     pub password_hash: String,
 }
 
-#[derive(Clone, Debug)]
+impl Into<AuthorWithoutPassword> for Author {
+    fn into(self) -> AuthorWithoutPassword {
+        let Author { id, name, email, .. } = self;
+
+        AuthorWithoutPassword { id, name, email }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AuthorWithoutPassword {
     pub id: i32,
     pub name: String,

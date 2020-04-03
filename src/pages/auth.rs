@@ -1,6 +1,6 @@
 use crate::{
     encryption,
-    models::Author,
+    models::{Author, AuthorWithoutPassword},
     pages::Page,
     State,
 };
@@ -87,7 +87,7 @@ impl Auth {
 
         Either::B(
             match encryption::verify(secret, &author.password_hash, &credentials.password) {
-                Ok(true) => match session.set("auth", author.id) {
+                Ok(true) => match session.set::<AuthorWithoutPassword>("auth", author.into()) {
                     Ok(_) => return Either::A(Ok(HttpResponse::Found()
                         .header(LOCATION, "/")
                         .finish()
