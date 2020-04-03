@@ -53,7 +53,7 @@ async fn main() -> io::Result<()> {
             .route("/about", get().to(pages::about::get))
             .route("/sandbox", get().to(pages::sandbox::get))
             .service(pages::auth::resource("/auth"))
-            .service(pages::posts::resource("/posts"))
+            .service(pages::post::resource("/posts"))
             .service(pages::admin::resource("/admin"))
             .route("/api/images", post().to(handlers::images::upload))
     })

@@ -1,6 +1,5 @@
 use crate::{
-    extensions::Assigns,
-    models::{AuthorWithoutPassword, Post, NewPost},
+    models::{Post, NewPost},
     pages::{notfound, Page},
     ActixResult,
     State,
@@ -8,37 +7,11 @@ use crate::{
 };
 
 use actix_web::{
-    dev::RequestHead,
-    guard::fn_guard,
-    web::{self, Data, Form, Path},
+    web::{Data, Form, Path},
     HttpResponse,
-    Scope,
 };
 use chrono::Utc;
 use horrorshow::{html, RenderOnce, TemplateBuffer};
-
-
-fn auth_guard(head: &RequestHead) -> bool {
-    let author: Option<AuthorWithoutPassword> = head
-        .extensions()
-        .get::<Assigns>()
-        .map(|assn| assn.author.clone())
-        .flatten();
-
-    author.is_some()
-}
-
-
-pub fn resource(path: &str) -> Scope {
-    use web::{get, post};
-
-    web::scope(path)
-        .guard(fn_guard(auth_guard))
-        .route("/new", get().to(PostForm::new))
-        .route("/new", post().to(PostForm::create))
-        .route("/{key}/edit", get().to(PostForm::edit))
-        .route("/{key}/edit", post().to(PostForm::update))
-}
 
 pub struct PostForm {
     pub post: Option<Post>,
