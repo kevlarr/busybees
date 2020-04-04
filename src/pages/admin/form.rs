@@ -1,5 +1,5 @@
 use crate::{
-    models::{Post, NewPost},
+    models::{Post, NewPost, TitleSlug},
     pages::{notfound, Page},
     ActixResult,
     State,
@@ -10,7 +10,6 @@ use actix_web::{
     web::{Data, Form, Path},
     HttpResponse,
 };
-use chrono::Utc;
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 pub struct PostForm {
@@ -29,7 +28,7 @@ impl PostForm {
         state: Data<State>,
     ) -> ActixResult {
         let pool = &mut *state.pool.borrow_mut();
-        let slug = slug::slugify(&form.title);
+        let slug = form.title_slug();
 
         match Post::create(pool, form.into_inner()).await {
             Ok(key) => Ok(redirect(&format!("/posts/{}/read/{}", key, slug))),
@@ -60,7 +59,7 @@ impl PostForm {
         state: Data<State>,
     ) -> ActixResult {
         let pool = &mut *state.pool.borrow_mut();
-        let slug = slug::slugify(&form.title);
+        let slug = form.title_slug();
 
         Ok(match Post::update(pool, path.0.clone(), form.into_inner()).await {
             Ok(_) => redirect(&format!("/posts/{}/read/{}", path.0, slug)),
@@ -77,8 +76,8 @@ impl RenderOnce for PostForm {
                 title,
                 content,
                 ..
-            }) => (format!("/posts/{}/edit", key), title, content),
-            None => ("/posts/new".to_string(), String::new(), String::new()),
+            }) => (format!("/admin/posts/edit/{}", key), title, content),
+            None => ("/admin/posts/new".to_string(), String::new(), String::new()),
         };
 
         tmpl << html! {

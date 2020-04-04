@@ -1,4 +1,9 @@
-use crate::{models::PostPreview, pages::Page, ActixResult, State};
+use crate::{
+    models::{PostPreview, TitleSlug},
+    pages::Page,
+    ActixResult,
+    State,
+};
 
 use actix_web::{web::Data, Either, HttpResponse};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
@@ -34,7 +39,7 @@ impl RenderOnce for Home {
                 tmpl << html! {
                     section (id = "PrimaryPost") {
                         a (
-                            href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
+                            href = format!("/posts/{}/read/{}", preview.key, preview.title_slug()),
                             class = "primary post-link"
                         ) {
                             preview (type = "primary") {
@@ -53,7 +58,7 @@ impl RenderOnce for Home {
                     section (id = "SecondaryPosts") {
                         @ for preview in posts {
                             a (
-                                href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
+                                href = format!("/posts/{}/read/{}", preview.key, preview.title_slug()),
                                 class = "secondary post-link"
                             ) {
                                 preview (type = "secondary") {

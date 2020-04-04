@@ -1,8 +1,8 @@
 use actix_web::{http::header, Error, HttpResponse};
 
+pub mod api;
 pub mod encryption;
 pub mod extensions;
-pub mod handlers;
 pub mod middleware;
 pub mod models;
 pub mod pages;

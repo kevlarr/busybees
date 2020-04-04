@@ -88,6 +88,16 @@ impl Post {
             .map_err(|e| e.to_string())
     }
 
+    pub async fn update_status(pool: &mut PgPool, key: String, published: bool) -> Result<(), String> {
+        sqlx::query!(r#"
+            update post set published = $2, updated_at = now() where key = $1
+        "#, key, published)
+            .execute(pool)
+            .await
+            .map(|_| ())
+            .map_err(|e| e.to_string())
+    }
+
     pub async fn load(pool: &mut PgPool, key: String) -> Result<Self, String> {
         sqlx::query_as!(
             Self,
@@ -129,4 +139,30 @@ pub struct AuthorWithoutPassword {
     pub id: i32,
     pub name: String,
     pub email: String,
+}
+
+pub trait TitleSlug {
+    fn title_slug(&self) -> String {
+        slug::slugify(&self.title())
+    }
+
+    fn title(&self) -> &str;
+}
+
+impl TitleSlug for NewPost {
+    fn title(&self) -> &str {
+        &self.title
+    }
+}
+
+impl TitleSlug for PostPreview {
+    fn title(&self) -> &str {
+        &self.title
+    }
+}
+
+impl TitleSlug for AdminPostPreview {
+    fn title(&self) -> &str {
+        &self.title
+    }
 }

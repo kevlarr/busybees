@@ -8,7 +8,7 @@ use actix_web::{
 use std::io;
 
 use ::busybees::{
-    handlers,
+    api,
     middleware,
     pages,
     State,
@@ -55,7 +55,7 @@ async fn main() -> io::Result<()> {
             .service(pages::auth::resource("/auth"))
             .service(pages::post::resource("/posts"))
             .service(pages::admin::resource("/admin"))
-            .route("/api/images", post().to(handlers::images::upload))
+            .service(api::resource("/api"))
     })
     .bind("127.0.0.1:3030")?
     .run()

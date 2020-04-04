@@ -17,7 +17,7 @@ use posts::Posts;
 use form::PostForm;
 
 
-fn auth_guard(head: &RequestHead) -> bool {
+pub fn auth_guard(head: &RequestHead) -> bool {
     let author: Option<AuthorWithoutPassword> = head
         .extensions()
         .get::<Assigns>()

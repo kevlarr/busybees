@@ -1,5 +1,5 @@
 use crate::{
-    models::AdminPostPreview,
+    models::{AdminPostPreview, TitleSlug},
     pages::Page,
     State,
 };
@@ -17,7 +17,9 @@ impl Posts {
 
         page.id("AdminPosts")
             .title("Manage Posts")
-            .content(Self { posts: AdminPostPreview::load_all(pool).await })
+            .content(Self {
+                posts: AdminPostPreview::load_all(pool).await
+            })
     }
 
 }
@@ -52,8 +54,10 @@ impl RenderOnce for PostItem {
 
         tmpl << html! {
             admin-post-item {
-                post-status (type = if post.published { "published" } else { "draft" });
-                h2 : post.title;
+                post-status (type = if post.published { "published" } else { "unlisted" });
+                h2 : &post.title;
+                a (href = format!("/posts/{}/read/{}", post.key, post.title_slug())) : "View";
+                a (href = format!("/admin/posts/edit/{}", post.key)) : "Edit";
             }
         }
     }

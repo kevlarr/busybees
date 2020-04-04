@@ -3,6 +3,7 @@ name = "busybees"
 version = "0.1.0"
 authors = ["kevlarr"]
 edition = "2018"
+default-run = "server"
 
 [dependencies]
 actix-web = "2.0"

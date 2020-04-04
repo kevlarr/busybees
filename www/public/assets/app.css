@@ -430,30 +430,50 @@ main#AdminPosts .posts-list {
 }
 
 admin-post-item {
+    align-items: center;
     display: flex;
+    margin-bottom: 15px;
 }
 
 admin-post-item > h2 {
     flex: 1;
+    font-size: 16px;
+    margin-bottom: 0;
+    margin-right: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+admin-post-item > post-status,
+admin-post-item > a:not(:last-child) {
+    margin-right: 20px;
+}
+
+admin-post-item > a {
+    font-size: 10px;
 }
 
 post-status::before {
-    border-radius: 2px;
+    border-radius: 20px;
     display: inline-block;
-    font-size: 12px;
-    padding: 5px 10px;
+    font-size: 10px;
+    margin-right: 10px;
+    padding: 5px 0;
+    text-align: center;
+    width: 50px;
 }
 
-post-status[type="draft"]::before {
+post-status[type="unlisted"]::before {
     background-color: #E3E0DB;
     color: #958E81;
-    content: "draft";
+    content: "unlisted";
 }
 
 post-status[type="published"]::before {
     background-color: #F3A909;
     color: white;
-    content: "published";
+    content: "public";
 }
 
 
