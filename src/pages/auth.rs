@@ -68,19 +68,11 @@ impl Auth {
         let pool = &mut *state.pool.borrow_mut();
         let secret = &state.secret_key;
 
-        let result = sqlx::query_as!(
-            Author,
-            "select id, email, name, password_hash from author where email = $1",
-            credentials.email
-        ).fetch_one(pool).await;
-
-        let author = match result {
+        let author = match Author::load(pool, credentials.email.clone()).await {
             Ok(author) => author,
-
             Err(_) => {
                 // Hash the password anyway to help prevent timing attacks
                 let _ = encryption::hash(secret, &credentials.password);
-
                 return Either::B(Auth::with_error("Invalid credentials").in_page(page));
             }
         };
@@ -88,11 +80,9 @@ impl Auth {
         Either::B(
             match encryption::verify(secret, &author.password_hash, &credentials.password) {
                 Ok(true) => match session.set::<AuthorWithoutPassword>("auth", author.into()) {
-                    Ok(_) => return Either::A(Ok(HttpResponse::Found()
-                        .header(LOCATION, "/")
-                        .finish()
-                        .into_body())),
-
+                    Ok(_) => return Either::A(Ok(
+                        HttpResponse::Found().header(LOCATION, "/admin/posts").finish().into_body()
+                    )),
                     Err(e) => Auth::with_error(e.to_string()).in_page(page),
                 },
                 Ok(_) => Auth::with_error("Invalid credentials").in_page(page),

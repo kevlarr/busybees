@@ -422,6 +422,43 @@ box-cursor {
 
 
 /* ********************
+ * PAGE: Admin Posts
+ */
+
+main#AdminPosts .posts-list {
+    list-style-type: none;
+}
+
+admin-post-item {
+    display: flex;
+}
+
+admin-post-item > h2 {
+    flex: 1;
+}
+
+post-status::before {
+    border-radius: 2px;
+    display: inline-block;
+    font-size: 12px;
+    padding: 5px 10px;
+}
+
+post-status[type="draft"]::before {
+    background-color: #E3E0DB;
+    color: #958E81;
+    content: "draft";
+}
+
+post-status[type="published"]::before {
+    background-color: #F3A909;
+    color: white;
+    content: "published";
+}
+
+
+
+/* ********************
  * PAGE: Not Found
  */
 

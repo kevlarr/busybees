@@ -29,25 +29,10 @@ impl PostForm {
         state: Data<State>,
     ) -> ActixResult {
         let pool = &mut *state.pool.borrow_mut();
-        let now = Utc::now();
+        let slug = slug::slugify(&form.title);
 
-        let result = sqlx::query!(
-            "insert into post (title, content, published, created_at, updated_at)
-                values ($1, $2, $3, $4, $5) returning key",
-            form.title,
-            form.content,
-            false,
-            now,
-            now
-        )
-        .fetch_one(pool)
-        .await;
-
-        match result {
-            Ok(row) => {
-                let slug = slug::slugify(&form.title);
-                Ok(redirect(&format!("/posts/{}/read/{}", row.key, slug)))
-            }
+        match Post::create(pool, form.into_inner()).await {
+            Ok(key) => Ok(redirect(&format!("/posts/{}/read/{}", key, slug))),
             Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
         }
     }
@@ -75,18 +60,10 @@ impl PostForm {
         state: Data<State>,
     ) -> ActixResult {
         let pool = &mut *state.pool.borrow_mut();
+        let slug = slug::slugify(&form.title);
 
-        let result = sqlx::query!(
-            "update post set title = $1, content = $2, updated_at = now() where key = $3",
-            form.title,
-            form.content,
-            path.0
-        )
-        .execute(pool)
-        .await;
-
-        Ok(match result {
-            Ok(_) => redirect_to_post(&path.0, &form.title),
+        Ok(match Post::update(pool, path.0.clone(), form.into_inner()).await {
+            Ok(_) => redirect(&format!("/posts/{}/read/{}", path.0, slug)),
             Err(e) => HttpResponse::BadRequest().body(e.to_string()),
         })
     }
@@ -123,10 +100,4 @@ impl RenderOnce for PostForm {
             script(src = "/public/assets/editor.js");
         };
     }
-}
-
-
-fn redirect_to_post(key: &str, title: &str) -> HttpResponse {
-    let slug = slug::slugify(title);
-    redirect(&format!("/posts/{}/read/{}", key, slug))
 }

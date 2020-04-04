@@ -7,19 +7,7 @@ use horrorshow::{html, RenderOnce, TemplateBuffer};
 pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
     let pool = &mut *state.pool.borrow_mut();
 
-    let result = sqlx::query_as!(PostPreview, r#"
-        select
-            key,
-            title,
-            created_at,
-            substring(content, 'src="([a-zA-Z0-9\.\-_~:\/%\?#=]+)"') as first_src
-        from post
-        where published
-        order by created_at desc
-        limit 4
-    "#).fetch_all(pool).await;
-
-    match result {
+    match PostPreview::load_latest(pool).await {
         Ok(posts) => Either::A(
             page.id("Home")
                 .title("Latest Posts")
@@ -27,7 +15,7 @@ pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
         ),
         Err(e) => Either::B(
             // TODO This should be an actual page
-            Ok(HttpResponse::BadRequest().body(e.to_string()))
+            Ok(HttpResponse::BadRequest().body(e))
         ),
     }
 }
