@@ -435,7 +435,11 @@ admin-post-item {
     margin-bottom: 15px;
 }
 
-admin-post-item > h2 {
+a.admin-post-title {
+    /*color: #504B40;*/
+}
+
+admin-post-item h2 {
     flex: 1;
     font-size: 16px;
     margin-bottom: 0;

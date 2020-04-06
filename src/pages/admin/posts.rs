@@ -1,11 +1,16 @@
 use crate::{
-    models::{AdminPostPreview, TitleSlug},
+    models::{AdminPostPreview, Post, TitleSlug},
     pages::Page,
     State,
 };
-
-use actix_web::web::Data;
+use actix_web::{web::{Data, Json, Path}, Error, HttpResponse};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+pub struct PostUpdate {
+    published: bool,
+}
 
 pub struct Posts {
     posts: Result<Vec<AdminPostPreview>, String>,
@@ -22,6 +27,19 @@ impl Posts {
             })
     }
 
+    pub async fn update_published(
+        page: Page,
+        path: Path<(String,)>,
+        params: Json<PostUpdate>,
+        state: Data<State>,
+    ) -> Page {
+        let pool = &mut *state.pool.borrow_mut();
+
+        Ok(match Post::update_status(pool, path.0.clone(), params.published).await {
+            Ok(_) => HttpResponse::NoContent().finish(),
+            Err(e) => HttpResponse::BadRequest().body(e),
+        })
+    }
 }
 
 impl RenderOnce for Posts {
@@ -54,10 +72,13 @@ impl RenderOnce for PostItem {
 
         tmpl << html! {
             admin-post-item {
-                post-status (type = if post.published { "published" } else { "unlisted" });
-                h2 : &post.title;
-                a (href = format!("/posts/{}/read/{}", post.key, post.title_slug())) : "View";
-                a (href = format!("/admin/posts/edit/{}", post.key)) : "Edit";
+                form (method = "post", action = "/admin/posts/{}/update") {
+                    input (type = "checkbox", checked? = post.published);
+                    post-status (type = if post.published { "published" } else { "unlisted" });
+                }
+                a (class = "admin-post-title", href = format!("/posts/{}/read/{}", &post.key, post.title_slug())) {
+                    h2 : &post.title;
+                }
             }
         }
     }
