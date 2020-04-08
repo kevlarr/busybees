@@ -19,6 +19,7 @@ pub fn resource(path: &str) -> Scope {
 
 pub struct PostView {
     pub post: Post,
+    pub auth: bool,
 }
 
 impl PostView {
@@ -28,11 +29,12 @@ impl PostView {
         state: Data<State>,
     ) -> Page {
         let pool = &mut *state.pool.borrow_mut();
+        let auth = page.user.is_some();
 
         match Post::load(pool, path.0.clone()).await {
             Ok(post) => page.id("Post")
                 .title(post.title.clone())
-                .content(Self{ post }),
+                .content(Self{ auth, post }),
 
             Err(_) => notfound::get_sync(page),
         }
@@ -41,8 +43,10 @@ impl PostView {
 
 impl RenderOnce for PostView {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
+        let auth = self.auth;
         let Post {
             author,
+            key,
             title,
             content,
             published,
@@ -51,6 +55,23 @@ impl RenderOnce for PostView {
         } = self.post;
 
         tmpl << html! {
+            @ if auth {
+                post-controls {
+                    post-status (
+                        type = if published { "published" } else { "unlisted" },
+                        data-post-key = &key
+                    );
+                    div {
+                        a (href = format!("/admin/posts/edit/{}", key)) {
+                            button (class = "small") : "Edit";
+                        }
+                        a (href = format!("/admin/posts/delete/{}", key)) {
+                            button (class = "small") : "Remove";
+                        }
+                    }
+                }
+            }
+
             h1 : title;
             post-meta {
                 @ if let Some(name) = author {
@@ -61,6 +82,10 @@ impl RenderOnce for PostView {
                 post-published : created_at.format("%a %b %e, %Y").to_string();
             }
             post-content : Raw(content);
+
+            @ if auth {
+                script(src = "/public/assets/admin.js");
+            }
         };
     }
 }

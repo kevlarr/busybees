@@ -3,9 +3,9 @@
 
   for (const postStatus of postStatuses) {
     const key = postStatus.getAttribute('data-post-key');
-    const published = postStatus.getAttribute('type') === 'published';
 
     postStatus.addEventListener('click', function() {
+      const published = postStatus.getAttribute('type') === 'published';
       let status;
 
       fetch(`/api/posts/${key}`, {

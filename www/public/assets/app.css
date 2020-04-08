@@ -109,6 +109,11 @@ button:not(.note-btn) {
     padding: 10px 20px;
 }
 
+button:not(.note-btn).small {
+    font-size: 10px;
+    padding: 5px 15px;
+}
+
 button:not([disabled]):active {
     transform: scale(0.95);
 }
@@ -140,6 +145,37 @@ button.primary:not([disabled]):active,
 button.primary:not([disabled]):focus,
 button.primary:not([disabled]):hover {
     background-color: #0990E3;
+}
+
+
+post-status, post-status:hover {
+    transition: transform 0.1s;
+}
+
+post-status:hover {
+    transform: scale(1.2);
+}
+
+post-status::before {
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 10px;
+    padding: 5px 0;
+    text-align: center;
+    width: 50px;
+}
+
+post-status[type="unlisted"]::before {
+    background-color: #E3E0DB;
+    color: #958E81;
+    content: "unlisted";
+}
+
+post-status[type="published"]::before {
+    background-color: #F3A909;
+    color: white;
+    content: "public";
 }
 
 
@@ -286,6 +322,21 @@ main#Post post-meta {
     font-size: 14px;
     margin-bottom: 25px;
     padding: 0 0 10px 10px;
+}
+
+post-controls {
+    background: #E3E0DB;
+    border-radius: 5px;
+    color: #BFBBB4;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+}
+
+post-controls post-status::before {
+    box-shadow: 0 0 10px 0 #958E81;
+    margin-right: 20px;
 }
 
 
@@ -469,38 +520,6 @@ admin-post-item > a:not(:last-child) {
 admin-post-item > a {
     font-size: 10px;
 }
-
-post-status, post-status:hover {
-    transition: transform 0.1s;
-}
-
-post-status:hover {
-    transform: scale(1.2);
-}
-
-post-status::before {
-    border-radius: 20px;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 10px;
-    margin-right: 10px;
-    padding: 5px 0;
-    text-align: center;
-    width: 50px;
-}
-
-post-status[type="unlisted"]::before {
-    background-color: #E3E0DB;
-    color: #958E81;
-    content: "unlisted";
-}
-
-post-status[type="published"]::before {
-    background-color: #F3A909;
-    color: white;
-    content: "public";
-}
-
 
 
 /* ********************
