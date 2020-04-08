@@ -26,20 +26,6 @@ impl Posts {
                 posts: AdminPostPreview::load_all(pool).await
             })
     }
-
-    pub async fn update_published(
-        page: Page,
-        path: Path<(String,)>,
-        params: Json<PostUpdate>,
-        state: Data<State>,
-    ) -> Page {
-        let pool = &mut *state.pool.borrow_mut();
-
-        Ok(match Post::update_status(pool, path.0.clone(), params.published).await {
-            Ok(_) => HttpResponse::NoContent().finish(),
-            Err(e) => HttpResponse::BadRequest().body(e),
-        })
-    }
 }
 
 impl RenderOnce for Posts {
@@ -53,6 +39,7 @@ impl RenderOnce for Posts {
                         : PostItem { post };
                     }
                 }
+                script(src = "/public/assets/admin.js");
             },
             Err(e) => tmpl << html! {
                 p : e;
@@ -72,10 +59,11 @@ impl RenderOnce for PostItem {
 
         tmpl << html! {
             admin-post-item {
-                form (method = "post", action = "/admin/posts/{}/update") {
-                    input (type = "checkbox", checked? = post.published);
-                    post-status (type = if post.published { "published" } else { "unlisted" });
-                }
+                post-status (
+                    type = if post.published { "published" } else { "unlisted" },
+                    data-post-key = &post.key
+                );
+
                 a (class = "admin-post-title", href = format!("/posts/{}/read/{}", &post.key, post.title_slug())) {
                     h2 : &post.title;
                 }

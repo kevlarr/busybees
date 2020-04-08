@@ -458,8 +458,17 @@ admin-post-item > a {
     font-size: 10px;
 }
 
+post-status, post-status:hover {
+    transition: transform 0.1s;
+}
+
+post-status:hover {
+    transform: scale(1.2);
+}
+
 post-status::before {
     border-radius: 20px;
+    cursor: pointer;
     display: inline-block;
     font-size: 10px;
     margin-right: 10px;
