@@ -3,7 +3,7 @@ pub mod admin;
 pub mod auth;
 pub mod home;
 pub mod notfound;
-pub mod posts;
+pub mod post;
 pub mod sandbox;
 
 mod page;

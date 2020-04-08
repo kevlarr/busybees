@@ -1,4 +1,9 @@
-use crate::{models::PostPreview, pages::Page, ActixResult, State};
+use crate::{
+    models::{PostPreview, TitleSlug},
+    pages::Page,
+    ActixResult,
+    State,
+};
 
 use actix_web::{web::Data, Either, HttpResponse};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
@@ -7,15 +12,7 @@ use horrorshow::{html, RenderOnce, TemplateBuffer};
 pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
     let pool = &mut *state.pool.borrow_mut();
 
-    let result = sqlx::query_as!(
-        PostPreview,
-        r#"select key, title, created_at, substring(content, 'src="([a-zA-Z0-9\.\-_~:\/%\?#=]+)"') as first_src
-            from post order by created_at desc limit 4"#,
-    )
-        .fetch_all(pool)
-        .await;
-
-    match result {
+    match PostPreview::load_latest(pool).await {
         Ok(posts) => Either::A(
             page.id("Home")
                 .title("Latest Posts")
@@ -23,7 +20,7 @@ pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
         ),
         Err(e) => Either::B(
             // TODO This should be an actual page
-            Ok(HttpResponse::BadRequest().body(e.to_string()))
+            Ok(HttpResponse::BadRequest().body(e))
         ),
     }
 }
@@ -42,7 +39,7 @@ impl RenderOnce for Home {
                 tmpl << html! {
                     section (id = "PrimaryPost") {
                         a (
-                            href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
+                            href = format!("/posts/{}/read/{}", preview.key, preview.title_slug()),
                             class = "primary post-link"
                         ) {
                             preview (type = "primary") {
@@ -52,7 +49,12 @@ impl RenderOnce for Home {
                                 });
                                 footer {
                                     h1 : &preview.title;
-                                    time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
+                                    @ if let Some(name) = &preview.author {
+                                        : "by ";
+                                        post-author : name;
+                                        : " on ";
+                                    }
+                                    post-published : &preview.created_at.format("%a %b %e, %Y").to_string();
                                 }
                             }
                         }
@@ -61,7 +63,7 @@ impl RenderOnce for Home {
                     section (id = "SecondaryPosts") {
                         @ for preview in posts {
                             a (
-                                href = format!("/posts/{}/read/{}", preview.key, slug::slugify(&preview.title)),
+                                href = format!("/posts/{}/read/{}", preview.key, preview.title_slug()),
                                 class = "secondary post-link"
                             ) {
                                 preview (type = "secondary") {
@@ -71,7 +73,14 @@ impl RenderOnce for Home {
                                     });
                                     footer {
                                         h2 : &preview.title;
-                                        time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
+                                        post-meta {
+                                            @ if let Some(name) = &preview.author {
+                                                : "by ";
+                                                post-author : name;
+                                                : " on ";
+                                            }
+                                            post-published : &preview.created_at.format("%a %b %e, %Y").to_string();
+                                        }
                                     }
                                 }
                             }

@@ -1,6 +1,5 @@
 use crate::{
-    extensions::Assigns,
-    models::{AuthorWithoutPassword, Post, NewPost},
+    models::{Post, NewPost, TitleSlug},
     pages::{notfound, Page},
     ActixResult,
     State,
@@ -8,37 +7,10 @@ use crate::{
 };
 
 use actix_web::{
-    dev::RequestHead,
-    guard::fn_guard,
-    web::{self, Data, Form, Path},
+    web::{Data, Form, Path},
     HttpResponse,
-    Scope,
 };
-use chrono::Utc;
 use horrorshow::{html, RenderOnce, TemplateBuffer};
-
-
-fn auth_guard(head: &RequestHead) -> bool {
-    let author: Option<AuthorWithoutPassword> = head
-        .extensions()
-        .get::<Assigns>()
-        .map(|assn| assn.author.clone())
-        .flatten();
-
-    author.is_some()
-}
-
-
-pub fn resource(path: &str) -> Scope {
-    use web::{get, post};
-
-    web::scope(path)
-        .guard(fn_guard(auth_guard))
-        .route("/new", get().to(PostForm::new))
-        .route("/new", post().to(PostForm::create))
-        .route("/{key}/edit", get().to(PostForm::edit))
-        .route("/{key}/edit", post().to(PostForm::update))
-}
 
 pub struct PostForm {
     pub post: Option<Post>,
@@ -56,25 +28,10 @@ impl PostForm {
         state: Data<State>,
     ) -> ActixResult {
         let pool = &mut *state.pool.borrow_mut();
-        let now = Utc::now();
+        let slug = form.title_slug();
 
-        let result = sqlx::query!(
-            "insert into post (title, content, published, created_at, updated_at)
-                values ($1, $2, $3, $4, $5) returning key",
-            form.title,
-            form.content,
-            false,
-            now,
-            now
-        )
-        .fetch_one(pool)
-        .await;
-
-        match result {
-            Ok(row) => {
-                let slug = slug::slugify(&form.title);
-                Ok(redirect(&format!("/posts/{}/read/{}", row.key, slug)))
-            }
+        match Post::create(pool, form.into_inner()).await {
+            Ok(key) => Ok(redirect(&format!("/posts/{}/read/{}", key, slug))),
             Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
         }
     }
@@ -102,18 +59,10 @@ impl PostForm {
         state: Data<State>,
     ) -> ActixResult {
         let pool = &mut *state.pool.borrow_mut();
+        let slug = form.title_slug();
 
-        let result = sqlx::query!(
-            "update post set title = $1, content = $2, updated_at = now() where key = $3",
-            form.title,
-            form.content,
-            path.0
-        )
-        .execute(pool)
-        .await;
-
-        Ok(match result {
-            Ok(_) => redirect_to_post(&path.0, &form.title),
+        Ok(match Post::update(pool, path.0.clone(), form.into_inner()).await {
+            Ok(_) => redirect(&format!("/posts/{}/read/{}", path.0, slug)),
             Err(e) => HttpResponse::BadRequest().body(e.to_string()),
         })
     }
@@ -127,8 +76,8 @@ impl RenderOnce for PostForm {
                 title,
                 content,
                 ..
-            }) => (format!("/posts/{}/edit", key), title, content),
-            None => ("/posts/new".to_string(), String::new(), String::new()),
+            }) => (format!("/admin/posts/edit/{}", key), title, content),
+            None => ("/admin/posts/new".to_string(), String::new(), String::new()),
         };
 
         tmpl << html! {
@@ -150,10 +99,4 @@ impl RenderOnce for PostForm {
             script(src = "/public/assets/editor.js");
         };
     }
-}
-
-
-fn redirect_to_post(key: &str, title: &str) -> HttpResponse {
-    let slug = slug::slugify(title);
-    redirect(&format!("/posts/{}/read/{}", key, slug))
 }

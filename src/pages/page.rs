@@ -98,8 +98,8 @@ impl RenderOnce for Page {
 
                         @ if let Some(_) = user {
                             ul (id = "AdminLinks") {
-                                li { a (href = "/posts/new", class = "admin page-link") : "New post"; }
-                                li { a (href = "/drafts", class = "admin page-link") : "Drafts"; }
+                                li { a (href = "/admin/posts", class = "admin page-link") : "Manage Posts"; }
+                                li { a (href = "/admin/posts/new", class = "admin page-link") : "New Post"; }
                             }
                         }
 
