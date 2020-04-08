@@ -1,16 +1,13 @@
 use crate::{
     models::{AdminPostPreview, Post, TitleSlug},
     pages::Page,
+    ActixResult,
     State,
+    redirect,
 };
 use actix_web::{web::{Data, Json, Path}, Error, HttpResponse};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
-use serde::Deserialize;
 
-#[derive(Deserialize)]
-pub struct PostUpdate {
-    published: bool,
-}
 
 pub struct Posts {
     posts: Result<Vec<AdminPostPreview>, String>,
@@ -25,6 +22,15 @@ impl Posts {
             .content(Self {
                 posts: AdminPostPreview::load_all(pool).await
             })
+    }
+
+    pub async fn delete(path: Path<(String,)>, state: Data<State>) -> ActixResult {
+        let pool = &mut *state.pool.borrow_mut();
+
+        match Post::delete(pool, &path.0).await {
+            Ok(key) => Ok(redirect("/admin/posts")),
+            Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
+        }
     }
 }
 

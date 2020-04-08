@@ -117,6 +117,14 @@ impl Post {
             where key = $1
         ", key).fetch_one(pool).await.map_err(|e| e.to_string())
     }
+
+    pub async fn delete(pool: &mut PgPool, key: &str) -> Result<(), String> {
+        sqlx::query!("delete from post where key = $1", key.to_string())
+            .execute(pool)
+            .await
+            .map(|_| ())
+            .map_err(|e| e.to_string())
+    }
 }
 
 #[derive(Clone)]
