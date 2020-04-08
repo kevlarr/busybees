@@ -9,6 +9,7 @@ pub struct NewPost {
 }
 
 pub struct PostPreview {
+    pub author: Option<String>,
     pub key: String,
     pub title: String,
     pub first_src: Option<String>,
@@ -19,11 +20,13 @@ impl PostPreview {
     pub async fn load_latest(pool: &mut PgPool) -> Result<Vec<Self>, String> {
         sqlx::query_as!(Self, r#"
             select
+                author.name as author,
                 key,
                 title,
                 created_at,
                 substring(content, 'src="([a-zA-Z0-9\.\-_~:\/%\?#=]+)"') as first_src
             from post
+            left join author on author.id = post.author_id
             where published
             order by created_at desc
             limit 4
@@ -55,6 +58,7 @@ impl AdminPostPreview {
 }
 
 pub struct Post {
+    pub author: Option<String>,
     pub key: String,
     pub title: String,
     pub content: String,
@@ -99,12 +103,19 @@ impl Post {
     }
 
     pub async fn load(pool: &mut PgPool, key: String) -> Result<Self, String> {
-        sqlx::query_as!(
-            Self,
-            "select key, title, content, published, created_at, updated_at
-                from post where key = $1",
-            key
-        ).fetch_one(pool).await.map_err(|e| e.to_string())
+        sqlx::query_as!(Self, "
+            select
+                author.name as author,
+                post.key,
+                post.title,
+                post.content,
+                post.published,
+                post.created_at,
+                post.updated_at
+
+            from post left join author on author.id = post.author_id
+            where key = $1
+        ", key).fetch_one(pool).await.map_err(|e| e.to_string())
     }
 }
 

@@ -49,7 +49,12 @@ impl RenderOnce for Home {
                                 });
                                 footer {
                                     h1 : &preview.title;
-                                    time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
+                                    @ if let Some(name) = &preview.author {
+                                        : "by ";
+                                        post-author : name;
+                                        : " on ";
+                                    }
+                                    post-published : &preview.created_at.format("%a %b %e, %Y").to_string();
                                 }
                             }
                         }
@@ -68,7 +73,14 @@ impl RenderOnce for Home {
                                     });
                                     footer {
                                         h2 : &preview.title;
-                                        time : &preview.created_at.format("%a %b %e, %Y @ %l:%M %P %Z").to_string();
+                                        post-meta {
+                                            @ if let Some(name) = &preview.author {
+                                                : "by ";
+                                                post-author : name;
+                                                : " on ";
+                                            }
+                                            post-published : &preview.created_at.format("%a %b %e, %Y").to_string();
+                                        }
                                     }
                                 }
                             }

@@ -42,20 +42,25 @@ impl PostView {
 impl RenderOnce for PostView {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         let Post {
+            author,
             title,
             content,
             published,
             created_at,
-            updated_at,
             ..
         } = self.post;
 
         tmpl << html! {
             h1 : title;
-            p : Raw(content);
-            p : format!("Published: {}", published);
-            p : format!("Created: {}", created_at);
-            p : format!("Updated: {}", updated_at);
+            post-meta {
+                @ if let Some(name) = author {
+                    : "by ";
+                    post-author : name;
+                    : " on ";
+                }
+                post-published : created_at.format("%a %b %e, %Y").to_string();
+            }
+            post-content : Raw(content);
         };
     }
 }
