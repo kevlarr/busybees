@@ -2,6 +2,10 @@
 
 Server to support the (upcoming) blog at http://busybee.life
 
+## Setup
+
+Server requires HTTPS even locally, but a test certificate can be generated with `gencert.sh`.
+
 ## Why Rust?
 
 I know a lot of people say Rust is ridiculous for web development because "we don't need that level of performance".

@@ -5,7 +5,7 @@ use crate::{
     State,
     redirect,
 };
-use actix_web::{web::{Data, Json, Path}, Error, HttpResponse};
+use actix_web::{web::{Data, Path}, HttpResponse};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 
@@ -28,7 +28,7 @@ impl Posts {
         let pool = &mut *state.pool.borrow_mut();
 
         match Post::delete(pool, &path.0).await {
-            Ok(key) => Ok(redirect("/admin/posts")),
+            Ok(()) => Ok(redirect("/admin/posts")),
             Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
         }
     }

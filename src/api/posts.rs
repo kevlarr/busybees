@@ -1,6 +1,6 @@
 use crate::{models::Post, ActixResult, State};
 
-use actix_web::{web::{Data, Json, Path}, Error, HttpResponse};
+use actix_web::{web::{Data, Json, Path}, HttpResponse};
 use serde::Deserialize;
 
 #[derive(Deserialize)]

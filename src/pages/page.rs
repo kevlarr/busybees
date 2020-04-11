@@ -109,7 +109,6 @@ impl RenderOnce for Page {
                         }
 
                         footer {
-                            p : "© 2020";
                             p {
                                 :"Powered by ";
                                 a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
@@ -118,9 +117,7 @@ impl RenderOnce for Page {
                                 : ", ";
                                 a(href = "https://summernote.org/", target = "_blank") : "Summernote";
                                 : ", and us 🐝s!";
-                            }
-                            p {
-                                : "Images courtesy of ...";
+                                : " © 2020";
                             }
                         }
                     }

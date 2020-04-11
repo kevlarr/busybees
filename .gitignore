@@ -1,3 +1,4 @@
 /target
 www/public/uploads
 .env
+*.pem
