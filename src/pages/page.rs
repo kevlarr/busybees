@@ -94,7 +94,7 @@ impl RenderOnce for Page {
                     main(id = main_id) : Raw(if let Some(c) = content { c } else { String::new() });
 
                     nav {
-                        a (id = "Logotype", href = "/") : "The busy bee life";
+                        a (id = "Logotype", href = "/") : "busy bee life";
 
                         @ if let Some(_) = user {
                             ul (id = "AdminLinks") {
@@ -103,20 +103,16 @@ impl RenderOnce for Page {
                             }
                         }
 
-                        ul (id = "Pages") {
+                        ul (class = "links") {
                             li { a (href = "/about", class = "page-link") : "About us"; }
-                            li { a (href = "/sandbox", class = "page-link") : "Sandbox"; }
                         }
 
                         footer {
                             p {
                                 :"Powered by ";
-                                a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
-                                : ", ";
-                                a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
-                                : ", ";
-                                a(href = "https://summernote.org/", target = "_blank") : "Summernote";
-                                : ", and us 🐝s!";
+                                a (href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
+                                : " and ";
+                                a (href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
                                 : " © 2020";
                             }
                         }

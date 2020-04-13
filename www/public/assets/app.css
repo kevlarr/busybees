@@ -21,6 +21,7 @@ ol, ul {
 body, input {
     color: #504B40;
     font-family: 'Work Sans', sans-serif;
+    font-weight: 300;
     font-size: 16px;
 }
 
@@ -59,26 +60,24 @@ footer {
 a {
     color: black;
     text-decoration: none;
-    transition: color 0.15s;
+    transition: border-color 0.1s, color 0.1s;
 }
 
 a, button:not([disabled]) {
     cursor: pointer;
 }
 
-/* Only basic links should be gold by default */
 a:not([id]):not([class]) {
-    color: #D9A600;
-    font-weight: 600;
+    border-bottom: 1px dotted #E5D5AE;
+    color: #B38101;
 }
 
-/* Even class-ified links should turn on hover */
 a:not([id]):hover,
 a:not([id]):focus,
 a:not([id]):active {
-    border: 0;
-    color: #2EA4ED;
-    transition: color 0.15s;
+    border-bottom: 1px dotted #477FBB;
+    color: #477FBB;
+    transition: border-color 0.1s, color 0.1s;
 }
 
 button,
@@ -93,7 +92,7 @@ button.note-btn:focus,
 button.note-btn:active {
     border: 0;
     color: white;
-    transition: background-color 0.15s, scale 0.05s;
+    transition: background-color 0.1s, scale 0.05s;
 }
 
 button, button.note-btn {
@@ -116,6 +115,10 @@ button:not(.note-btn).small {
 
 button:not([disabled]):active {
     transform: scale(0.95);
+}
+
+button.note-btn {
+    font-size: 12px;
 }
 
 button.note-btn:not([disabled]):active {
@@ -144,7 +147,7 @@ button.primary[disabled] {
 button.primary:not([disabled]):active,
 button.primary:not([disabled]):focus,
 button.primary:not([disabled]):hover {
-    background-color: #0990E3;
+    background-color: #F0A200;
 }
 
 
@@ -173,14 +176,14 @@ post-status[type="unlisted"]::before {
 }
 
 post-status[type="published"]::before {
-    background-color: #F3A909;
+    background-color: #F0A200;
     color: white;
     content: "public";
 }
 
 
 /* ********************
- * LAYOUT
+ * Layout
  */
 
 html {
@@ -197,10 +200,11 @@ main {
     background: white;
     box-shadow: 0 0 40px 10px #999;
     display: flex;
-    flex: 4;
+    flex: 3;
     flex-direction: column;
     overflow: scroll;
-    padding: 75px;
+    padding: 65px;
+    position: relative;
     z-index: 1;
 }
 
@@ -221,17 +225,18 @@ body > nav > footer {
 }
 
 a#Logotype {
-    background-color: white;
+    color: white;
+    background-image: url('/public/images/bee-gold-rev.jpg');
+    background-repeat: no-repeat;
+    background-position: right 76% top 54%;
     font-family: 'Damion', cursive;
     font-size: 36px;
-    padding: 15px;
-    transition: background-color 0.1s;
+    padding: 5px 0 10px 30px;
     z-index: 1;
 }
 
-a#Logotype:hover {
-    background-color: #FFC23F;
-    transition: background-color 0.1s;
+ul.links {
+    list-style-type: none;
 }
 
 
@@ -246,7 +251,7 @@ main#Home preview {
 
 #PrimaryPost {
     flex: 3;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     padding-bottom: 20px;
 }
 
@@ -261,14 +266,14 @@ main#Home preview {
 
 a.post-link {
     display: inline-block;
-    transition: color 0.1s, transform 0.2s;
+    transition: color 0.1s, transform 0.05s;
     width: 100%;
 }
 
 a.post-link:hover {
-    color: #D9A600;
+    color: #CDAA53;
     transform: scale(1.02);
-    transition: color 0.1s, transform 0.2s;
+    transition: color 0.1s, transform 0.1s;
 }
 
 .primary.post-link {
@@ -303,7 +308,7 @@ preview img {
 }
 
 preview[type="primary"] img {
-    height: 40vh;
+    height: 35vh;
     object-fit: cover;
 }
 
@@ -316,22 +321,30 @@ preview[type="secondary"] img {
  * PAGE: Post view
  */
 
+main#Post {
+    overflow-x: hidden;
+}
+
 main#Post post-meta {
     box-shadow: 0 7px 15px -12px gray;
     color: #958E81;
     font-size: 14px;
-    margin-bottom: 25px;
     padding: 0 0 10px 10px;
 }
 
 post-controls {
-    background: #E3E0DB;
-    border-radius: 5px;
+    align-items: center;
+    background: #585650;
     color: #BFBBB4;
     display: flex;
+    height: 65px;
     justify-content: space-between;
+    left: 0;
     margin-bottom: 20px;
     padding: 10px 20px;
+    position: absolute;
+    top: 0;
+    width: 100%;
 }
 
 post-controls post-status::before {
@@ -339,10 +352,29 @@ post-controls post-status::before {
     margin-right: 20px;
 }
 
+a.icon-link {
+    border-bottom: 1px dotted #aaa;
+    color: white;
+    font-weight: 600;
+}
+
+a.icon-link:hover {
+    border-color: #B38101;
+    color: #F0A200;
+}
+
+post-controls post-changes a:not(:last-child) {
+    margin-right: 20px;
+}
+
 
 /* ********************
  * PAGE: Post form
  */
+
+main#PostForm {
+    padding: 20px 65px;
+}
 
 #EditorForm {
     display: flex;
@@ -366,7 +398,7 @@ input {
 }
 
 input:focus, input:active {
-    box-shadow: inset 0px 0px 5px 0px #73CAE6;
+    box-shadow: inset 0px 0px 5px 0px #477FBB;
     transition: box-shadow .2s;
 }
 
@@ -390,7 +422,7 @@ input:focus, input:active {
 #PostTitle:active,
 .note-editable:focus,
 .note-editable:active {
-    box-shadow: inset 0px 0px 9px 0px #73CAE6;
+    box-shadow: inset 0px 0px 9px 0px #477FBB;
     transition: box-shadow .2s;
 }
 
@@ -413,7 +445,12 @@ input:focus, input:active {
     border: 0;
 }
 
-.note-dropdown-menu {
+#EditorForm .note-dropdown-menu {
+    background: #E3E0DB;
+}
+
+.note-dropdown-menu .note-btn-group:not(:last-child) {
+    margin-bottom: 6px;
 }
 
 .note-editor .note-editing-area {
