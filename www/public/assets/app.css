@@ -218,10 +218,28 @@ body > nav {
     z-index: 0;
 }
 
+body > nav > header > a {
+    display: block;
+}
+
+body > nav > header p {
+    font-size: 12px;
+    /*padding: 15px 25px;*/
+    padding: 5px 15px 5px 30px;
+}
+
+body > nav > section {
+    flex: 1;
+}
+
 body > nav > footer {
     margin: 0;
-    padding: 5px 15px;
+    padding: 5px 25px;
     background: white;
+}
+
+body > nav > footer p {
+    padding: 0;
 }
 
 a#Logotype {
@@ -235,8 +253,11 @@ a#Logotype {
     z-index: 1;
 }
 
-ul.links {
+ul#AdminLinks {
+    background: #585650;
     list-style-type: none;
+    margin: 0;
+    padding: 15px 15px 15px 30px;
 }
 
 
@@ -250,14 +271,14 @@ main#Home preview {
 }
 
 #PrimaryPost {
-    flex: 3;
-    margin-bottom: 30px;
+    /*flex: 3;*/
+    margin-bottom: 40px;
     padding-bottom: 20px;
 }
 
 #SecondaryPosts {
     display: flex;
-    flex: 1;
+    /*flex: 1;*/
     justify-content: space-between;
 }
 
@@ -292,15 +313,19 @@ preview[type="secondary"] footer {
     padding: 10px 0;
 }
 
+preview[type="primary"] h1,
+preview[type="secondary"] h2 {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 preview[type="primary"] h1 {
     font-size: 28px;
 }
 
 preview[type="secondary"] h2 {
     font-size: 20px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 }
 
 preview img {

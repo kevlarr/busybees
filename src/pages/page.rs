@@ -94,17 +94,27 @@ impl RenderOnce for Page {
                     main(id = main_id) : Raw(if let Some(c) = content { c } else { String::new() });
 
                     nav {
-                        a (id = "Logotype", href = "/") : "busy bee life";
+                        header {
+                            a (id = "Logotype", href = "/") : "busy bee life";
 
-                        @ if let Some(_) = user {
-                            ul (id = "AdminLinks") {
-                                li { a (href = "/admin/posts", class = "admin page-link") : "Manage Posts"; }
-                                li { a (href = "/admin/posts/new", class = "admin page-link") : "New Post"; }
+                            @ if let Some(_) = user {
+                                ul (id = "AdminLinks") {
+                                    li { a (class = "icon-link", href = "/admin/posts") : "⌸ Manage Posts"; }
+                                    li { a (class = "icon-link", href = "/admin/posts/new") : "⎘ New Post"; }
+                                    li { a (class = "icon-link", href = "/auth/clear") : "⍇ Sign Out"; }
+                                }
+                            }
+
+                            p {
+                                : "Stacey the attorney and Kevin the software engineer;
+                                    parents; DIY home-renovators; growing environmentalists;
+                                    all-around busy bees. ";
+                                a (href = "/about") : "More about us ➝";
                             }
                         }
 
-                        ul (class = "links") {
-                            li { a (href = "/about", class = "page-link") : "About us"; }
+                        section {
+                            // Author links, tags, etc.
                         }
 
                         footer {
