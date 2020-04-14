@@ -62,8 +62,14 @@ impl RenderOnce for PostView {
                         data-post-key = &key
                     );
                     post-changes {
-                        a (class = "icon-link", href = format!("/admin/posts/edit/{}", key)) : "✎ Edit";
-                        a (class = "icon-link", href = format!("/admin/posts/delete/{}", key)) :"✖ Delete";
+                        a (class = "icon-link", href = format!("/admin/posts/edit/{}", key)) {
+                            i (class = "fa fa-pencil-square-o");
+                            : " Edit";
+                        }
+                        a (class = "icon-link", href = format!("/admin/posts/delete/{}", key)) {
+                            i (class = "fa fa-trash-o");
+                            : " Delete";
+                        }
                     }
                 }
             }

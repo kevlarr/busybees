@@ -88,6 +88,11 @@ impl RenderOnce for Page {
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Work+Sans:300,300i,600&display=swap");
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:400&display=swap");
+
+                    // Font Awesome assets are ~80kb
+                    @ if let Some(_) = user {
+                        script (src = "https://use.fontawesome.com/195e7e8d92.js");
+                    }
                 }
 
                 body {
@@ -99,9 +104,24 @@ impl RenderOnce for Page {
 
                             @ if let Some(_) = user {
                                 ul (id = "AdminLinks") {
-                                    li { a (class = "icon-link", href = "/admin/posts") : "⌸ Manage Posts"; }
-                                    li { a (class = "icon-link", href = "/admin/posts/new") : "⎘ New Post"; }
-                                    li { a (class = "icon-link", href = "/auth/clear") : "⍇ Sign Out"; }
+                                    li {
+                                        a (class = "icon-link", href = "/admin/posts") {
+                                            i (class = "fa fa-th-list");
+                                            : " Manage Posts";
+                                        }
+                                    }
+                                    li {
+                                        a (class = "icon-link", href = "/admin/posts/new") {
+                                            i (class = "fa fa-file-text-o");
+                                            : " New Post";
+                                        }
+                                    }
+                                    li {
+                                        a (class = "icon-link", href = "/auth/clear") {
+                                            i (class = "fa fa-lock");
+                                            : " Sign Out";
+                                        }
+                                    }
                                 }
                             }
 

@@ -282,7 +282,8 @@ a#Logotype {
 }
 
 ul#AdminLinks {
-    background: #585650;
+    background: rgba(88, 86, 80, .75);
+    box-shadow: inset 0 -50px 50px 0 #585650;
     list-style-type: none;
     margin: 0;
     padding: 15px 15px 15px 30px;
@@ -406,13 +407,19 @@ post-controls post-status::before {
 }
 
 a.icon-link {
-    border-bottom: 1px dotted #aaa;
+    border: 0;
     color: white;
-    font-weight: 600;
+    font-size: 14px;
+    /*font-weight: 600;*/
+}
+
+a.icon-link .fa {
+    color: #BFBBB4;
+    width: 1.05em;
 }
 
 a.icon-link:hover {
-    border-color: #B38101;
+    border: 0;
     color: #F0A200;
 }
 
