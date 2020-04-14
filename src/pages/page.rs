@@ -88,35 +88,74 @@ impl RenderOnce for Page {
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Work+Sans:300,300i,600&display=swap");
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:400&display=swap");
+
+                    // Font Awesome assets are ~80kb
+                    @ if let Some(_) = user {
+                        script (src = "https://use.fontawesome.com/195e7e8d92.js");
+                    }
                 }
 
                 body {
                     main(id = main_id) : Raw(if let Some(c) = content { c } else { String::new() });
 
-                    nav {
-                        a (id = "Logotype", href = "/") : "The busy bee life";
+                    main-nav {
+                        header {
+                            a (id = "Logotype", href = "/") : "busy bee life";
 
-                        @ if let Some(_) = user {
-                            ul (id = "AdminLinks") {
-                                li { a (href = "/admin/posts", class = "admin page-link") : "Manage Posts"; }
-                                li { a (href = "/admin/posts/new", class = "admin page-link") : "New Post"; }
+                            @ if let Some(_) = user {
+                                ul (id = "AdminLinks") {
+                                    li {
+                                        a (class = "icon-link", href = "/admin/posts") {
+                                            i (class = "fa fa-th-list");
+                                            : " Manage Posts";
+                                        }
+                                    }
+                                    li {
+                                        a (class = "icon-link", href = "/admin/posts/new") {
+                                            i (class = "fa fa-file-text-o");
+                                            : " New Post";
+                                        }
+                                    }
+                                    li {
+                                        a (class = "icon-link", href = "/auth/clear") {
+                                            i (class = "fa fa-lock");
+                                            : " Sign Out";
+                                        }
+                                    }
+                                }
+                            }
+
+                            bio {
+                                img (src = "/public/images/pose-crop.jpg");
+
+                                dl {
+                                    div {
+                                        dt : "Stacey";
+                                        dd : "Attorney";
+                                    }
+                                    div {
+                                        dt : "Kevin";
+                                        dd : "Software Engineer";
+                                    }
+                                }
+                            }
+
+                            p {
+                                : "Parents, DIY home-renovators, budding environmentalists, and all-around busy bees. ";
+                                a (href = "/about") : "More about us ➝";
                             }
                         }
 
-                        ul (id = "Pages") {
-                            li { a (href = "/about", class = "page-link") : "About us"; }
-                            li { a (href = "/sandbox", class = "page-link") : "Sandbox"; }
+                        section {
+                            // Author links, tags, etc.
                         }
 
                         footer {
                             p {
                                 :"Powered by ";
-                                a(href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
-                                : ", ";
-                                a(href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
-                                : ", ";
-                                a(href = "https://summernote.org/", target = "_blank") : "Summernote";
-                                : ", and us 🐝s!";
+                                a (href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
+                                : " and ";
+                                a (href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
                                 : " © 2020";
                             }
                         }

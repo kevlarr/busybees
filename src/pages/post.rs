@@ -61,12 +61,14 @@ impl RenderOnce for PostView {
                         type = if published { "published" } else { "unlisted" },
                         data-post-key = &key
                     );
-                    div {
-                        a (href = format!("/admin/posts/edit/{}", key)) {
-                            button (class = "small") : "Edit";
+                    post-changes {
+                        a (class = "icon-link", href = format!("/admin/posts/edit/{}", key)) {
+                            i (class = "fa fa-pencil-square-o");
+                            : " Edit";
                         }
-                        a (href = format!("/admin/posts/delete/{}", key)) {
-                            button (class = "small") : "Remove";
+                        a (class = "icon-link", href = format!("/admin/posts/delete/{}", key)) {
+                            i (class = "fa fa-trash-o");
+                            : " Delete";
                         }
                     }
                 }

@@ -2,7 +2,9 @@ use crate::{
     encryption,
     models::{Author, AuthorWithoutPassword},
     pages::Page,
+    ActixResult,
     State,
+    redirect
 };
 use actix_session::Session;
 use actix_web::{
@@ -11,16 +13,17 @@ use actix_web::{
     Either,
     Error,
     HttpResponse,
-    Resource,
+    Scope,
 };
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 use serde::Deserialize;
 
 
-pub fn resource(path: &str) -> Resource {
-    web::resource(path)
-        .route(web::get().to(Auth::get))
-        .route(web::post().to(Auth::post))
+pub fn resource(path: &str) -> Scope {
+    web::scope(path)
+        .route("", web::get().to(Auth::get))
+        .route("", web::post().to(Auth::post))
+        .route("/clear", web::get().to(Auth::delete))
 }
 
 
@@ -89,6 +92,11 @@ impl Auth {
                 Err(e) => Auth::with_error(e.to_string()).in_page(page),
             }
         )
+    }
+
+    pub async fn delete(session: Session) -> ActixResult {
+        session.remove("auth");
+        Ok(redirect("/"))
     }
 }
 
