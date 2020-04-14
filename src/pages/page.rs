@@ -93,7 +93,7 @@ impl RenderOnce for Page {
                 body {
                     main(id = main_id) : Raw(if let Some(c) = content { c } else { String::new() });
 
-                    nav {
+                    main-nav {
                         header {
                             a (id = "Logotype", href = "/") : "busy bee life";
 
@@ -105,10 +105,23 @@ impl RenderOnce for Page {
                                 }
                             }
 
+                            bio {
+                                img (src = "/public/images/pose-crop.jpg");
+
+                                dl {
+                                    div {
+                                        dt : "Stacey";
+                                        dd : "Attorney";
+                                    }
+                                    div {
+                                        dt : "Kevin";
+                                        dd : "Software Engineer";
+                                    }
+                                }
+                            }
+
                             p {
-                                : "Stacey the attorney and Kevin the software engineer;
-                                    parents; DIY home-renovators; growing environmentalists;
-                                    all-around busy bees. ";
+                                : "Parents, DIY home-renovators, budding environmentalists, and all-around busy bees. ";
                                 a (href = "/about") : "More about us ➝";
                             }
                         }

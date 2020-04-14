@@ -208,7 +208,7 @@ main {
     z-index: 1;
 }
 
-body > nav {
+main-nav {
     background-image: url('/public/images/hive-gs-rot.svg');
     background-size: cover;
     display: flex;
@@ -218,14 +218,42 @@ body > nav {
     z-index: 0;
 }
 
-body > nav > header > a {
+main-nav #Logotype {
     display: block;
 }
 
-body > nav > header p {
+main-nav bio {
+    align-items: center;
+    display: flex;
+    padding: 15px 5px;
+}
+
+main-nav bio img {
+    align-self: flex-start;
+    border-radius: 50%;
+    width: 55%;
+}
+
+main-nav bio dl {
+    padding: 0px 5px 0 10px;
+}
+
+main-nav bio > dl dt {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+main-nav bio > dl div:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+main-nav bio > dl dd {
     font-size: 12px;
-    /*padding: 15px 25px;*/
-    padding: 5px 15px 5px 30px;
+}
+
+main-nav > header p {
+    font-size: 12px;
+    padding: 0 15px;
 }
 
 body > nav > section {
