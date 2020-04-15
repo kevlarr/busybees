@@ -23,6 +23,8 @@ async fn main() -> io::Result<()> {
 
     dotenv::dotenv().ok();
 
+    let address = env::var("ADDRESS").expect("ADDRESS not set");
+
     let ssl_builder = {
         let key_file = env::var("SSL_KEY_FILE").expect("SSL_KEY_FILE not set");
         let cert_file = env::var("SSL_CERT_FILE").expect("SSL_CERT_FILE not set");
@@ -70,7 +72,7 @@ async fn main() -> io::Result<()> {
             .service(pages::admin::resource("/admin"))
             .service(api::resource("/api"))
     })
-    .bind_openssl("127.0.0.1:3030", ssl_builder)?
+    .bind_openssl(address, ssl_builder)?
     .run()
     .await
 }
