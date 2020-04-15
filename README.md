@@ -4,7 +4,16 @@ Server to support the (upcoming) blog at http://busybee.life
 
 ## Setup
 
+### HTTPS
+
 Server requires HTTPS even locally, but a test certificate can be generated with `gencert.sh`.
+
+### Database
+
+The application relies on `pgcrypto` to generate random post keys.
+
+- `create schema exts;`
+- `create extensions pgcrypto with schema exts;`
 
 ## Why Rust?
 
