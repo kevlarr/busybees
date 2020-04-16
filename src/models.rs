@@ -12,7 +12,7 @@ pub struct PostPreview {
     pub author: Option<String>,
     pub key: String,
     pub title: String,
-    pub first_src: Option<String>,
+    pub first_image: Option<String>,
     pub created_at: DateTime<Utc>,
 }
 
@@ -24,7 +24,7 @@ impl PostPreview {
                 key,
                 title,
                 created_at,
-                substring(content, 'src="([a-zA-Z0-9\.\-_~:\/%\?#=]+)"') as first_src
+                first_image(content)
             from post
             left join author on author.id = post.author_id
             where published
@@ -65,6 +65,7 @@ pub struct Post {
     pub published: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub first_image: Option<String>
 }
 
 impl Post {
@@ -111,7 +112,8 @@ impl Post {
                 post.content,
                 post.published,
                 post.created_at,
-                post.updated_at
+                post.updated_at,
+                first_image(post.content)
 
             from post left join author on author.id = post.author_id
             where key = $1

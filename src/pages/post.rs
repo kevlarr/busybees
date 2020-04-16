@@ -32,8 +32,10 @@ impl PostView {
         let auth = page.user.is_some();
 
         match Post::load(pool, path.0.clone()).await {
-            Ok(post) => page.id("Post")
+            Ok(post) => page
+                .id("Post")
                 .title(post.title.clone())
+                .image(post.first_image.clone())
                 .content(Self{ auth, post }),
 
             Err(_) => notfound::get_sync(page),

@@ -6,18 +6,22 @@ use horrorshow::{helper::doctype, html, Raw, RenderOnce, Template, TemplateBuffe
 
 pub struct Page {
     pub user: Option<AuthorWithoutPassword>,
-    title: Option<String>,
-    main_id: Option<String>,
     content: Option<String>,
+    main_id: Option<String>,
+    og_image: Option<String>,
+    title: Option<String>,
+    url: String,
 }
 
 impl Page {
-    pub fn new(user: Option<AuthorWithoutPassword>) -> Self {
+    pub fn new(url: String, user: Option<AuthorWithoutPassword>) -> Self {
         Page {
+            url,
             user,
-            title: None,
-            main_id: None,
             content: None,
+            main_id: None,
+            og_image: None,
+            title: None,
         }
     }
 
@@ -36,6 +40,13 @@ impl Page {
 
     pub fn id(mut self, id: impl Into<String>) -> Self {
         self.main_id = Some(id.into());
+        self
+    }
+
+    pub fn image(mut self, image: Option<impl Into<String>>) -> Self {
+        if let Some(i) = image {
+            self.og_image = Some(i.into());
+        }
         self
     }
 }
@@ -57,30 +68,43 @@ impl FromRequest for Page {
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
         let user = req.extensions().get::<Assigns>().map(|a| a.author.clone()).flatten();
 
-        ok(Page::new(user))
+        ok(Page::new(req.uri().to_string(), user))
     }
 }
 
 impl RenderOnce for Page {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         let Page {
-            title,
-            main_id,
             content,
+            main_id,
+            og_image,
+            title,
+            url,
             user,
         } = self;
+
+        let title = match title {
+            Some(t) => format!("Busy Bee Life | {}", t),
+            None => "Busy Bee Life".to_string(),
+        };
+
+        let image = og_image.unwrap_or_else(|| "/public/images/canoe-crop.jpg".into());
 
         tmpl << html! {
             : doctype::HTML;
 
             html {
                 head {
-                    title : match title {
-                        Some(t) => format!("The Busy Bee Life | {}", t),
-                        None => "The Busy Bee Life".to_string(),
-                    };
+                    title : &title;
 
                     meta(charset = "utf-8");
+
+                    // Object Graph
+                    meta(property = "og:type", content = "website");
+                    meta(property = "og:image", content = &image);
+                    meta(property = "og:site_name ", content = "Busy Bee Life");
+                    meta(property = "og:title", content = &title);
+                    meta(property = "og:url", content = &url);
 
                     link(rel = "stylesheet", type = "text/css", href = "/public/assets/app.css");
 
