@@ -1,1 +1,0 @@
-this is a simple file to test serving static assets

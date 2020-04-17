@@ -1,16 +1,19 @@
 use actix_multipart::{Field, Multipart, MultipartError};
 use actix_web::{web, Error, HttpResponse};
+use chrono::Utc;
 use futures::StreamExt;
 use serde::Serialize;
 use std::io::Write;
+
+use crate::State;
 
 #[derive(Serialize)]
 pub struct UploadedImages {
     filepaths: Vec<String>,
 }
 
-pub async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error> {
-    let mut filepaths = Vec::new();
+pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<HttpResponse, Error> {
+    let mut srcpaths = Vec::new();
 
     while let Some(item) = payload.next().await {
         let mut field: Field = item?;
@@ -23,12 +26,13 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error> {
             .get_filename()
             .ok_or_else(|| MultipartError::Incomplete)?;
 
-        let filepath = format!("www/public/uploads/{}", filename);
-        filepaths.push(format!("public/uploads/{}", filename));
+        let timestamp = Utc::now().timestamp();
+        let realpath = format!("{}/{}.{}", &state.upload_path, timestamp, filename);
+        srcpaths.push(format!("uploads/{}.{}", timestamp, filename));
 
         // TODO async-std..?
         // File::create is blocking operation, use threadpool
-        let mut f = web::block(|| std::fs::File::create(filepath)).await?;
+        let mut f = web::block(|| std::fs::File::create(realpath)).await?;
 
         while let Some(chunk) = field.next().await {
             let data = chunk?;
@@ -37,5 +41,5 @@ pub async fn upload(mut payload: Multipart) -> Result<HttpResponse, Error> {
         }
     }
 
-    Ok(HttpResponse::Ok().json(UploadedImages { filepaths }))
+    Ok(HttpResponse::Ok().json(UploadedImages { filepaths: srcpaths }))
 }

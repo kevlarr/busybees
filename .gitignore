@@ -1,5 +1,4 @@
-/target
-www/public/uploads/*
-!www/public/uploads/.gitkeep
+target/
+uploads/
 .env
 *.pem

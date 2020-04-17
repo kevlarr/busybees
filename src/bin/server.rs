@@ -37,7 +37,8 @@ async fn main() -> io::Result<()> {
     };
 
     HttpServer::new(|| {
-        let state = State::new();
+        let upload_path = env::var("UPLOAD_PATH").expect("UPLOAD_PATH not set");
+        let state = State::new(upload_path);
 
         let cookie_session = CookieSession::private(&state.secret_key.as_bytes())
             .name("busybeelife")
@@ -45,6 +46,10 @@ async fn main() -> io::Result<()> {
             .secure(true);
 
         let static_files = Files::new("/public", "www/public")
+            .show_files_listing()
+            .use_last_modified(true);
+
+        let uploaded_files = Files::new("/uploads", &state.upload_path)
             .show_files_listing()
             .use_last_modified(true);
 
@@ -63,6 +68,7 @@ async fn main() -> io::Result<()> {
 
             // Public assets
             .service(static_files)
+            .service(uploaded_files)
 
             .route("/", get().to(pages::home::get))
             .route("/about", get().to(pages::about::get))
