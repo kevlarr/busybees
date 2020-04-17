@@ -1,7 +1,5 @@
 # busybees
 
-Server to support the (upcoming) blog at http://busybee.life
-
 ## Setup
 
 ### HTTPS
