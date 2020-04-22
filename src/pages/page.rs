@@ -99,6 +99,9 @@ impl RenderOnce for Page {
 
                     meta(charset = "utf-8");
 
+                    // Favicons
+                    link(rel = "icon", href = "/public/images/favicon-32.png", sizes = "32x32");
+
                     // Object Graph
                     meta(property = "og:type", content = "website");
                     meta(property = "og:image", content = &image);
