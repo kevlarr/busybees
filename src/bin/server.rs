@@ -1,8 +1,8 @@
 use actix_files::Files;
 use actix_session::CookieSession;
 use actix_web::{
-    middleware::Logger,
-    web::{get, route},
+    middleware::{DefaultHeaders, Logger},
+    web::{get, route, scope},
     App, HttpServer,
 };
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
@@ -45,11 +45,11 @@ async fn main() -> io::Result<()> {
             .http_only(true)
             .secure(true);
 
-        let static_files = Files::new("/public", "www/public")
+        let static_files = Files::new("/", "www/public")
             .show_files_listing()
             .use_last_modified(true);
 
-        let uploaded_files = Files::new("/uploads", &state.upload_path)
+        let uploaded_files = Files::new("/", &state.upload_path)
             .show_files_listing()
             .use_last_modified(true);
 
@@ -66,9 +66,14 @@ async fn main() -> io::Result<()> {
             // Default 404 response
             .default_service(route().to(pages::notfound::get))
 
-            // Public assets
-            .service(static_files)
-            .service(uploaded_files)
+            // Public assets and uploaded images
+            .service(scope("/public")
+                .service(static_files)
+                .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")))
+
+            .service(scope("/uploads")
+                .service(uploaded_files)
+                .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")))
 
             .route("/", get().to(pages::home::get))
             .route("/about", get().to(pages::about::get))
