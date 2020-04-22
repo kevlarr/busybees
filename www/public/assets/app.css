@@ -203,7 +203,7 @@ main {
     flex: 3;
     flex-direction: column;
     overflow: scroll;
-    padding: 65px;
+    padding: 45px 65px;
     position: relative;
     z-index: 1;
 }
@@ -383,6 +383,7 @@ main#Post post-meta {
     box-shadow: 0 7px 15px -12px gray;
     color: #5F584F;
     font-size: 14px;
+    margin-bottom: 20px;
     padding: 0 0 10px 10px;
 }
 

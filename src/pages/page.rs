@@ -100,7 +100,9 @@ impl RenderOnce for Page {
                     meta(charset = "utf-8");
 
                     // Favicons
-                    link(rel = "icon", href = "/public/images/favicon-32.png", sizes = "32x32");
+                    @ for px in vec![32, 57, 76, 96, 120, 128, 152, 180, 192, 228] {
+                        link(rel = "icon", href = format!("/public/images/favicon-{}.png", px), sizes = format!("{}x{}", px, px));
+                    }
 
                     // Object Graph
                     meta(property = "og:type", content = "website");
@@ -181,8 +183,10 @@ impl RenderOnce for Page {
                             p {
                                 :"Powered by ";
                                 a (href = "https://www.rust-lang.org/", target = "_blank", rel = "noopener") : "Rust";
-                                : " and ";
+                                : ", ";
                                 a (href = "https://www.postgresql.org/", target = "_blank", rel = "noopener") : "PostgreSQL";
+                                : ", and ";
+                                a (href = "https://summernote.org/", target = "_blank", rel = "noopener") : "Summernote";
                                 : " © 2020";
                             }
                         }
