@@ -68,15 +68,15 @@ a, button:not([disabled]) {
 }
 
 a:not([id]):not([class]) {
-    border-bottom: 1px dotted #E5D5AE;
-    color: #B38101;
+    border-bottom: 1px dotted #005D8F;
+    color: #005D8F;
 }
 
 a:not([id]):hover,
 a:not([id]):focus,
 a:not([id]):active {
-    border-bottom: 1px dotted #477FBB;
-    color: #477FBB;
+    border-bottom: 1px dotted #804800;
+    color: #804800;
     transition: border-color 0.1s, color 0.1s;
 }
 
@@ -381,7 +381,7 @@ main#Post {
 
 main#Post post-meta {
     box-shadow: 0 7px 15px -12px gray;
-    color: #958E81;
+    color: #5F584F;
     font-size: 14px;
     padding: 0 0 10px 10px;
 }

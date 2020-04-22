@@ -93,7 +93,7 @@ impl RenderOnce for Page {
         tmpl << html! {
             : doctype::HTML;
 
-            html {
+            html(lang = "en") {
                 head {
                     title : &title;
 
