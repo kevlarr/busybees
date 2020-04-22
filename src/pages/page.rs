@@ -180,9 +180,9 @@ impl RenderOnce for Page {
                         footer {
                             p {
                                 :"Powered by ";
-                                a (href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
+                                a (href = "https://www.rust-lang.org/", target = "_blank", rel = "noopener") : "Rust";
                                 : " and ";
-                                a (href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
+                                a (href = "https://www.postgresql.org/", target = "_blank", rel = "noopener") : "PostgreSQL";
                                 : " © 2020";
                             }
                         }
