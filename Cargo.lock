@@ -590,6 +590,7 @@ dependencies = [
  "dotenv",
  "futures 0.3.4",
  "horrorshow",
+ "lazy_static",
  "openssl",
  "pretty_env_logger",
  "rand 0.7.3",

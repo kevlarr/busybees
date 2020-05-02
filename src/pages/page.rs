@@ -1,4 +1,4 @@
-use crate::{extensions::Assigns, models::AuthorWithoutPassword};
+use crate::{extensions::Assigns, models::AuthorWithoutPassword, asset_path};
 
 use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, HttpResponse, Responder};
 use futures::future::{ok, Ready};
@@ -66,7 +66,10 @@ impl FromRequest for Page {
     type Future = Ready<Result<Page, Error>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
-        let user = req.extensions().get::<Assigns>().map(|a| a.author.clone()).flatten();
+        let user = req.extensions()
+            .get::<Assigns>()
+            .map(|a| a.author.clone())
+            .flatten();
 
         ok(Page::new(req.uri().to_string(), user))
     }
@@ -111,7 +114,7 @@ impl RenderOnce for Page {
                     meta(property = "og:title", content = &title);
                     meta(property = "og:url", content = &url);
 
-                    link(rel = "stylesheet", type = "text/css", href = "/public/assets/app.css");
+                    link(rel = "stylesheet", type = "text/css", href = asset_path("app.css"));
 
                     // Font families
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");

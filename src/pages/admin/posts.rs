@@ -3,6 +3,7 @@ use crate::{
     pages::Page,
     ActixResult,
     State,
+    asset_path,
     redirect,
 };
 use actix_web::{web::{Data, Path}, HttpResponse};
@@ -45,7 +46,7 @@ impl RenderOnce for Posts {
                         : PostItem { post };
                     }
                 }
-                script(src = "/public/assets/admin.js");
+                script(src = asset_path("admin.js"));
             },
             Err(e) => tmpl << html! {
                 p : e;

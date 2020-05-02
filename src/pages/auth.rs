@@ -4,7 +4,8 @@ use crate::{
     pages::Page,
     ActixResult,
     State,
-    redirect
+    asset_path,
+    redirect,
 };
 use actix_session::Session;
 use actix_web::{
@@ -119,7 +120,7 @@ impl RenderOnce for Auth {
                 button (id = "SignInSubmit",  type = "submit", class = "primary", disabled) : "Sign In";
             }
 
-            script(src = "/public/assets/signin.js");
+            script(src = asset_path("signin.js"));
         };
     }
 }

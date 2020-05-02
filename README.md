@@ -1,5 +1,28 @@
 # busybees
 
+Server for [Busy Bee Life](https://www.busybee.life).
+
+## Features
+
+**Compile-time HTML guarantees**
+
+`busybees` uses [horrorshow](https://docs.rs/horrorshow/0.8.3/horrorshow/) to generate HTML responses.
+This basically means that HTML is guaranteed to be valid at compile time due to the `html!` macro expansion,
+unlike using traditional `.html` templates that aren't really validated until you see it in the browser.
+
+**JS/CSS cache-busting**
+
+JS and CSS files are served on paths like `/assets/1588378111/app.css`.
+These do not correspond to actual paths, though, as the server will discard the timestamp
+and instead load `/assets/app.css`. The paths will only change upon server restarts.
+
+A big advantage to this is that the files themselves do not need to be 'built' or have
+hashes appended to them, HTML files do not need to be updated to match the new asset hashes, etc.
+
+Everything happens at **run time**: the server generates HTML that links to these
+virtual paths and then requests for them get stripped and matched to actual paths.
+There are no build systems to coordinate and there is a single source of truth.
+
 ## Setup
 
 ### HTTPS

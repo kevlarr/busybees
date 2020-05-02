@@ -9,6 +9,7 @@ use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use std::{env, io};
 
 use ::busybees::{
+    ASSET_BASEPATH,
     api,
     middleware,
     pages,
@@ -45,6 +46,11 @@ async fn main() -> io::Result<()> {
             .http_only(true)
             .secure(true);
 
+        // TODO Okay, this is some copy/paste...
+        let assets = Files::new("/", "www/assets")
+            .show_files_listing()
+            .use_last_modified(true);
+
         let static_files = Files::new("/", "www/public")
             .show_files_listing()
             .use_last_modified(true);
@@ -67,6 +73,10 @@ async fn main() -> io::Result<()> {
             .default_service(route().to(pages::notfound::get))
 
             // Public assets and uploaded images
+            .service(scope(&ASSET_BASEPATH)
+                .service(assets)
+                .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")))
+
             .service(scope("/public")
                 .service(static_files)
                 .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")))
