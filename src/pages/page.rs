@@ -1,4 +1,4 @@
-use crate::{extensions::Assigns, models::AuthorWithoutPassword};
+use crate::{extensions::Assigns, models::AuthorWithoutPassword, asset_path};
 
 use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, HttpResponse, Responder};
 use futures::future::{ok, Ready};
@@ -66,7 +66,10 @@ impl FromRequest for Page {
     type Future = Ready<Result<Page, Error>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
-        let user = req.extensions().get::<Assigns>().map(|a| a.author.clone()).flatten();
+        let user = req.extensions()
+            .get::<Assigns>()
+            .map(|a| a.author.clone())
+            .flatten();
 
         ok(Page::new(req.uri().to_string(), user))
     }
@@ -93,38 +96,48 @@ impl RenderOnce for Page {
         tmpl << html! {
             : doctype::HTML;
 
-            html {
+            html(lang = "en") {
                 head {
                     title : &title;
 
                     meta(charset = "utf-8");
+                    meta(name = "viewport", content = "width=device-width, initial-scale=1");
 
-                    // Object Graph
+                    // Favicons
+                    link(rel = "icon", href = "/public/images/favicon-16.png", type = "image/png", sizes = "16x16");
+                    link(rel = "icon", href = "/public/images/favicon-32.png", type = "image/png", sizes = "32x32");
+                    link(rel = "apple-touch-icon", href="/public/images/apple-touch-icon.png", type = "image/png", sizes = "180x180");
+
+                    // Object Graph properties
                     meta(property = "og:type", content = "website");
                     meta(property = "og:image", content = &image);
                     meta(property = "og:site_name ", content = "Busy Bee Life");
                     meta(property = "og:title", content = &title);
                     meta(property = "og:url", content = &url);
 
-                    link(rel = "stylesheet", type = "text/css", href = "/public/assets/app.css");
+                    // Application assets
+                    link(rel = "stylesheet", type = "text/css", href = asset_path("app.css"));
 
                     // Font families
-                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Damion&display=swap");
+                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Dancing+Script:wght@600&display=swap");
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Work+Sans:300,300i,600&display=swap");
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:400&display=swap");
 
-                    // Font Awesome assets are ~80kb
+                    // Font Awesome assets are ~80kb - not huge but no reason to include for non-admins
                     @ if let Some(_) = user {
                         script (src = "https://use.fontawesome.com/195e7e8d92.js");
                     }
                 }
 
                 body {
-                    main(id = main_id) : Raw(if let Some(c) = content { c } else { String::new() });
-
                     main-nav {
                         header {
-                            a (id = "Logotype", href = "/") : "busy bee life";
+                            logotype {
+                                a (href = "/") {
+                                    img (id = "Logo", src = "/public/images/b-logo-white.svg");
+                                    : "usy bee life";
+                                }
+                            }
 
                             @ if let Some(_) = user {
                                 ul (id = "AdminLinks") {
@@ -148,25 +161,24 @@ impl RenderOnce for Page {
                                     }
                                 }
                             }
-
                             bio {
-                                img (src = "/public/images/pose-crop.jpg");
-
-                                dl {
-                                    div {
-                                        dt : "Stacey";
-                                        dd : "Attorney";
-                                    }
-                                    div {
-                                        dt : "Kevin";
-                                        dd : "Software Engineer";
+                                snapshot {
+                                    img (src = "/public/images/pose-crop.jpg");
+                                    dl {
+                                        div { dt : "Stacey"; dd : "Attorney"; }
+                                        div { dt : "Kevin"; dd : "Software Engineer"; }
                                     }
                                 }
-                            }
-
-                            p {
-                                : "Parents, DIY home-renovators, budding environmentalists, and all-around busy bees. ";
-                                a (href = "/about") : "More about us ➝";
+                                summary {
+                                    small-display {
+                                        strong: "Stacey";
+                                        : " (attorney) and ";
+                                        strong: "Kevin";
+                                        : " (software engineer). "
+                                    }
+                                    : "Parents, DIY home-renovators, budding environmentalists, and all around busy bees. ";
+                                    a (class = "basic", href = "/about") : "More about us ➝";
+                                }
                             }
                         }
 
@@ -175,15 +187,17 @@ impl RenderOnce for Page {
                         }
 
                         footer {
-                            p {
-                                :"Powered by ";
-                                a (href = "https://www.rust-lang.org/", target = "_blank") : "Rust";
-                                : " and ";
-                                a (href = "https://www.postgresql.org/", target = "_blank") : "PostgreSQL";
-                                : " © 2020";
-                            }
+                            :"Powered by ";
+                            a (class = "basic", href = "https://www.rust-lang.org/", target = "_blank", rel = "noopener") : "Rust";
+                            : ", ";
+                            a (class = "basic", href = "https://www.postgresql.org/", target = "_blank", rel = "noopener") : "PostgreSQL";
+                            : ", and ";
+                            a (class = "basic", href = "https://summernote.org/", target = "_blank", rel = "noopener") : "Summernote";
+                            : " © 2020";
                         }
                     }
+
+                    main(id = main_id) : Raw(if let Some(c) = content { c } else { String::new() });
                 }
             }
         };

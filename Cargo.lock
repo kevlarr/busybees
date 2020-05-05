@@ -577,7 +577,7 @@ checksum = "12ae9db68ad7fac5fe51304d20f016c911539251075a214f8e663babefa35187"
 
 [[package]]
 name = "busybees"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "actix-files",
  "actix-multipart",
@@ -590,6 +590,7 @@ dependencies = [
  "dotenv",
  "futures 0.3.4",
  "horrorshow",
+ "lazy_static",
  "openssl",
  "pretty_env_logger",
  "rand 0.7.3",

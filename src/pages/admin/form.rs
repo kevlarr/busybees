@@ -3,6 +3,7 @@ use crate::{
     pages::{notfound, Page},
     ActixResult,
     State,
+    asset_path,
     redirect,
 };
 
@@ -96,7 +97,7 @@ impl RenderOnce for PostForm {
 
             script(src = "https://code.jquery.com/jquery-3.4.1.min.js");
             script(src = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.js");
-            script(src = "/public/assets/editor.js");
+            script(src = asset_path("editor.js"));
         };
     }
 }

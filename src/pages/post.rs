@@ -2,6 +2,7 @@ use crate::{
     models::Post,
     pages::{notfound, Page},
     State,
+    asset_path,
 };
 
 use actix_web::{
@@ -88,7 +89,7 @@ impl RenderOnce for PostView {
             post-content : Raw(content);
 
             @ if auth {
-                script(src = "/public/assets/admin.js");
+                script(src = asset_path("admin.js"));
             }
         };
     }
