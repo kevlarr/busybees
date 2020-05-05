@@ -100,13 +100,13 @@ impl RenderOnce for Page {
                 head {
                     title : &title;
 
-                    // Common favicon sizes...?
-                    @ for px in vec![32, 57, 76, 96, 120, 128, 152, 180, 192, 228] {
-                        link(rel = "icon", href = format!("/public/images/favicon-{}.png", px), sizes = format!("{}x{}", px, px));
-                    }
-
                     meta(charset = "utf-8");
                     meta(name = "viewport", content = "width=device-width, initial-scale=1");
+
+                    // Favicons
+                    link(rel = "icon", href = "/public/images/favicon-16.png", type = "image/png", sizes = "16x16");
+                    link(rel = "icon", href = "/public/images/favicon-32.png", type = "image/png", sizes = "32x32");
+                    link(rel = "apple-touch-icon", href="/public/images/apple-touch-icon.png", type = "image/png", sizes = "180x180");
 
                     // Object Graph properties
                     meta(property = "og:type", content = "website");
