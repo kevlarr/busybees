@@ -10,6 +10,29 @@ Server for [Busy Bee Life](https://www.busybee.life).
 This basically means that HTML is guaranteed to be valid at compile time due to the `html!` macro expansion,
 unlike using traditional `.html` templates that aren't really validated until you see it in the browser.
 
+Plus...
+
+```rust
+html! {
+    dl {
+        div { dt : "Stacey"; dd : "Attorney"; }
+        div { dt : "Kevin"; dd : "Software Engineer"; }
+    }
+}
+```
+... is so much easier to visually parse (and write and edit) than...
+
+```html
+<dl>
+    <div>
+        <dt>Stacey</dt><dd>Attorney</dd>
+    </div>
+    <div>
+        <dt>Kevin</dt><dd>Software Engineer</dd>
+    </div>
+</dl>
+```
+
 **JS/CSS cache-busting**
 
 JS and CSS files are served on paths like `/assets/1588378111/app.css`.
