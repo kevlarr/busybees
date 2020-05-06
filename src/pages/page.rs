@@ -120,7 +120,7 @@ impl RenderOnce for Page {
 
                     // Font families
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Dancing+Script:wght@600&display=swap");
-                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Work+Sans:300,300i,600&display=swap");
+                    link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Work+Sans:300,300i,400,600&display=swap");
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:400&display=swap");
 
                     // Font Awesome assets are ~80kb - not huge but no reason to include for non-admins
@@ -177,7 +177,7 @@ impl RenderOnce for Page {
                                         : " (software engineer). "
                                     }
                                     : "Parents, DIY home-renovators, budding environmentalists, and all around busy bees. ";
-                                    a (class = "basic", href = "/about") : "More about us ➝";
+                                    a (href = "/about") : "More about us ➝";
                                 }
                             }
                         }
@@ -186,14 +186,26 @@ impl RenderOnce for Page {
                             // Author links, tags, etc.
                         }
 
+                        media-links {
+                            a (aria-label = "Visit busy bee life on Facebook", href = "https://www.facebook.com/ourbusybeelife/", target = "_blank", rel = "noreferrer noopener") {
+                                img (src = "/public/images/f_logo_RGB-Blue_1024.svg", alt = "facebook logo");
+                            }
+                            a (aria-label = "Visit busy bee life on Twitter", href = "https://twitter.com/busy_bee_life", target = "_blank", rel = "noreferrer noopener") {
+                                img (src = "/public/images/Twitter_Logo_WhiteOnBlue.svg", alt = "twitter logo");
+                            }
+                            a (aria-label = "View source code on GitHub", href = "https://github.com/kevlarr/busybees", target = "_blank", rel = "noreferrer noopener") {
+                                img (src = "/public/images/GitHub-Mark.svg", alt = "github logo");
+                            }
+                        }
+
                         footer {
-                            :"Powered by ";
-                            a (class = "basic", href = "https://www.rust-lang.org/", target = "_blank", rel = "noopener") : "Rust";
+                            :"© 2020. Powered by ";
+                            a (href = "https://www.rust-lang.org/", target = "_blank", rel = "noopener") : "Rust";
                             : ", ";
-                            a (class = "basic", href = "https://www.postgresql.org/", target = "_blank", rel = "noopener") : "PostgreSQL";
+                            a (href = "https://www.postgresql.org/", target = "_blank", rel = "noopener") : "PostgreSQL";
                             : ", and ";
-                            a (class = "basic", href = "https://summernote.org/", target = "_blank", rel = "noopener") : "Summernote";
-                            : " © 2020";
+                            a (href = "https://summernote.org/", target = "_blank", rel = "noopener") : "Summernote";
+                            : ".";
                         }
                     }
 

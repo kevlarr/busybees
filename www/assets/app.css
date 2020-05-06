@@ -49,7 +49,7 @@ strong {
 }
 
 footer {
-    font-size: 14px;
+    font-size: 12px;
 }
 
 
@@ -61,19 +61,18 @@ a, button:not([disabled]) {
     cursor: pointer;
 }
 
-a, a:hover, a:active, a:focus, a:visited {
-    transition: border-color 0.1s, color 0.1s;
+a {
+    color: #B98100;
+    font-weight: 400;
     text-decoration: none;
 }
 
-a, a:visited {
-    border-bottom: 1px dotted #005D8F;
-    color: #005D8F;
+a, a:hover, a:active, a:focus, a:visited {
+    transition: color 0.1s;
 }
 
 a:hover, a:active, a:focus {
-    border-bottom: 1px dotted #B98100;
-    color: #B98100;
+    color: #005D8F;
 }
 
 button,
@@ -202,7 +201,7 @@ body {
 
 main {
     background: white;
-    box-shadow: 0 0 40px 10px #999;
+    box-shadow: 0 0 20px 5px #999;
     display: flex;
     flex: 4;
     flex-direction: column;
@@ -291,25 +290,66 @@ bio > snapshot dl {
 
     bio > snapshot dl {
         display: block;
-        padding: 0px 5px 0 10px;
     }
+}
 
-    bio > snapshot > dl dt {
-        font-size: 14px;
-        font-weight: 600;
-    }
+bio > snapshot dl {
+    padding: 0px 5px 0 10px;
+}
 
-    bio > snapshot > dl div:not(:last-child) {
-        margin-bottom: 10px;
-    }
+bio > snapshot > dl dt {
+    font-size: 16px;
+    font-weight: 600;
+}
 
-    bio > snapshot > dl dd {
-        font-size: 14px;
-    }
+bio > snapshot > dl div:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+bio > snapshot > dl dd {
+    font-size: 12px;
+}
+
+bio > snapshot > dl dd a {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+bio > snapshot > dl dd a,
+bio > snapshot > dl dd a:visited {
+    color: #504B40;
+}
+
+bio > snapshot > dl dd a:hover {
+    color: #005D8F;
+}
+
+bio > snapshot dd a img {
+    margin-right: 0.25em;
+    transform: translatey(-1px);
+    vertical-align: middle;
+    width: 1em;
 }
 
 main-nav > section {
     flex: 1;
+}
+
+media-links {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 30px;
+    transition: transform 0.05s;
+}
+
+media-links a:hover {
+    transform: scale(1.1);
+    transition: transform 0.05s;
+}
+
+media-links img {
+    border-radius: 50%;
+    width: 32px;
 }
 
 main-nav > footer {

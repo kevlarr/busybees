@@ -7,7 +7,7 @@ Server for [Busy Bee Life](https://www.busybee.life).
 **Compile-time HTML guarantees**
 
 `busybees` uses [horrorshow](https://docs.rs/horrorshow/0.8.3/horrorshow/) to generate HTML responses.
-This basically means that HTML is guaranteed to be valid at compile time due to the `html!` macro expansion,
+This effectively means that HTML is guaranteed to be valid at compile time due to the `html!` macro expansion,
 unlike using traditional `.html` templates that aren't really validated until you see it in the browser.
 
 Plus...
@@ -59,12 +59,17 @@ The application relies on `pgcrypto` to generate random post keys.
 - `create schema exts;`
 - `create extensions pgcrypto with schema exts;`
 
-## Why Rust?
+## So, why Rust?
 
-I know a lot of people say Rust is ridiculous for web development because "we don't need that level of performance".
-That's a fair viewpoint. It's also a complicated language, the compiler is harder to please than my dad, and it can be tough to build the same kind of 'feature momentum' compared to using, well, virtually any other language.
+I know a lot of people say Rust is ridiculous for web development because "we don't need that level of performance". That's a fair viewpoint -
+it's also a complicated language,
+the compiler is harder to please than a truckload of dads,
+and it can be tough to build the same kind of 'feature momentum' compared to using common web languages.
 
-But I really do think it's a viable web language, because...
+Well, *"Butts to that,"* I say - Rust is perfect for the web.
+This started as a proof-of-concept, and the experience continues to be enjoyable.
+
+**10/10 would choose again.**
 
 ### 1. we should **always** strive for 'that level of performance'
 
