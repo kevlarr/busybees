@@ -44,7 +44,17 @@ On storing IP addresses, from https://www.pinsentmasons.com/out-law/guides/ip-ad
 and they are not used to build profiles of individuals.**
 (Nothing is used to profile readers; we don't profile readers.)
 
-### Compile-time HTML guarantees
+### Compile-time guarantees
+
+#### SQL
+
+Using the `sqlx::query!` macro, I can write plain SQL (yay!) that is also verified **at compile time** against an actual database. Combined with trivially-easy serialization to user-defined structs... pure joy.
+
+I used to like ORMs and query builders. But the weeks of my life spent trying to learn some cryptic set of poorly documented methods to accomplish something non-trivial, well, I would love to get them back. Plain SQL means that won't happen anymore.
+
+Plus, no runtime errors from bad SQL statements.
+
+#### HTML
 
 `busybees` uses [horrorshow](https://docs.rs/horrorshow/0.8.3/horrorshow/) to generate HTML responses.
 This effectively means that HTML is guaranteed to be valid at compile time due to the `html!` macro expansion,
@@ -60,7 +70,7 @@ html! {
     }
 }
 ```
-... is so much easier to visually parse (and write and edit) than...
+... isn't Haml, but it *is* so much easier to visually parse (and write and edit) than...
 
 ```html
 <dl>
@@ -73,7 +83,7 @@ html! {
 </dl>
 ```
 
-### JS/CSS cache-busting
+### JS/CSS cache-busting without new filenames
 
 JS and CSS files are served on paths like `/assets/1588378111/app.css`.
 These do not correspond to actual paths, though, as the server will discard the timestamp
