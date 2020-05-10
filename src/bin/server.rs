@@ -61,6 +61,7 @@ async fn main() -> io::Result<()> {
 
         App::new()
             .data(state)
+            .wrap(middleware::RequestLogger)
 
             // First applied is last to execute, so user/session management needs to
             // be applied prior to the cookie session backend

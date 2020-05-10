@@ -16,19 +16,15 @@ pub struct Posts {
 
 impl Posts {
     pub async fn get(page: Page, state: Data<State>) -> Page {
-        let pool = &mut *state.pool.borrow_mut();
-
         page.id("AdminPosts")
             .title("Manage Posts")
             .content(Self {
-                posts: AdminPostPreview::load_all(pool).await
+                posts: AdminPostPreview::load_all(&state.pool).await
             })
     }
 
     pub async fn delete(path: Path<(String,)>, state: Data<State>) -> ActixResult {
-        let pool = &mut *state.pool.borrow_mut();
-
-        match Post::delete(pool, &path.0).await {
+        match Post::delete(&state.pool, &path.0).await {
             Ok(()) => Ok(redirect("/admin/posts")),
             Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
         }

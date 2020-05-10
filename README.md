@@ -4,7 +4,47 @@ Server for [Busy Bee Life](https://www.busybee.life).
 
 ## Features
 
-**Compile-time HTML guarantees**
+### 100% tracker and (effectively) cookie free
+
+No Google, no Facebook. Zero trackers.
+
+The server *does* set a cookie by default, but it is 100% emmpty for anyone who views the page
+except for myself and Stacey.
+
+**Privacy** is under-rated on the web. I respect yours.
+
+### Bookmark-friendly article links
+
+Posts are served on routes like `/posts/xLoGbVFoZasq/read/the-article-title-in-url-here`.
+
+The goal was to have the post title serialized into the URL, but if it was ever changed
+then the URL would change, too, and if I'm lucky enough to have someone bookmark my links,
+then their links would break.
+
+Hence the `xLoGbVFoZasq` portion. This is a random id assigned on creation and never changed.
+The server actually doesn't care what the title is in the URL - one could visit
+`/posts/xLoGbVFoZasq/read/blarg` or `/posts/xLoGbVFoZasq/read/you-are-the-very-model-of-a-modern-major-general`
+for all that matters and the post would still load.
+
+Best of both worlds: the title is shown in the URL because it's user-friendly, but the pages
+are loaded by the random id because it's server (and bookmark) friendly.
+
+### Basic, internal analytics
+
+Very basic page analytics are gathered per request - path visited, referer (if any), timestamp, and IP address.
+It's imperfect and faulty, but it beats cookies, fingerprinting, etc. and it's really all I need.
+
+On storing IP addresses, from https://www.pinsentmasons.com/out-law/guides/ip-addresses-and-the-data-protection-act :
+
+> An IP address in isolation is not personal data under the Data Protection Act, according to the Information Commissioner.
+> But an IP address can become personal data when combined with other information or when used to build a profile of an individual,
+> even if that individual's name is unknown
+
+**IP addresses gathered for basic analytics are not combined with other, more personal information
+and they are not used to build profiles of individuals.**
+(Nothing is used to profile readers; we don't profile readers.)
+
+### Compile-time HTML guarantees
 
 `busybees` uses [horrorshow](https://docs.rs/horrorshow/0.8.3/horrorshow/) to generate HTML responses.
 This effectively means that HTML is guaranteed to be valid at compile time due to the `html!` macro expansion,
@@ -33,7 +73,7 @@ html! {
 </dl>
 ```
 
-**JS/CSS cache-busting**
+### JS/CSS cache-busting
 
 JS and CSS files are served on paths like `/assets/1588378111/app.css`.
 These do not correspond to actual paths, though, as the server will discard the timestamp
