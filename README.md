@@ -6,12 +6,10 @@ Server for [Busy Bee Life](https://www.busybee.life).
 
 ### 100% tracker and (effectively) cookie free
 
-No Google, no Facebook. Zero trackers.
+No Google, no Facebook. Just no trackers.
 
 The server *does* set a cookie by default, but it is 100% emmpty for anyone who views the page
-except for myself and Stacey.
-
-**Privacy** is under-rated on the web. I respect yours.
+except for us authors.
 
 ### Bookmark-friendly article links
 
@@ -28,21 +26,6 @@ for all that matters and the post would still load.
 
 Best of both worlds: the title is shown in the URL because it's user-friendly, but the pages
 are loaded by the random id because it's server (and bookmark) friendly.
-
-### Basic, internal analytics
-
-Very basic page analytics are gathered per request - path visited, referer (if any), timestamp, and IP address.
-It's imperfect and faulty, but it beats cookies, fingerprinting, etc. and it's really all I need.
-
-On storing IP addresses, from https://www.pinsentmasons.com/out-law/guides/ip-addresses-and-the-data-protection-act :
-
-> An IP address in isolation is not personal data under the Data Protection Act, according to the Information Commissioner.
-> But an IP address can become personal data when combined with other information or when used to build a profile of an individual,
-> even if that individual's name is unknown
-
-**IP addresses gathered for basic analytics are not combined with other, more personal information
-and they are not used to build profiles of individuals.**
-(Nothing is used to profile readers; we don't profile readers.)
 
 ### Compile-time guarantees
 
