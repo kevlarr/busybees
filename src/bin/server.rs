@@ -61,14 +61,13 @@ async fn main() -> io::Result<()> {
 
         App::new()
             .data(state)
-            .wrap(middleware::RequestLogger)
 
             // First applied is last to execute, so user/session management needs to
             // be applied prior to the cookie session backend
             .wrap_fn(middleware::load_user)
             .wrap_fn(middleware::set_assigns)
             .wrap(cookie_session)
-            .wrap(Logger::default())
+            .wrap(Logger::new("%t > %a > %r > %{User-Agent}i > %{Referer}i > %s > %b > %D"))
 
             // Default 404 response
             .default_service(route().to(pages::notfound::get))
