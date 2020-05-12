@@ -19,10 +19,8 @@ use ::busybees::{
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
-    std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
-    pretty_env_logger::init();
-
     dotenv::dotenv().ok();
+    pretty_env_logger::init();
 
     let address = env::var("ADDRESS").expect("ADDRESS not set");
 
@@ -67,7 +65,7 @@ async fn main() -> io::Result<()> {
             .wrap_fn(middleware::load_user)
             .wrap_fn(middleware::set_assigns)
             .wrap(cookie_session)
-            .wrap(Logger::new("%t > %a > %r > %{User-Agent}i > %{Referer}i > %s > %b > %D"))
+            .wrap(Logger::default())
 
             // Default 404 response
             .default_service(route().to(pages::notfound::get))
