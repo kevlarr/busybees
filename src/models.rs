@@ -17,7 +17,7 @@ pub struct PostPreview {
 }
 
 impl PostPreview {
-    pub async fn load_latest(pool: &mut PgPool) -> Result<Vec<Self>, String> {
+    pub async fn load_latest(pool: &PgPool) -> Result<Vec<Self>, String> {
         sqlx::query_as!(Self, r#"
             select
                 author.name as author,
@@ -43,7 +43,7 @@ pub struct AdminPostPreview {
 }
 
 impl AdminPostPreview {
-    pub async fn load_all(pool: &mut PgPool) -> Result<Vec<Self>, String> {
+    pub async fn load_all(pool: &PgPool) -> Result<Vec<Self>, String> {
         sqlx::query_as!(Self, r#"
             select
                 key,
@@ -69,7 +69,7 @@ pub struct Post {
 }
 
 impl Post {
-    pub async fn create(pool: &mut PgPool, params: NewPost) -> Result<String, String> {
+    pub async fn create(pool: &PgPool, params: NewPost) -> Result<String, String> {
         let now = Utc::now();
 
         sqlx::query!(r#"
@@ -83,7 +83,7 @@ impl Post {
             .map_err(|e| e.to_string())
     }
 
-    pub async fn update(pool: &mut PgPool, key: String, params: NewPost) -> Result<(), String> {
+    pub async fn update(pool: &PgPool, key: String, params: NewPost) -> Result<(), String> {
         sqlx::query!(r#"
             update post set title = $2, content = $3, updated_at = now() where key = $1
         "#, key, params.title, params.content)
@@ -93,7 +93,7 @@ impl Post {
             .map_err(|e| e.to_string())
     }
 
-    pub async fn update_status(pool: &mut PgPool, key: String, published: bool) -> Result<(), String> {
+    pub async fn update_status(pool: &PgPool, key: String, published: bool) -> Result<(), String> {
         sqlx::query!(r#"
             update post set published = $2, updated_at = now() where key = $1
         "#, key, published)
@@ -103,7 +103,7 @@ impl Post {
             .map_err(|e| e.to_string())
     }
 
-    pub async fn load(pool: &mut PgPool, key: String) -> Result<Self, String> {
+    pub async fn load(pool: &PgPool, key: String) -> Result<Self, String> {
         sqlx::query_as!(Self, "
             select
                 author.name as author,
@@ -120,7 +120,7 @@ impl Post {
         ", key).fetch_one(pool).await.map_err(|e| e.to_string())
     }
 
-    pub async fn delete(pool: &mut PgPool, key: &str) -> Result<(), String> {
+    pub async fn delete(pool: &PgPool, key: &str) -> Result<(), String> {
         sqlx::query!("delete from post where key = $1", key.to_string())
             .execute(pool)
             .await
@@ -138,7 +138,7 @@ pub struct Author {
 }
 
 impl Author {
-    pub async fn load(pool: &mut PgPool, email: String) -> Result<Self, String> {
+    pub async fn load(pool: &PgPool, email: String) -> Result<Self, String> {
         sqlx::query_as!(
             Self,
             "select id, email, name, password_hash from author where email = $1",

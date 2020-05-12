@@ -1,10 +1,10 @@
 use futures::FutureExt;
 use sqlx::PgPool;
-use std::{cell::RefCell, env, rc::Rc};
+use std::env;
 
 #[derive(Debug)]
 pub struct State {
-    pub pool: Rc<RefCell<PgPool>>,
+    pub pool: PgPool,
     pub secret_key: String,
     pub upload_path: String,
 }
@@ -20,7 +20,7 @@ impl State {
             .unwrap(); // sqlx Result
 
         State {
-            pool: Rc::new(RefCell::new(pool)),
+            pool,
             secret_key,
             upload_path,
         }

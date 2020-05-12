@@ -10,9 +10,7 @@ use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 
 pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
-    let pool = &mut *state.pool.borrow_mut();
-
-    match PostPreview::load_latest(pool).await {
+    match PostPreview::load_latest(&state.pool).await {
         Ok(posts) => Either::A(
             page.id("Home")
                 .title("Latest Posts")

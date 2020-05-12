@@ -69,10 +69,9 @@ impl Auth {
         session: Session,
         page: Page,
     ) -> Either<Result<HttpResponse, Error>, Page> {
-        let pool = &mut *state.pool.borrow_mut();
         let secret = &state.secret_key;
 
-        let author = match Author::load(pool, credentials.email.clone()).await {
+        let author = match Author::load(&state.pool, credentials.email.clone()).await {
             Ok(author) => author,
             Err(_) => {
                 // Hash the password anyway to help prevent timing attacks

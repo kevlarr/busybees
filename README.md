@@ -4,6 +4,29 @@ Server for [Busy Bee Life](https://www.busybee.life).
 
 ## Features
 
+### 100% tracker and (effectively) cookie free
+
+No Google, no Facebook. Just no trackers.
+
+The server *does* set a cookie by default, but it is 100% emmpty for anyone who views the page
+except for us authors.
+
+### Bookmark-friendly article links
+
+Posts are served on routes like `/posts/xLoGbVFoZasq/read/the-article-title-in-url-here`.
+
+The goal was to have the post title serialized into the URL, but if it was ever changed
+then the URL would change, too, and if I'm lucky enough to have someone bookmark my links,
+then their links would break.
+
+Hence the `xLoGbVFoZasq` portion. This is a random id assigned on creation and never changed.
+The server actually doesn't care what the title is in the URL - one could visit
+`/posts/xLoGbVFoZasq/read/blarg` or `/posts/xLoGbVFoZasq/read/you-are-the-very-model-of-a-modern-major-general`
+for all that matters and the post would still load.
+
+Best of both worlds: the title is shown in the URL because it's user-friendly, but the pages
+are loaded by the random id because it's server (and bookmark) friendly.
+
 ### Compile-time guarantees
 
 #### SQL
@@ -43,7 +66,7 @@ html! {
 </dl>
 ```
 
-### JS/CSS cache-busting without changing filenames
+### JS/CSS cache-busting without new filenames
 
 JS and CSS files are served on paths like `/assets/1588378111/app.css`.
 These do not correspond to actual paths, though, as the server will discard the timestamp

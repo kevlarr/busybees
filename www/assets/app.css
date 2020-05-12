@@ -348,6 +348,7 @@ media-links a:hover {
 }
 
 media-links img {
+    background: white;
     border-radius: 50%;
     width: 32px;
 }

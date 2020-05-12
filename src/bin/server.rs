@@ -19,10 +19,8 @@ use ::busybees::{
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
-    std::env::set_var("RUST_LOG", "actix_server=info,actix_web=info");
-    pretty_env_logger::init();
-
     dotenv::dotenv().ok();
+    pretty_env_logger::init();
 
     let address = env::var("ADDRESS").expect("ADDRESS not set");
 

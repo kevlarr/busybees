@@ -1,4 +1,5 @@
-use crate::{extensions::Assigns, models::AuthorWithoutPassword};
+use crate::extensions::Assigns;
+use crate::models::AuthorWithoutPassword;
 
 use actix_service::Service;
 use actix_session::UserSession;
@@ -6,6 +7,7 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::Error;
 
 
+/// Adds a new `Assigns` struct to the request extensions.
 pub fn set_assigns<S, B>(req: ServiceRequest, service: &mut S) -> S::Future
 where
     S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>
@@ -15,6 +17,8 @@ where
 }
 
 
+/// Inspects the request session for an `auth` cookie and, if present,
+/// adds the user information into the request extensions' assigns.
 pub fn load_user<S, B>(req: ServiceRequest, service: &mut S) -> S::Future
 where
     S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>

@@ -29,10 +29,9 @@ impl PostView {
         path: Path<(String, String)>,
         state: Data<State>,
     ) -> Page {
-        let pool = &mut *state.pool.borrow_mut();
         let auth = page.user.is_some();
 
-        match Post::load(pool, path.0.clone()).await {
+        match Post::load(&state.pool, path.0.clone()).await {
             Ok(post) => page
                 .id("Post")
                 .title(post.title.clone())

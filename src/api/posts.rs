@@ -13,9 +13,7 @@ pub async fn update(
     params: Json<PostUpdate>,
     state: Data<State>,
 ) -> ActixResult {
-    let pool = &mut *state.pool.borrow_mut();
-
-    Ok(match Post::update_status(pool, path.0.clone(), params.published).await {
+    Ok(match Post::update_status(&state.pool, path.0.clone(), params.published).await {
         Ok(_) => HttpResponse::NoContent().finish(),
         Err(e) => HttpResponse::BadRequest().body(e),
     })

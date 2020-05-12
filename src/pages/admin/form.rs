@@ -28,10 +28,9 @@ impl PostForm {
         form: Form<NewPost>,
         state: Data<State>,
     ) -> ActixResult {
-        let pool = &mut *state.pool.borrow_mut();
         let slug = form.title_slug();
 
-        match Post::create(pool, form.into_inner()).await {
+        match Post::create(&state.pool, form.into_inner()).await {
             Ok(key) => Ok(redirect(&format!("/posts/{}/read/{}", key, slug))),
             Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
         }
@@ -42,9 +41,7 @@ impl PostForm {
         path: Path<(String,)>,
         state: Data<State>,
     ) -> Page {
-        let pool = &mut *state.pool.borrow_mut();
-
-        match Post::load(pool, path.0.clone()).await {
+        match Post::load(&state.pool, path.0.clone()).await {
             Ok(post) => page
                 .id("PostForm")
                 .title("Edit Post")
@@ -59,10 +56,9 @@ impl PostForm {
         form: Form<NewPost>,
         state: Data<State>,
     ) -> ActixResult {
-        let pool = &mut *state.pool.borrow_mut();
         let slug = form.title_slug();
 
-        Ok(match Post::update(pool, path.0.clone(), form.into_inner()).await {
+        Ok(match Post::update(&state.pool, path.0.clone(), form.into_inner()).await {
             Ok(_) => redirect(&format!("/posts/{}/read/{}", path.0, slug)),
             Err(e) => HttpResponse::BadRequest().body(e.to_string()),
         })
