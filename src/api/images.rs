@@ -2,8 +2,10 @@ use actix_multipart::{Field, Multipart, MultipartError};
 use actix_web::{web, Error, HttpResponse};
 use chrono::Utc;
 use futures::StreamExt;
+use image::GenericImageView;
 use image::imageops::FilterType;
 use serde::Serialize;
+use std::fs;
 use std::io::Write;
 
 use crate::State;
@@ -38,11 +40,22 @@ pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<H
         let img = image::open(&filepath)
             .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
 
-        img.resize(1200, 1200, FilterType::CatmullRom).save(&filepath)
-            .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
+        let (width, height) = img.dimensions();
 
-        img.thumbnail(400, 400).save(&thumbpath)
-            .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
+        if width > 1200 || height > 1200 {
+            img.resize(1200, 1200, FilterType::CatmullRom).save(&filepath)
+                .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
+        }
+
+        if width > 400 || height > 400 {
+            img.resize(400, 400, FilterType::CatmullRom).save(&thumbpath)
+                .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
+        } else {
+            // For now, the server assumes every image has a corresponding thumbnail
+            // at the expected path, so just copy it. It's small.
+            fs::copy(&filepath, &thumbpath)?;
+        }
+
     }
 
     Ok(HttpResponse::Ok().json(UploadedImages { filepaths: srcpaths }))
