@@ -2,7 +2,7 @@ use actix_multipart::{Field, Multipart, MultipartError};
 use actix_web::{web, Error, HttpResponse};
 use chrono::Utc;
 use futures::StreamExt;
-use image::GenericImageView;
+use image::imageops::FilterType;
 use serde::Serialize;
 use std::io::Write;
 
@@ -35,12 +35,11 @@ pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<H
 
         save_file(&mut field, filepath.clone()).await?;
 
-        let img = image::open(filepath)
+        let img = image::open(&filepath)
             .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
 
-        let (width, height) = img.dimensions();
-
-        // FIXME resize if necesssary
+        img.resize(1200, 1200, FilterType::CatmullRom).save(&filepath)
+            .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
 
         img.thumbnail(400, 400).save(&thumbpath)
             .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
