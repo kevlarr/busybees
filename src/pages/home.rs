@@ -66,7 +66,7 @@ impl RenderOnce for Home {
                             ) {
                                 preview (type = "secondary") {
                                     img (src = match &preview.first_image {
-                                        Some(s) => s.to_string(),
+                                        Some(s) => thumbnail_src(&s),
                                         None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
                                     });
                                     footer {
@@ -93,4 +93,14 @@ impl RenderOnce for Home {
             }
         }
     }
+}
+
+/// Builds a src path to a thumbnail for the given image
+fn thumbnail_src(src: &str) -> String {
+    let mut parts: Vec<&str> = src.rsplitn(2, '/').collect();
+
+    parts.reverse();
+    parts.insert(1, "/thumb.");
+
+    parts.join("")
 }
