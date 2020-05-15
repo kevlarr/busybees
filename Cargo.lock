@@ -583,7 +583,7 @@ checksum = "12ae9db68ad7fac5fe51304d20f016c911539251075a214f8e663babefa35187"
 
 [[package]]
 name = "busybees"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "actix-files",
  "actix-multipart",

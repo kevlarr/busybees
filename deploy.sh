@@ -21,7 +21,7 @@ echo "\nCopying binary and assets"
 (
     set -x
     mkdir $TARGETDIR
-    cp target/debug/server $TARGETDIR/server-$VERSION
+    cp target/release/server $TARGETDIR/server-$VERSION
     cp .env $TARGETDIR/
     cp -r www $TARGETDIR
 )
