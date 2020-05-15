@@ -1,4 +1,5 @@
 use crate::{
+    imaging,
     models::{PostPreview, TitleSlug},
     pages::Page,
     ActixResult,
@@ -66,7 +67,7 @@ impl RenderOnce for Home {
                             ) {
                                 preview (type = "secondary") {
                                     img (src = match &preview.first_image {
-                                        Some(s) => s.to_string(),
+                                        Some(s) => imaging::thumbnail_path(&s),
                                         None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
                                     });
                                     footer {

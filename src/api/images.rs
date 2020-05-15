@@ -5,7 +5,7 @@ use futures::StreamExt;
 use serde::Serialize;
 use std::io::Write;
 
-use crate::State;
+use crate::{imaging, State};
 
 #[derive(Serialize)]
 pub struct UploadedImages {
@@ -16,6 +16,7 @@ pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<H
     let mut srcpaths = Vec::new();
 
     while let Some(item) = payload.next().await {
+        let timestamp = Utc::now().timestamp();
         let mut field: Field = item?;
 
         let content_type = field
@@ -26,20 +27,28 @@ pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<H
             .get_filename()
             .ok_or_else(|| MultipartError::Incomplete)?;
 
-        let timestamp = Utc::now().timestamp();
-        let realpath = format!("{}/{}.{}", &state.upload_path, timestamp, filename);
         srcpaths.push(format!("uploads/{}.{}", timestamp, filename));
 
-        // TODO async-std..?
-        // File::create is blocking operation, use threadpool
-        let mut f = web::block(|| std::fs::File::create(realpath)).await?;
+        let filepath = format!("{}/{}.{}", state.upload_path, timestamp, filename);
+        let thumbpath = format!("{}/thumb.{}.{}", state.upload_path, timestamp, filename);
 
-        while let Some(chunk) = field.next().await {
-            let data = chunk?;
+        save_file(&mut field, filepath.clone()).await?;
 
-            f = web::block(move || f.write_all(&data).map(|_| f)).await?;
-        }
+        imaging::process(&filepath, &thumbpath)
+            .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
     }
 
     Ok(HttpResponse::Ok().json(UploadedImages { filepaths: srcpaths }))
+}
+
+async fn save_file(field: &mut Field, filepath: String) -> Result<(), Error> {
+    let mut f = web::block(|| std::fs::File::create(filepath)).await?;
+
+    while let Some(chunk) = field.next().await {
+        let data = chunk?;
+
+        f = web::block(move || f.write_all(&data).map(|_| f)).await?;
+    }
+
+    Ok(())
 }

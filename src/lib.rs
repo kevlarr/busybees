@@ -5,6 +5,7 @@ use lazy_static::lazy_static;
 pub mod api;
 pub mod encryption;
 pub mod extensions;
+pub mod imaging;
 pub mod middleware;
 pub mod models;
 pub mod pages;
