@@ -14,7 +14,7 @@ TARGETDIR="$TARGETDIR/$VERSION"
 echo "Building busybees:$VERSION"
 (
     set -x
-    cargo build
+    cargo build --all --release
 )
 
 echo "\nCopying binary and assets"
