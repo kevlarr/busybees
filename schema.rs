@@ -8,6 +8,14 @@ table! {
 }
 
 table! {
+    image (id) {
+        id -> Int4,
+        src -> Text,
+        alt -> Nullable<Text>,
+    }
+}
+
+table! {
     post (id) {
         id -> Int4,
         key -> Text,
@@ -20,9 +28,20 @@ table! {
     }
 }
 
+table! {
+    post_image (id) {
+        id -> Int4,
+        post_id -> Int4,
+        image_id -> Int4,
+        thumbnail -> Nullable<Bool>,
+    }
+}
+
 joinable!(post -> author (author_id));
 
 allow_tables_to_appear_in_same_query!(
     author,
+    image,
     post,
+    post_image,
 );
