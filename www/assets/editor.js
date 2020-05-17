@@ -11,14 +11,10 @@
   let textDisplay;
   let statusBar;
 
-  function visibleText() {
-      return (textDisplay && textDisplay.innerText.trim()) || '';
-  }
-
   function setSubmitState() {
     // TODO This might be too much for every keypress...
     // There will always be markup in the base <textarea> so need to look in the visible display <div>
-    !uploading && visibleText() && postTitle.value ?
+    !uploading && postTitle.value ?
       submitButton.removeAttribute('disabled') :
       submitButton.setAttribute('disabled', 'true');
   }
@@ -95,7 +91,7 @@
   statusBar = document.getElementsByClassName('note-status-output')[0];
 
   postTitle.addEventListener('input', function(evt) {
-    !uploading && evt.target.value && visibleText() ?
+    !uploading && evt.target.value ?
       submitButton.removeAttribute('disabled') :
       submitButton.setAttribute('disabled', 'true');
   });

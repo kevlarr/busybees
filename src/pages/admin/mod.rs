@@ -35,7 +35,6 @@ pub fn resource(path: &str) -> Scope {
         .guard(fn_guard(auth_guard))
         .route("/posts", get().to(Posts::get))
         .route("/posts/new", get().to(PostForm::new))
-        .route("/posts/new", post().to(PostForm::create))
         .route("/posts/edit/{key}", get().to(PostForm::edit))
         .route("/posts/edit/{key}", post().to(PostForm::update))
 

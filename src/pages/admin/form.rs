@@ -14,24 +14,18 @@ use actix_web::{
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 pub struct PostForm {
-    pub post: Option<Post>,
+    pub post: Post,
 }
 
 impl PostForm {
-    pub async fn new(page: Page) -> Page {
-        page.id("PostForm")
-            .title("Create Post")
-            .content(Self{ post: None })
-    }
+    pub async fn new(state: Data<State>) -> ActixResult {
+        let new_post = NewPost {
+            title: "New post".into(),
+            content: None,
+        };
 
-    pub async fn create(
-        form: Form<NewPost>,
-        state: Data<State>,
-    ) -> ActixResult {
-        let slug = form.title_slug();
-
-        match Post::create(&state.pool, form.into_inner()).await {
-            Ok(key) => Ok(redirect(&format!("/posts/{}/read/{}", key, slug))),
+        match Post::create(&state.pool, new_post).await {
+            Ok(key) => Ok(redirect(&format!("/admin/posts/edit/{}", key))),
             Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
         }
     }
@@ -45,9 +39,12 @@ impl PostForm {
             Ok(post) => page
                 .id("PostForm")
                 .title("Edit Post")
-                .content(Self{ post: Some(post) }),
+                .content(Self{ post }),
 
-            Err(_) => notfound::get_sync(page),
+            Err(e) => {
+                eprintln!("{}", e.to_string());
+                notfound::get_sync(page)
+            },
         }
     }
 
@@ -67,15 +64,8 @@ impl PostForm {
 
 impl RenderOnce for PostForm {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let (action, title, content) = match self.post {
-            Some(Post {
-                key,
-                title,
-                content,
-                ..
-            }) => (format!("/admin/posts/edit/{}", key), title, content),
-            None => ("/admin/posts/new".to_string(), String::new(), String::new()),
-        };
+        let Post { key, title, content, .. } = self.post;
+        let action = format!("/admin/posts/edit/{}", key);
 
         tmpl << html! {
             form(id = "EditorForm", method = "post", action = action) {
@@ -84,7 +74,7 @@ impl RenderOnce for PostForm {
 
                 div(id = "PostControls") {
                     a (href = "/") { button(type = "button") : "Cancel"; }
-                    button(id = "SubmitEditor", type = "submit", class = "primary", disabled) : "Submit";
+                    button(id = "SubmitEditor", type = "submit", class = "primary") : "Submit";
                 }
             }
 

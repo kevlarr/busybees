@@ -5,7 +5,7 @@ use sqlx::PgPool;
 #[derive(Deserialize)]
 pub struct NewPost {
     pub title: String,
-    pub content: String,
+    pub content: Option<String>,
 }
 
 pub struct PostPreview {
@@ -61,7 +61,7 @@ pub struct Post {
     pub author: Option<String>,
     pub key: String,
     pub title: String,
-    pub content: String,
+    pub content: Option<String>,
     pub published: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
