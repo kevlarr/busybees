@@ -10,10 +10,11 @@ mod images;
 mod posts;
 
 pub fn resource(path: &str) -> Scope {
-    use web::post;
+    use web::{patch, post};
 
     web::scope(path)
         .guard(fn_guard(auth_guard))
         .route("/images", post().to(images::upload))
-        .route("/posts/{key}", post().to(posts::update))
+        .route("/posts/{key}", patch().to(posts::update))
+        .route("/posts/{key}/published", patch().to(posts::update_published))
 }

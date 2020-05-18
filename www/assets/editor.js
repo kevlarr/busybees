@@ -3,25 +3,19 @@
  * to enable and disable the submit button
  */
 (function() {
+  const SAVED = 'Saved';
+  const UNSAVED = 'Unsaved';
+  const SAVING = 'Saving...';
 
-  const submitButton = document.getElementById('SubmitEditor');
+  const postKey = document.getElementById('EditorForm').getAttribute('data-post-key');
   const postTitle = document.getElementById('PostTitle');
+  const postContent = document.getElementById('SummernoteEditor');
+  const saveStatus = document.getElementById('saveStatus');
 
-  let uploading = 0;
   let textDisplay;
   let statusBar;
 
-  function visibleText() {
-      return (textDisplay && textDisplay.innerText.trim()) || '';
-  }
-
-  function setSubmitState() {
-    // TODO This might be too much for every keypress...
-    // There will always be markup in the base <textarea> so need to look in the visible display <div>
-    !uploading && visibleText() && postTitle.value ?
-      submitButton.removeAttribute('disabled') :
-      submitButton.setAttribute('disabled', 'true');
-  }
+  let uploading = 0;
 
   $('#SummernoteEditor').summernote({
     toolbar: [
@@ -40,11 +34,10 @@
 
     callbacks: {
       onChange(contents, $editable) {
-        setSubmitState();
+        scheduleSave();
       },
 
       onImageUpload(files) {
-        submitButton.setAttribute('disabled', 'true');
         uploading++;
 
         const data = new FormData()
@@ -84,8 +77,6 @@
           .finally(() => {
             uploadingAlert.remove();
             uploading--;
-
-            setSubmitState();
           });
       },
     },
@@ -94,9 +85,44 @@
   textDisplay = document.getElementsByClassName('note-editable')[0];
   statusBar = document.getElementsByClassName('note-status-output')[0];
 
-  postTitle.addEventListener('input', function(evt) {
-    !uploading && evt.target.value && visibleText() ?
-      submitButton.removeAttribute('disabled') :
-      submitButton.setAttribute('disabled', 'true');
-  });
+  let autosaveTimeout;
+
+  function scheduleSave(evt) {
+    if (autosaveTimeout) {
+      window.clearTimeout(autosaveTimeout);
+    }
+
+    saveStatus.innerText = UNSAVED;
+
+    if (uploading > 0) {
+      return;
+    }
+
+    autosaveTimeout = window.setTimeout(save, 2500);
+  }
+
+  function save() {
+    saveStatus.innerText = SAVING;
+
+    fetch(`/api/posts/${postKey}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: postTitle.value,
+        content: postContent.value,
+      }),
+    })
+      .then(resp => {
+        if (resp.status >= 400) {
+          saveStatus.innerText = UNSAVED;
+          throw new Error(JSON.stringify(resp.statusText));
+        }
+
+        saveStatus.innerText = SAVED;
+      });
+  }
+
+  postTitle.addEventListener('input', scheduleSave);
 })();

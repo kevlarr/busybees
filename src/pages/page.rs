@@ -204,7 +204,7 @@ impl RenderOnce for Page {
                             : ", ";
                             a (href = "https://www.postgresql.org/", target = "_blank", rel = "noopener") : "PostgreSQL";
                             : ", and ";
-                            a (href = "https://summernote.org/", target = "_blank", rel = "noopener") : "Summernote";
+                            a (href = "https://www.digitalocean.com/", target = "_blank", rel = "noopener") : "DigitalOcean";
                             : ".";
                         }
                     }

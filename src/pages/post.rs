@@ -85,6 +85,7 @@ impl RenderOnce for PostView {
                 }
                 post-published : created_at.format("%a %b %e, %Y").to_string();
             }
+
             post-content : Raw(content);
 
             @ if auth {

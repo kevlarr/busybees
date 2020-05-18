@@ -18,7 +18,7 @@ pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
                 .content(Home { posts })
         ),
         Err(e) => Either::B(
-            // TODO This should be an actual page
+            // FIXME This should be an actual page
             Ok(HttpResponse::BadRequest().body(e))
         ),
     }
