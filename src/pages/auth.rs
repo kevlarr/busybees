@@ -116,7 +116,7 @@ impl RenderOnce for Auth {
                     form-message (type = "error") : msg;
                 }
 
-                button (id = "SignInSubmit",  type = "submit", class = "primary", disabled) : "Sign In";
+                button (id = "SignInSubmit", type = "submit", disabled) : "Sign In";
             }
 
             script(src = asset_path("signin.js"));

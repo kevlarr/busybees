@@ -97,15 +97,14 @@ button, button.note-btn {
     font-size: 16px;
 }
 
+button[disabled] {
+    background-color: #DAD7D3;
+}
+
 button:not(.note-btn) {
     font-weight: 600;
     margin: 0 10px;
     padding: 10px 20px;
-}
-
-button:not(.note-btn).small {
-    font-size: 10px;
-    padding: 5px 15px;
 }
 
 button:not([disabled]):active {
@@ -129,20 +128,6 @@ button.note-btn:active,
 button.note-btn:focus,
 button.note-btn:hover {
     background-color: #958E81;
-}
-
-button.primary {
-    background-color: #585650;
-}
-
-button.primary[disabled] {
-    background-color: #eee;
-}
-
-button.primary:not([disabled]):active,
-button.primary:not([disabled]):focus,
-button.primary:not([disabled]):hover {
-    background-color: #F0A200;
 }
 
 post-status {
