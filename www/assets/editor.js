@@ -98,7 +98,7 @@
       return;
     }
 
-    autosaveTimeout = window.setTimeout(save, 5000);
+    autosaveTimeout = window.setTimeout(save, 2500);
   }
 
   function save() {
