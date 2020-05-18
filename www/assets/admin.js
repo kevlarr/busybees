@@ -8,8 +8,8 @@
       const published = postStatus.getAttribute('type') === 'published';
       let status;
 
-      fetch(`/api/posts/${key}`, {
-        method: 'post',
+      fetch(`/api/posts/${key}/published`, {
+        method: 'PATCH',
         credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json',

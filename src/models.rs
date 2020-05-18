@@ -3,9 +3,9 @@ use serde::{Serialize, Deserialize};
 use sqlx::PgPool;
 
 #[derive(Deserialize)]
-pub struct NewPost {
+pub struct PostProps {
     pub title: String,
-    pub content: Option<String>,
+    pub content: String,
 }
 
 pub struct PostPreview {
@@ -61,7 +61,7 @@ pub struct Post {
     pub author: Option<String>,
     pub key: String,
     pub title: String,
-    pub content: Option<String>,
+    pub content: String,
     pub published: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -69,24 +69,24 @@ pub struct Post {
 }
 
 impl Post {
-    pub async fn create(pool: &PgPool, params: NewPost) -> Result<String, String> {
+    pub async fn create(pool: &PgPool, props: PostProps) -> Result<String, String> {
         let now = Utc::now();
 
         sqlx::query!(r#"
             insert into post (title, content, published, created_at, updated_at)
                 values ($1, $2, $3, $4, $5)
                 returning key
-        "#, params.title, params.content, false, now, now)
+        "#, props.title, props.content, false, now, now)
             .fetch_one(pool)
             .await
             .map(|row| row.key)
             .map_err(|e| e.to_string())
     }
 
-    pub async fn update(pool: &PgPool, key: String, params: NewPost) -> Result<(), String> {
+    pub async fn update(pool: &PgPool, key: String, props: PostProps) -> Result<(), String> {
         sqlx::query!(r#"
             update post set title = $2, content = $3, updated_at = now() where key = $1
-        "#, key, params.title, params.content)
+        "#, key, props.title, props.content)
             .execute(pool)
             .await
             .map(|_| ())
@@ -170,7 +170,7 @@ pub trait TitleSlug {
     fn title(&self) -> &str;
 }
 
-impl TitleSlug for NewPost {
+impl TitleSlug for PostProps {
     fn title(&self) -> &str {
         &self.title
     }

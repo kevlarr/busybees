@@ -559,8 +559,8 @@ main#PostForm {
     padding-bottom: 5px;
 }
 
-#PostControls {
-    text-align: right;
+#PostForm #saveStatus {
+    font-style: italic;
 }
 
 input {

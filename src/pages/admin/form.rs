@@ -1,5 +1,5 @@
 use crate::{
-    models::{Post, NewPost, TitleSlug},
+    models::{Post, PostProps},
     pages::{notfound, Page},
     ActixResult,
     State,
@@ -8,7 +8,7 @@ use crate::{
 };
 
 use actix_web::{
-    web::{Data, Form, Path},
+    web::{Data, Path},
     HttpResponse,
 };
 use horrorshow::{html, RenderOnce, TemplateBuffer};
@@ -19,9 +19,9 @@ pub struct PostForm {
 
 impl PostForm {
     pub async fn new(state: Data<State>) -> ActixResult {
-        let new_post = NewPost {
+        let new_post = PostProps {
             title: "New post".into(),
-            content: None,
+            content: String::new(),
         };
 
         match Post::create(&state.pool, new_post).await {
@@ -47,43 +47,26 @@ impl PostForm {
             },
         }
     }
-
-    pub async fn update(
-        path: Path<(String,)>,
-        form: Form<NewPost>,
-        state: Data<State>,
-    ) -> ActixResult {
-        let slug = form.title_slug();
-
-        Ok(match Post::update(&state.pool, path.0.clone(), form.into_inner()).await {
-            Ok(_) => redirect(&format!("/posts/{}/read/{}", path.0, slug)),
-            Err(e) => HttpResponse::BadRequest().body(e.to_string()),
-        })
-    }
 }
 
 impl RenderOnce for PostForm {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         let Post { key, title, content, .. } = self.post;
-        let action = format!("/admin/posts/edit/{}", key);
 
         tmpl << html! {
-            form(id = "EditorForm", method = "post", action = action) {
-                input(id = "PostTitle", name = "title", placeholder = "How I stopped the zombie apocalypse...", autofocus = "true", value = title);
+            form (id = "EditorForm", data-post-key = key) {
+                input(id = "PostTitle", name = "title", placeholder = "Title", autofocus = "true", value = title);
                 textarea(id = "SummernoteEditor", name = "content") : content;
-
-                div(id = "PostControls") {
-                    a (href = "/") { button(type = "button") : "Cancel"; }
-                    button(id = "SubmitEditor", type = "submit", class = "primary") : "Submit";
-                }
             }
 
-            // WYSIWYG editor
-            link(rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");
+            p (id = "saveStatus") : "Saved";
 
-            script(src = "https://code.jquery.com/jquery-3.4.1.min.js");
-            script(src = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.js");
-            script(src = asset_path("editor.js"));
+            // WYSIWYG editor
+            link (rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");
+
+            script (src = "https://code.jquery.com/jquery-3.4.1.min.js");
+            script (src = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.js");
+            script (src = asset_path("editor.js"));
         };
     }
 }

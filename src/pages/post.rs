@@ -86,9 +86,7 @@ impl RenderOnce for PostView {
                 post-published : created_at.format("%a %b %e, %Y").to_string();
             }
 
-            @ if let Some(c) = content {
-                post-content : Raw(c);
-            }
+            post-content : Raw(content);
 
             @ if auth {
                 script(src = asset_path("admin.js"));
