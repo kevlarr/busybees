@@ -13,7 +13,11 @@ pub struct UploadedImages {
     filepaths: Vec<String>,
 }
 
-pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<HttpResponse, Error> {
+pub async fn upload(
+    mut payload: Multipart,
+    path: web::Path<(String,)>,
+    state: web::Data<State>,
+) -> Result<HttpResponse, Error> {
     let mut srcpaths = Vec::new();
 
     while let Some(item) = payload.next().await {
@@ -37,7 +41,7 @@ pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<H
         let image = imaging::process(&filepath)
             .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
 
-        Image::create(&state.pool, image).await
+        Image::create(&state.pool, &path.0, image).await
             .map_err(|e| HttpResponse::BadRequest().body(e))?;
     }
 

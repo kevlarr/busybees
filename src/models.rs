@@ -12,15 +12,25 @@ pub struct Image {
 }
 
 impl Image {
-    pub async fn create(pool: &PgPool, props: Image) -> Result<(), String> {
-        sqlx::query!(r#"
+    pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> Result<(), String> {
+        let image_id = sqlx::query!(r#"
             insert into image (src, thumbnail_src, width, height, kb)
                 values ($1, $2, $3, $4, $5)
+                returning id
         "#, props.src, props.thumbnail_src, props.width, props.height, props.kb)
+            .fetch_one(pool)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        sqlx::query!(r#"
+            insert into post_image (post_id, image_id)
+                values ((select id from post where key = $1), $2)
+        "#, String::from(post_key), image_id.id)
             .execute(pool)
             .await
-            .map(|_| ())
-            .map_err(|e| e.to_string())
+            .map_err(|e| e.to_string())?;
+
+        Ok(())
     }
 }
 
