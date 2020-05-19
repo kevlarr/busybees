@@ -34,8 +34,7 @@ fn main() -> Result<()> {
 
         if let Some(p) = imgpath.to_str() {
             println!("{}", p);
-            let thumbpath = imaging::thumbnail_path(&p);
-            imaging::process(&p, &thumbpath).unwrap();
+            let image = imaging::process(&p).unwrap();
         }
     }
 

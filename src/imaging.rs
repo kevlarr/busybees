@@ -1,13 +1,15 @@
+use crate::models::Image;
+
 use image::{GenericImageView, ImageError};
 use image::imageops::FilterType;
-use std::{fmt, fs, io};
+use std::{fmt, fs};
 
+/// Image handling errors relating to file I/O or image processing.
 #[derive(Debug)]
 pub enum ImagingError {
     ImageOpenError(ImageError),
     ResizeError(ImageError),
     ThumbnailError(ImageError),
-    ThumbnailCopyError(io::Error),
 }
 
 impl fmt::Display for ImagingError {
@@ -18,7 +20,6 @@ impl fmt::Display for ImagingError {
             ImageOpenError(e) => write!(f, "Error opening image file: {}", e),
             ResizeError(e) => write!(f, "Error resizing image: {}", e),
             ThumbnailError(e) => write!(f, "Error generating thumbnail: {}", e),
-            ThumbnailCopyError(e) => write!(f, "Error copying file to thumbnail: {}", e),
         }
     }
 }
@@ -26,9 +27,8 @@ impl fmt::Display for ImagingError {
 /// Opens `imgpath` and resizes the image so that the maximum dimension is 1200px, 
 /// maintaining the aspect ratio and overwriting the existing file. Additionally,
 /// if the image is over 400px in either dimension, it will generate a thumbnail
-/// with maximum dimension of 400px and aspect ratio preserved. If the image is
-/// under 400px in both dimensions, than a copy is simply made at `thumbpath`.
-pub fn process(imgpath: &str, thumbpath: &str) -> Result<(), ImagingError> {
+/// with maximum dimension of 400px and aspect ratio preserved.
+pub fn process(imgpath: &str) -> Result<Image, ImagingError> {
     use ImagingError::*;
 
     let img = image::open(imgpath).map_err(|e| ImageOpenError(e))?;
@@ -40,27 +40,36 @@ pub fn process(imgpath: &str, thumbpath: &str) -> Result<(), ImagingError> {
             .map_err(|e| ResizeError(e))?;
     }
 
-    if width > 400 || height > 400 {
+    let thumbnail_src = if width > 400 || height > 400 {
+        let thumbpath = thumbnail_path(imgpath);
+
         img.resize(400, 400, FilterType::CatmullRom)
             .save(&thumbpath)
             .map_err(|e| ThumbnailError(e))?;
-    } else {
-        // For now, the server assumes every image has a corresponding thumbnail
-        // at the expected path, so just copy it. It's small.
-        fs::copy(&imgpath, &thumbpath).map_err(|e| ThumbnailCopyError(e))?;
-    }
 
-    Ok(())
+        Some(thumbpath)
+    } else {
+        None
+    };
+
+    // Failing to obtain file size is fine, so just discard any error
+    let kb = fs::metadata(imgpath).ok().map(|meta| (meta.len() / 1024) as i32);
+
+    Ok(Image {
+        src: String::from(imgpath),
+        thumbnail_src,
+        width: Some(width as i16),
+        height: Some(height as i16),
+        kb,
+    })
 }
 
-/// Generates the expected thumbnail path for the given image path name.
-/// **Note:** This should definitely go away once the magic of the "first
-/// image" for an article goes away.
+/// Returns a new path name with the filename portion of `imgpath`
+/// prepended by `"thumb.'`.
 pub fn thumbnail_path(imgpath: &str) -> String {
     let mut parts: Vec<&str> = imgpath.rsplitn(2, '/').collect();
 
     parts.reverse();
     parts.insert(1, "/thumb.");
-
     parts.join("")
 }

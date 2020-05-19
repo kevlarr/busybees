@@ -2,6 +2,29 @@ use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
 use sqlx::PgPool;
 
+
+pub struct Image {
+    pub src: String,
+    pub thumbnail_src: Option<String>,
+    pub width: Option<i16>,
+    pub height: Option<i16>,
+    pub kb: Option<i32>,
+}
+
+impl Image {
+    pub async fn create(pool: &PgPool, props: Image) -> Result<(), String> {
+        sqlx::query!(r#"
+            insert into image (src, thumbnail_src, width, height, kb)
+                values ($1, $2, $3, $4, $5)
+        "#, props.src, props.thumbnail_src, props.width, props.height, props.kb)
+            .execute(pool)
+            .await
+            .map(|_| ())
+            .map_err(|e| e.to_string())
+    }
+}
+
+
 #[derive(Deserialize)]
 pub struct PostProps {
     pub title: String,

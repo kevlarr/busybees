@@ -6,6 +6,7 @@ use serde::Serialize;
 use std::io::Write;
 
 use crate::{imaging, State};
+use crate::models::Image;
 
 #[derive(Serialize)]
 pub struct UploadedImages {
@@ -30,12 +31,14 @@ pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<H
         srcpaths.push(format!("uploads/{}.{}", timestamp, filename));
 
         let filepath = format!("{}/{}.{}", state.upload_path, timestamp, filename);
-        let thumbpath = format!("{}/thumb.{}.{}", state.upload_path, timestamp, filename);
 
         save_file(&mut field, filepath.clone()).await?;
 
-        imaging::process(&filepath, &thumbpath)
+        let image = imaging::process(&filepath)
             .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
+
+        Image::create(&state.pool, image).await
+            .map_err(|e| HttpResponse::BadRequest().body(e))?;
     }
 
     Ok(HttpResponse::Ok().json(UploadedImages { filepaths: srcpaths }))
