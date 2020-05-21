@@ -35,7 +35,7 @@ impl PostView {
             Ok(post) => page
                 .id("Post")
                 .title(post.title.clone())
-                .image(post.first_image.clone())
+                .image(post.thumbnail.clone())
                 .content(Self{ auth, post }),
 
             Err(_) => notfound::get_sync(page),
