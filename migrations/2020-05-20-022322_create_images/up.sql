@@ -1,14 +1,17 @@
 create table image (
     id serial primary key,
-    src text unique not null,
-    thumbnail_src text unique,
-    alt text
+    filename text unique not null,
+    thumbnail_filename text unique,
+    alt_text text,
+    width smallint not null,
+    height smallint not null,
+    kb int
 );
 
 create table post_image (
     id serial primary key,
-    post_id int not null,
-    image_id int not null,
+    post_id int not null references post (id),
+    image_id int not null references image (id),
     thumbnail boolean default false,
 
     unique (post_id, image_id)

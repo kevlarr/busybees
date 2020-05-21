@@ -37,6 +37,10 @@
         scheduleSave();
       },
 
+      onImageLinkInsert(url) {
+        $(this).summernote('insertImage', url);
+      },
+
       onImageUpload(files) {
         uploading++;
 
@@ -54,10 +58,7 @@
 
         statusBar.appendChild(uploadingAlert);
 
-        resp = fetch(`/api/posts/${postKey}/images/new`, {
-          method: 'POST',
-          body: data,
-        })
+        fetch(`/api/posts/${postKey}/images/new`, { method: 'POST', body: data })
           .then(resp => {
             if (resp.status >= 400) {
               throw new Error(JSON.stringify(resp.statusText));
@@ -65,7 +66,7 @@
             return resp.json()
           })
           .then(json => {
-            json.filepaths.forEach(f => {
+            json.srcpaths.forEach(f => {
               $(this).summernote('insertImage', `/${f}`)
             });
           })
