@@ -32,10 +32,7 @@ fn main() -> Result<()> {
     for imgpath in images {
         println!("{:?}", imgpath);
 
-        if let Some(p) = imgpath.to_str() {
-            println!("{}", p);
-            let image = imaging::process(&p).unwrap();
-        }
+        let _image = imaging::process(&imgpath.as_path()).unwrap();
     }
 
     Ok(())

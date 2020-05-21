@@ -21,6 +21,7 @@ impl fmt::Display for ImagingError {
             ImageOpenError(e) => write!(f, "Error opening image file: {}", e),
             ResizeError(e) => write!(f, "Error resizing image: {}", e),
             ThumbnailError(e) => write!(f, "Error generating thumbnail: {}", e),
+            PathError(e) => write!(f, "Error creating path: {}", e),
         }
     }
 }
@@ -75,7 +76,7 @@ fn path_filename(path: &Path) -> Result<String, ImagingError> {
 
 /// Generates a thumbnail path string from the given filepath.
 fn thumbnail_path(filepath: &Path) -> Result<PathBuf, ImagingError> {
-    let thumbpath = PathBuf::new();
+    let mut thumbpath = PathBuf::new();
 
     if let Some(parent) = filepath.parent() {
         thumbpath.push(parent);
@@ -83,4 +84,13 @@ fn thumbnail_path(filepath: &Path) -> Result<PathBuf, ImagingError> {
 
     thumbpath.push(format!("thumb.{}", path_filename(filepath)?));
     Ok(thumbpath)
+}
+
+#[deprecated(note = "Use `thumbnail_path` with a `&Path` argument instead")]
+pub fn thumbnail_path_string(imgpath: &str) -> String {
+    let mut parts: Vec<&str> = imgpath.rsplitn(2, '/').collect();
+
+    parts.reverse();
+    parts.insert(1, "/thumb.");
+    parts.join("")
 }
