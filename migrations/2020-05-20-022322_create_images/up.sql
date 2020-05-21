@@ -17,5 +17,5 @@ create table post_image (
     unique (post_id, image_id)
 );
 
-create unique index post_image_post_thubnail_key
-    on post_image (post_id, thumbnail) where thumbnail;
+create unique index post_image_thumbnail_post_key
+    on post_image (thumbnail, post_id) where thumbnail;
