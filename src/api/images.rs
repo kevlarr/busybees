@@ -39,7 +39,7 @@ pub async fn upload(
 
         srcpaths.push(format!("uploads/{}", filename));
 
-        let filepath = format!("{}/{}.{}", state.upload_path, timestamp, filename);
+        let filepath = format!("{}/{}", state.upload_path, filename);
         let filepath = Path::new(&filepath);
 
         save_file(&mut field, filepath).await?;

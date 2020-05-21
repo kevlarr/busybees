@@ -34,12 +34,16 @@ pub fn process(filepath: &Path) -> Result<Image, ImagingError> {
     use ImagingError::*;
 
     let img = image::open(filepath).map_err(|e| ImageOpenError(e))?;
-    let (width, height) = img.dimensions();
+    let (mut width, mut height) = img.dimensions();
 
     if width > 1200 || height > 1200 {
-        img.resize(1200, 1200, FilterType::CatmullRom)
-            .save(filepath)
-            .map_err(|e| ResizeError(e))?;
+        let resized = img.resize(1200, 1200, FilterType::CatmullRom);
+
+        resized.save(filepath).map_err(|e| ResizeError(e))?;
+
+        let dims = resized.dimensions();
+        width = dims.0;
+        height = dims.1;
     }
 
     let thumbnail_filename = if width > 400 || height > 400 {

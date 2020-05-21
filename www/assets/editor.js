@@ -38,10 +38,17 @@
       },
 
       onImageLinkInsert(url) {
+        console.log(`[onImageLinkInsert::insertImage] ${url}`);
+
+        if (url.startsWith(`https://${window.location.host}/uploads`)) {
+          console.log('TODO: POST');
+        }
+
         $(this).summernote('insertImage', url);
       },
 
       onImageUpload(files) {
+        saveStatus.innerText = UNSAVED;
         uploading++;
 
         const data = new FormData()
@@ -66,8 +73,9 @@
             return resp.json()
           })
           .then(json => {
-            json.srcpaths.forEach(f => {
-              $(this).summernote('insertImage', `/${f}`)
+            json.srcpaths.forEach(path => {
+              console.log(`[onImageUpload::insertImage] ${path}`);
+              $(this).summernote('insertImage', `/${path}`)
             });
           })
           .catch(e => {
