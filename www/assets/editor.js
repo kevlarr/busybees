@@ -6,6 +6,8 @@
   const SAVED = 'Saved';
   const UNSAVED = 'Unsaved';
   const SAVING = 'Saving...';
+ 
+  const RGX = new RegExp(`(${window.location.host}/uploads/)(.+)`);
 
   const postKey = document.getElementById('EditorForm').getAttribute('data-post-key');
   const postTitle = document.getElementById('PostTitle');
@@ -38,10 +40,13 @@
       },
 
       onImageLinkInsert(url) {
-        console.log(`[onImageLinkInsert::insertImage] ${url}`);
+        console.log(`[onImageLinkInsert::insertImage] URL: ${url}`);
 
-        if (url.startsWith(`https://${window.location.host}/uploads`)) {
-          console.log('TODO: POST');
+        const matches = RGX.exec(url);
+
+        if (matches) {
+          const filename = matches[2];
+          console.log(`[onImageLinkInsert::insertImage] MATCHED FILENAME: ${filename}`);
         }
 
         $(this).summernote('insertImage', url);
