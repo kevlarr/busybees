@@ -13,11 +13,16 @@ pub struct Image {
 
 impl Image {
     pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> Result<(), String> {
-        let image_id = sqlx::query!(r#"
+        let image_id = sqlx::query!("
             insert into image (filename, thumbnail_filename, width, height, kb)
                 values ($1, $2, $3, $4, $5)
-                returning id
-        "#, props.filename, props.thumbnail_filename, props.width, props.height, props.kb)
+                returning id",
+            props.filename,
+            props.thumbnail_filename,
+            props.width,
+            props.height,
+            props.kb,
+        )
             .fetch_one(pool)
             .await
             .map_err(|e| e.to_string())?;
@@ -26,6 +31,26 @@ impl Image {
             insert into post_image (post_id, image_id)
                 values ((select id from post where key = $1), $2)
         "#, post_key.to_owned(), image_id.id)
+            .execute(pool)
+            .await
+            .map(|_| ())
+            .map_err(|e| e.to_string())
+    }
+
+    pub async fn link(pool: &PgPool, post_key: &str, filename: &str) -> Result<(), String> {
+        sqlx::query!("
+            insert into post_image (post_id, image_id)
+                values (
+                    (select id from post where key = $1),
+                    (select id from image where filename = $2)
+                )
+
+                -- It is dumb to try linking to an image embedded in the same post,
+                -- but it's not worth an error at all. Just don't need an extra record.
+                on conflict do nothing",
+            post_key.to_owned(),
+            filename.to_owned(),
+        )
             .execute(pool)
             .await
             .map(|_| ())

@@ -2,6 +2,54 @@
  * Configuration for the embedded Summernote editor and listeners
  * to enable and disable the submit button
  */
+const API = (function() {
+  function request(method, url, { expect = 200, headers, body }) {
+    if (headers === undefined) {
+      headers = {'Content-Type': 'application/json'};
+    }
+
+    if (headers['Content-Type'] === 'application/json') {
+      body = JSON.stringify(body);
+    }
+
+    let status, statusText;
+
+    return fetch(url, { method, headers, body })
+      .then(resp => new Promise((resolve, reject) => {
+        if (resp.status !== expect) {
+          status = resp.status;
+          statusText = resp.statusText;
+
+          return resp.text().then(text => reject(text))
+        }
+
+        return resolve(resp);
+      }))
+      .catch(text => new Promise((_, reject) => {
+        return reject({
+            expected: expect,
+            received: {
+              code: status,
+              reason: statusText,
+              text,
+            },
+        });
+      }))
+  }
+
+  return {
+    get(url, { expect, headers }) {
+      return request('GET', url, { expect, headers });
+    },
+    post(url, { expect, headers, body }) {
+      return request('POST', url, { expect, headers, body });
+    },
+    patch(url, { expect, headers, body }) {
+      return request('PATCH', url, { expect, headers, body });
+    },
+  };
+})();
+
 (function() {
   const SAVED = 'Saved';
   const UNSAVED = 'Unsaved';
@@ -18,6 +66,19 @@
   let statusBar;
 
   let uploading = 0;
+
+  function showError({received: { code, reason, text }}) {
+    let errorAlert = document.createElement('div');
+    let msg = String(code);
+
+    if (reason) { msg += ` ${reason}`; }
+    if (text) { msg += `: ${text}`; }
+
+    errorAlert.classList.add('alert', 'alert-danger');
+    errorAlert.innerHTML = msg;
+
+    statusBar.appendChild(errorAlert);
+  }
 
   $('#SummernoteEditor').summernote({
     toolbar: [
@@ -41,15 +102,22 @@
 
       onImageLinkInsert(url) {
         console.log(`[onImageLinkInsert::insertImage] URL: ${url}`);
-
         const matches = RGX.exec(url);
 
         if (matches) {
           const filename = matches[2];
           console.log(`[onImageLinkInsert::insertImage] MATCHED FILENAME: ${filename}`);
+
+          API.post(`/api/posts/${postKey}/images/link`, {
+            expect: 201,
+            body: { filename },
+          }).then(resp => {
+            $(this).summernote('insertImage', url);
+          }).catch(showError);
+        } else {
+          $(this).summernote('insertImage', url);
         }
 
-        $(this).summernote('insertImage', url);
       },
 
       onImageUpload(files) {
@@ -70,27 +138,15 @@
 
         statusBar.appendChild(uploadingAlert);
 
-        fetch(`/api/posts/${postKey}/images/new`, { method: 'POST', body: data })
-          .then(resp => {
-            if (resp.status >= 400) {
-              throw new Error(JSON.stringify(resp.statusText));
-            }
-            return resp.json()
-          })
+        API.post(`/api/posts/${postKey}/images/new`, { headers: {}, body: data })
+          .then(resp => resp.json())
           .then(json => {
             json.srcpaths.forEach(path => {
-              console.log(`[onImageUpload::insertImage] ${path}`);
+              console.log(`[onImageUpload::insertImage] PATH: ${path}`);
               $(this).summernote('insertImage', `/${path}`)
             });
           })
-          .catch(e => {
-            let errorAlert = document.createElement('div');
-
-            errorAlert.classList.add('alert', 'alert-danger');
-            errorAlert.innerHTML = `There was an err: ${e}... tell Kevin to fix his shit`;
-
-            statusBar.appendChild(errorAlert);
-          })
+          .catch(showError)
           .finally(() => {
             uploadingAlert.remove();
             uploading--;
@@ -121,23 +177,19 @@
   function save() {
     saveStatus.innerText = SAVING;
 
-    fetch(`/api/posts/${postKey}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    API.patch(`/api/posts/${postKey}`, {
+      expect: 204,
+      body: {
         title: postTitle.value,
         content: postContent.value,
-      }),
+      },
     })
-      .then(resp => {
-        if (resp.status >= 400) {
-          saveStatus.innerText = UNSAVED;
-          throw new Error(JSON.stringify(resp.statusText));
-        }
-
+      .then(() => {
         saveStatus.innerText = SAVED;
+      })
+      .catch(err => {
+        saveStatus.innerText = UNSAVED;
+        window.alert(JSON.stringify(err));
       });
   }
 

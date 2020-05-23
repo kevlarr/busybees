@@ -2,16 +2,31 @@ use actix_multipart::{Field, Multipart, MultipartError};
 use actix_web::{web, Error, HttpResponse};
 use chrono::Utc;
 use futures::StreamExt;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::io::Write;
 use std::path::Path;
 
-use crate::{imaging, State};
+use crate::{imaging, ActixResult, State};
 use crate::models::Image;
 
 #[derive(Serialize)]
-pub struct UploadedImages {
+struct UploadedImages {
     srcpaths: Vec<String>,
+}
+
+#[derive(Deserialize)]
+pub struct LinkExisting {
+    filename: String,
+}
+
+pub async fn link(
+    path: web::Path<(String,)>,
+    link: web::Json<LinkExisting>,
+    state: web::Data<State>,
+) -> ActixResult {
+    Ok(Image::link(&state.pool, &path.0, &link.filename).await
+        .map(|()| HttpResponse::Created().finish())
+        .map_err(|e| HttpResponse::BadRequest().body(e))?)
 }
 
 /// Streams each included image, saving each to the application upload path with
@@ -21,7 +36,7 @@ pub async fn upload(
     mut payload: Multipart,
     path: web::Path<(String,)>,
     state: web::Data<State>,
-) -> Result<HttpResponse, Error> {
+) -> ActixResult {
     let mut srcpaths = Vec::new();
 
     while let Some(item) = payload.next().await {
