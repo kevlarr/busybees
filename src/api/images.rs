@@ -24,6 +24,10 @@ pub async fn upload(
 ) -> ActixResult {
     let mut srcpaths = Vec::new();
 
+    // TODO use lazy_static for compilation?
+    let rgx = regex::Regex::new(r"\s+")
+        .map_err(|e| HttpResponse::InternalServerError().body(e.to_string()))?;
+
     while let Some(item) = payload.next().await {
         let timestamp = Utc::now().timestamp();
         let mut field: Field = item?;
@@ -34,6 +38,7 @@ pub async fn upload(
 
         let filename = content_type
             .get_filename()
+            .map(|f| rgx.replace_all(f, "+"))
             .map(|f| format!("{}.{}", timestamp, f))
             .ok_or_else(|| MultipartError::Incomplete)?;
 
