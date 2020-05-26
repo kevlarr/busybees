@@ -36,30 +36,10 @@ impl Image {
             .map(|_| ())
             .map_err(|e| e.to_string())
     }
-
-    pub async fn link(pool: &PgPool, post_key: &str, filename: &str) -> Result<(), String> {
-        sqlx::query!("
-            insert into post_image (post_id, image_id)
-                values (
-                    (select id from post where key = $1),
-                    (select id from image where filename = $2)
-                )
-
-                -- It is dumb to try linking to an image embedded in the same post,
-                -- but it's not worth an error at all. Just don't need an extra record.
-                on conflict do nothing",
-            post_key.to_owned(),
-            filename.to_owned(),
-        )
-            .execute(pool)
-            .await
-            .map(|_| ())
-            .map_err(|e| e.to_string())
-    }
 }
 
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct PostProps {
     pub title: String,
     pub content: String,
@@ -140,15 +120,15 @@ impl Post {
             .map_err(|e| e.to_string())
     }
 
-    pub async fn update(pool: &PgPool, key: String, props: PostProps) -> Result<(), String> {
-        sqlx::query!(r#"
-            update post set title = $2, content = $3, updated_at = now() where key = $1
-        "#, key, props.title, props.content)
-            .execute(pool)
-            .await
-            .map(|_| ())
-            .map_err(|e| e.to_string())
-    }
+    //pub async fn update(pool: &PgPool, key: String, props: PostProps) -> Result<(), String> {
+        //sqlx::query!(r#"
+            //update post set title = $2, content = $3, updated_at = now() where key = $1
+        //"#, key, props.title, props.content)
+            //.execute(pool)
+            //.await
+            //.map(|_| ())
+            //.map_err(|e| e.to_string())
+    //}
 
     pub async fn update_status(pool: &PgPool, key: String, published: bool) -> Result<(), String> {
         sqlx::query!(r#"

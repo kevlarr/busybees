@@ -65,7 +65,7 @@ impl RenderOnce for PostForm {
             link (rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");
 
             script (src = "https://code.jquery.com/jquery-3.4.1.min.js");
-            script (src = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.js");
+            script (src = "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js");
             script (src = asset_path("editor.js"));
         };
     }

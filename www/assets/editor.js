@@ -100,26 +100,6 @@ const API = (function() {
         scheduleSave();
       },
 
-      onImageLinkInsert(url) {
-        console.log(`[onImageLinkInsert::insertImage] URL: ${url}`);
-        const matches = RGX.exec(url);
-
-        if (matches) {
-          const filename = matches[2];
-          console.log(`[onImageLinkInsert::insertImage] MATCHED FILENAME: ${filename}`);
-
-          API.post(`/api/posts/${postKey}/images/link`, {
-            expect: 201,
-            body: { filename },
-          }).then(resp => {
-            $(this).summernote('insertImage', url);
-          }).catch(showError);
-        } else {
-          $(this).summernote('insertImage', url);
-        }
-
-      },
-
       onImageUpload(files) {
         saveStatus.innerText = UNSAVED;
         uploading++;
@@ -177,11 +157,27 @@ const API = (function() {
   function save() {
     saveStatus.innerText = SAVING;
 
+    const linkedUploads = [];
+
+    document.querySelectorAll('.note-editable img').forEach(img => {
+      const matches = RGX.exec(img.src);
+
+      if (matches) {
+        const filename = matches[2];
+
+        console.log(`[save::linkedUpload] MATCHED FILENAME: ${filename}`);
+        linkedUploads.push(filename);
+      }
+    });
+
     API.patch(`/api/posts/${postKey}`, {
       expect: 204,
       body: {
-        title: postTitle.value,
-        content: postContent.value,
+        post: {
+          title: postTitle.value,
+          content: postContent.value,
+        },
+        linkedUploads,
       },
     })
       .then(() => {
