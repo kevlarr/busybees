@@ -1,16 +1,18 @@
 use actix_multipart::{Field, Multipart, MultipartError};
-use actix_web::{web, Error, HttpResponse};
+use actix_web::web;
+use actix_web::error::{Error as ActixError};
 use chrono::Utc;
 use futures::StreamExt;
+use regex::Regex;
 use serde::Serialize;
 use std::io::Write;
 use std::path::Path;
 
-use crate::{imaging, ActixResult, State};
+use crate::{imaging, ApiResult, State};
 use crate::models::Image;
 
 #[derive(Serialize)]
-struct UploadedImages {
+pub struct UploadedImages {
     srcpaths: Vec<String>,
 }
 
@@ -21,12 +23,11 @@ pub async fn upload(
     mut payload: Multipart,
     path: web::Path<(String,)>,
     state: web::Data<State>,
-) -> ActixResult {
+) -> ApiResult<web::Json<UploadedImages>> {
     let mut srcpaths = Vec::new();
 
     // TODO use lazy_static for compilation?
-    let rgx = regex::Regex::new(r"\s+")
-        .map_err(|e| HttpResponse::InternalServerError().body(e.to_string()))?;
+    let rgx = Regex::new(r"\s+")?;
 
     while let Some(item) = payload.next().await {
         let timestamp = Utc::now().timestamp();
@@ -49,17 +50,15 @@ pub async fn upload(
 
         save_file(&mut field, filepath).await?;
 
-        let image = imaging::process(&filepath)
-            .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
+        let image = imaging::process(&filepath)?;
 
-        Image::create(&state.pool, &path.0, image).await
-            .map_err(|e| HttpResponse::BadRequest().body(e))?;
+        Image::create(&state.pool, &path.0, image).await?;
     }
 
-    Ok(HttpResponse::Ok().json(UploadedImages { srcpaths }))
+    Ok(web::Json(UploadedImages { srcpaths }))
 }
 
-async fn save_file(field: &mut Field, filepath: &Path) -> Result<(), Error> {
+async fn save_file(field: &mut Field, filepath: &Path) -> Result<(), ActixError> {
     let filepath = filepath.as_os_str().to_os_string();
     let mut f = web::block(|| std::fs::File::create(filepath)).await?;
 

@@ -2,9 +2,14 @@ use crate::models::Image;
 
 use image::{GenericImageView, ImageError};
 use image::imageops::FilterType;
-use std::{fmt, fs, path::{Path, PathBuf}};
+use std::{fmt, fs};
+use std::error::Error;
+use std::path::{Path, PathBuf};
 
-/// Image handling errors relating to file I/O or image processing.
+
+type ImagingResult<T> = Result<T, ImagingError>;
+
+/// Imaging errors relating to file I/O or image processing.
 #[derive(Debug)]
 pub enum ImagingError {
     ImageOpenError(ImageError),
@@ -26,11 +31,22 @@ impl fmt::Display for ImagingError {
     }
 }
 
+impl Error for ImagingError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        use ImagingError::*;
+
+        match self {
+            ImageOpenError(e) | ResizeError(e) | ThumbnailError(e) => Some(e),
+            _ => None,
+        }
+    }
+}
+
 /// Opens `imgpath` and resizes the image so that the maximum dimension is 1200px, 
 /// maintaining the aspect ratio and overwriting the existing file. Additionally,
 /// if the image is over 400px in either dimension, it will generate a thumbnail
 /// with maximum dimension of 400px and aspect ratio preserved.
-pub fn process(filepath: &Path) -> Result<Image, ImagingError> {
+pub fn process(filepath: &Path) -> ImagingResult<Image> {
     use ImagingError::*;
 
     let img = image::open(filepath).map_err(|e| ImageOpenError(e))?;
@@ -70,7 +86,7 @@ pub fn process(filepath: &Path) -> Result<Image, ImagingError> {
     })
 }
 
-fn path_filename(path: &Path) -> Result<String, ImagingError> {
+fn path_filename(path: &Path) -> ImagingResult<String> {
     path.file_name()
         .ok_or_else(|| ImagingError::PathError("Filename not present".to_owned()))?
         .to_os_string()
@@ -79,7 +95,7 @@ fn path_filename(path: &Path) -> Result<String, ImagingError> {
 }
 
 /// Generates a thumbnail path string from the given filepath.
-fn thumbnail_path(filepath: &Path) -> Result<PathBuf, ImagingError> {
+fn thumbnail_path(filepath: &Path) -> ImagingResult<PathBuf> {
     let mut thumbpath = PathBuf::new();
 
     if let Some(parent) = filepath.parent() {
