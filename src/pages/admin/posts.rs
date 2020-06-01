@@ -8,10 +8,11 @@ use crate::{
 };
 use actix_web::{web::{Data, Path}, HttpResponse};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
+use sqlx::error::Error as SqlxError;
 
 
 pub struct Posts {
-    posts: Result<Vec<AdminPostPreview>, String>,
+    posts: Result<Vec<AdminPostPreview>, SqlxError>,
 }
 
 impl Posts {
@@ -45,7 +46,7 @@ impl RenderOnce for Posts {
                 script(src = asset_path("admin.js"));
             },
             Err(e) => tmpl << html! {
-                p : e;
+                p : e.to_string();
             },
         }
     }

@@ -97,7 +97,7 @@ pub async fn update_published(
         Ok(_) => HttpResponse::NoContent().finish(),
         Err(e) => {
             eprintln!("{}", e.to_string());
-            HttpResponse::BadRequest().body(e)
+            HttpResponse::BadRequest().body(e.to_string())
         },
     })
 }

@@ -1,19 +1,23 @@
-use actix_web::{http::header, Error, HttpResponse};
+use actix_web::{http::header, Error as ActixError, HttpResponse};
 use chrono::Utc;
 use lazy_static::lazy_static;
 
 pub mod api;
 pub mod encryption;
+pub mod error;
 pub mod extensions;
 pub mod imaging;
 pub mod middleware;
 pub mod models;
+mod state;
 pub mod pages;
 
-mod state;
+pub use error::ApiError;
 pub use state::State;
 
-pub type ActixResult = Result<HttpResponse, Error>;
+pub type ActixResult = Result<HttpResponse, ActixError>;
+
+pub type ApiResult<T> = Result<T, ApiError>;
 
 
 lazy_static! {
