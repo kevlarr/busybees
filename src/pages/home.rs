@@ -19,7 +19,7 @@ pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
         ),
         Err(e) => Either::B(
             // FIXME This should be an actual page
-            Ok(HttpResponse::BadRequest().body(e))
+            Ok(HttpResponse::BadRequest().body(e.to_string()))
         ),
     }
 }
@@ -67,7 +67,7 @@ impl RenderOnce for Home {
                             ) {
                                 preview (type = "secondary") {
                                     img (src = match &preview.first_image {
-                                        Some(s) => imaging::thumbnail_path(&s),
+                                        Some(s) => imaging::thumbnail_path_string(&s),
                                         None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
                                     });
                                     footer {

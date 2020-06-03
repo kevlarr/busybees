@@ -1,19 +1,33 @@
 use actix_multipart::{Field, Multipart, MultipartError};
-use actix_web::{web, Error, HttpResponse};
+use actix_web::web;
+use actix_web::error::{Error as ActixError};
 use chrono::Utc;
 use futures::StreamExt;
+use regex::Regex;
 use serde::Serialize;
 use std::io::Write;
+use std::path::Path;
 
-use crate::{imaging, State};
+use crate::{imaging, ApiResult, State};
+use crate::models::Image;
 
 #[derive(Serialize)]
 pub struct UploadedImages {
-    filepaths: Vec<String>,
+    srcpaths: Vec<String>,
 }
 
-pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<HttpResponse, Error> {
+/// Streams each included image, saving each to the application upload path with
+/// timestamp, generating relevant image `src` paths, and linking them to the given
+/// post.  Each image will be resized and thumbnailed as appropriate.
+pub async fn upload(
+    mut payload: Multipart,
+    path: web::Path<(String,)>,
+    state: web::Data<State>,
+) -> ApiResult<web::Json<UploadedImages>> {
     let mut srcpaths = Vec::new();
+
+    // TODO use lazy_static for compilation?
+    let rgx = Regex::new(r"\s+")?;
 
     while let Some(item) = payload.next().await {
         let timestamp = Utc::now().timestamp();
@@ -25,23 +39,27 @@ pub async fn upload(mut payload: Multipart, state: web::Data<State>) -> Result<H
 
         let filename = content_type
             .get_filename()
+            .map(|f| rgx.replace_all(f, "+"))
+            .map(|f| format!("{}.{}", timestamp, f))
             .ok_or_else(|| MultipartError::Incomplete)?;
 
-        srcpaths.push(format!("uploads/{}.{}", timestamp, filename));
+        srcpaths.push(format!("uploads/{}", filename));
 
-        let filepath = format!("{}/{}.{}", state.upload_path, timestamp, filename);
-        let thumbpath = format!("{}/thumb.{}.{}", state.upload_path, timestamp, filename);
+        let filepath = format!("{}/{}", state.upload_path, filename);
+        let filepath = Path::new(&filepath);
 
-        save_file(&mut field, filepath.clone()).await?;
+        save_file(&mut field, filepath).await?;
 
-        imaging::process(&filepath, &thumbpath)
-            .map_err(|e| HttpResponse::BadRequest().body(e.to_string()))?;
+        let image = imaging::process(&filepath)?;
+
+        Image::create(&state.pool, &path.0, image).await?;
     }
 
-    Ok(HttpResponse::Ok().json(UploadedImages { filepaths: srcpaths }))
+    Ok(web::Json(UploadedImages { srcpaths }))
 }
 
-async fn save_file(field: &mut Field, filepath: String) -> Result<(), Error> {
+async fn save_file(field: &mut Field, filepath: &Path) -> Result<(), ActixError> {
+    let filepath = filepath.as_os_str().to_os_string();
     let mut f = web::block(|| std::fs::File::create(filepath)).await?;
 
     while let Some(chunk) = field.next().await {

@@ -2,10 +2,60 @@
  * Configuration for the embedded Summernote editor and listeners
  * to enable and disable the submit button
  */
+const API = (function() {
+  function request(method, url, { expect = 200, headers, body }) {
+    if (headers === undefined) {
+      headers = {'Content-Type': 'application/json'};
+    }
+
+    if (headers['Content-Type'] === 'application/json') {
+      body = JSON.stringify(body);
+    }
+
+    let status, statusText;
+
+    return fetch(url, { method, headers, body })
+      .then(resp => new Promise((resolve, reject) => {
+        if (resp.status !== expect) {
+          status = resp.status;
+          statusText = resp.statusText;
+
+          return resp.text().then(text => reject(text))
+        }
+
+        return resolve(resp);
+      }))
+      .catch(text => new Promise((_, reject) => {
+        return reject({
+            expected: expect,
+            received: {
+              code: status,
+              reason: statusText,
+              text,
+            },
+        });
+      }))
+  }
+
+  return {
+    get(url, { expect, headers }) {
+      return request('GET', url, { expect, headers });
+    },
+    post(url, { expect, headers, body }) {
+      return request('POST', url, { expect, headers, body });
+    },
+    patch(url, { expect, headers, body }) {
+      return request('PATCH', url, { expect, headers, body });
+    },
+  };
+})();
+
 (function() {
   const SAVED = 'Saved';
   const UNSAVED = 'Unsaved';
   const SAVING = 'Saving...';
+ 
+  const RGX = new RegExp(`(${window.location.host}/uploads/)(.+)`);
 
   const postKey = document.getElementById('EditorForm').getAttribute('data-post-key');
   const postTitle = document.getElementById('PostTitle');
@@ -16,6 +66,19 @@
   let statusBar;
 
   let uploading = 0;
+
+  function showError({received: { code, reason, text }}) {
+    let errorAlert = document.createElement('div');
+    let msg = String(code);
+
+    if (reason) { msg += ` ${reason}`; }
+    if (text) { msg += `: ${text}`; }
+
+    errorAlert.classList.add('alert', 'alert-danger');
+    errorAlert.innerHTML = msg;
+
+    statusBar.appendChild(errorAlert);
+  }
 
   $('#SummernoteEditor').summernote({
     toolbar: [
@@ -38,6 +101,7 @@
       },
 
       onImageUpload(files) {
+        saveStatus.innerText = UNSAVED;
         uploading++;
 
         const data = new FormData()
@@ -54,26 +118,15 @@
 
         statusBar.appendChild(uploadingAlert);
 
-        resp = fetch('/api/images', { method: 'POST', body: data })
-          .then(resp => {
-            if (resp.status >= 400) {
-              throw new Error(JSON.stringify(resp.statusText));
-            }
-            return resp.json()
-          })
+        API.post(`/api/posts/${postKey}/images/new`, { headers: {}, body: data })
+          .then(resp => resp.json())
           .then(json => {
-            json.filepaths.forEach(f => {
-              $(this).summernote('insertImage', `/${f}`)
+            json.srcpaths.forEach(path => {
+              console.log(`[onImageUpload::insertImage] PATH: ${path}`);
+              $(this).summernote('insertImage', `/${path}`)
             });
           })
-          .catch(e => {
-            let errorAlert = document.createElement('div');
-
-            errorAlert.classList.add('alert', 'alert-danger');
-            errorAlert.innerHTML = `There was an err: ${e}... tell Kevin to fix his shit`;
-
-            statusBar.appendChild(errorAlert);
-          })
+          .catch(showError)
           .finally(() => {
             uploadingAlert.remove();
             uploading--;
@@ -104,23 +157,35 @@
   function save() {
     saveStatus.innerText = SAVING;
 
-    fetch(`/api/posts/${postKey}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        title: postTitle.value,
-        content: postContent.value,
-      }),
-    })
-      .then(resp => {
-        if (resp.status >= 400) {
-          saveStatus.innerText = UNSAVED;
-          throw new Error(JSON.stringify(resp.statusText));
-        }
+    const linkedUploads = [];
 
+    document.querySelectorAll('.note-editable img').forEach(img => {
+      const matches = RGX.exec(img.src);
+
+      if (matches) {
+        const filename = matches[2];
+
+        console.log(`[save::linkedUpload] MATCHED FILENAME: ${filename}`);
+        linkedUploads.push(filename);
+      }
+    });
+
+    API.patch(`/api/posts/${postKey}`, {
+      expect: 204,
+      body: {
+        post: {
+          title: postTitle.value,
+          content: postContent.value,
+        },
+        linkedUploads,
+      },
+    })
+      .then(() => {
         saveStatus.innerText = SAVED;
+      })
+      .catch(err => {
+        saveStatus.innerText = UNSAVED;
+        window.alert(JSON.stringify(err));
       });
   }
 
