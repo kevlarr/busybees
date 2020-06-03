@@ -2,16 +2,36 @@ use busybees::State;
 use busybees::imaging;
 use busybees::models::Image;
 
-use std::fs;
+use lazy_static::lazy_static;
+use regex::Regex;
+use std::{fmt, fs, ops};
 use std::io::Result as IoResult;
 use std::path::{Path, PathBuf};
+
+lazy_static! {
+    pub static ref WHITESPACE: Regex = Regex::new(r"\s+").expect("Could not compile regex");
+}
 
 #[derive(Debug)]
 struct Filename(String);
 
+impl Filename {
+    fn is_thumbnail(&self) -> bool {
+        self.0.starts_with("thumb.")
+    }
+}
+
+impl ops::Deref for Filename {
+    type Target = String;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 struct ProcessedImages {
     ok: Vec<Image>,
-    err: Vec<PathBuf>,
+    err: Vec<FileLink>,
 }
 
 struct ImportedImages {
@@ -19,10 +39,63 @@ struct ImportedImages {
     err: Vec<Filename>,
 }
 
+/// General purpose error representing failure to process a directory entry
+/// for metadata or open as image.
+struct FileLinkError(String);
+
+impl fmt::Display for FileLinkError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl From<String> for FileLinkError {
+    fn from(msg: String) -> FileLinkError {
+        FileLinkError(msg)
+    }
+}
+
+/// Helper class to extract filename from owned path and open as image
+struct FileLink {
+    existing_path: Box<Path>,
+    existing_filename: Filename,
+    encoded_path: Box<Path>,
+    encoded_filename: Filename,
+}
+
+impl FileLink {
+    /// Accepts an owned Path. Returns `Some<Self>` if the path is able to
+    /// be loaded as an image with an accessible filename. Returns `None`
+    /// otherwise.
+    fn new(path: Box<Path>) -> Result<Self, FileLinkError> {
+        let filename = Filename(path.file_name()
+            .ok_or_else(|| "Filename is not present".to_owned())?
+            .to_os_string().into_string()
+            .map_err(|_| "Filename is not valid unicode".to_owned())?);
+
+        if filename.is_thumbnail() {
+            Err("File is a thumbnail".to_owned())?;
+        }
+
+        let encoded_filename = Filename(WHITESPACE.replace_all(&*filename, "+").to_string());
+        let encoded_path = path
+            .with_file_name(&*encoded_filename)
+            .into_boxed_path();
+
+        Ok(FileLink {
+            existing_path: path,
+            existing_filename: filename,
+            encoded_path,
+            encoded_filename,
+        })
+    }
+}
+
 #[actix_rt::main]
 async fn main() -> IoResult<()> {
-    let args: Vec<String> = std::env::args().collect();
+    dotenv::dotenv().ok();
 
+    let args: Vec<String> = std::env::args().collect();
     let dirpath = args.iter().skip(1).next().expect("Must provide images directory");
 
     if !Path::new(dirpath).is_dir() {
@@ -30,12 +103,12 @@ async fn main() -> IoResult<()> {
     }
 
     let state = State::new(dirpath.clone());
-    let image_paths = load_images(&state)?;
+    let file_paths = load_paths(&state)?;
 
     println!("Searching {} for images", state.upload_path);
-    println!("Found {} images", image_paths.len());
+    println!("Found {} files", file_paths.len());
 
-    let processed = process_images(image_paths);
+    let processed = process_images(file_paths);
 
     println!("Processed {} images", processed.ok.len());
     println!("Failed to process {} images:", processed.err.len());
@@ -46,6 +119,60 @@ async fn main() -> IoResult<()> {
     println!("Failed to import {} images:", imported.err.len());
 
     Ok(())
+}
+
+fn load_paths(state: &State) -> IoResult<Vec<PathBuf>> {
+    Ok(fs::read_dir(&state.upload_path)?
+        .map(|entry| entry.ok())
+        .filter_map(|opt_entry| opt_entry)
+        .map(|entry| entry.path())
+        .filter(|path| path.is_file())
+        .collect())
+}
+
+fn process_images(paths: Vec<PathBuf>) -> ProcessedImages {
+    let mut ok = Vec::new();
+    let mut err = Vec::new();
+
+    for image_path in paths {
+        println!("\n{:?}", image_path);
+
+        let link = match FileLink::new(image_path.into_boxed_path()) {
+            Ok(link) => link,
+            Err(e) => {
+                println!("\t{}", e);
+                continue;
+            },
+        };
+
+        if link.existing_path != link.encoded_path {
+            println!(
+                "\tRenaming {} to {}",
+                *link.existing_filename,
+                *link.encoded_filename,
+            );
+
+            if let Err(e) = fs::rename(&link.existing_path, &link.encoded_path) {
+                eprintln!("\tError: {}", e);
+                continue;
+            }
+        }
+
+        println!("\tProcessing");
+
+        let image = match imaging::process(&link.encoded_path) {
+            Ok(image) => image,
+            Err(e) => {
+                eprintln!("\tError: {}", e);
+                err.push(link);
+                continue;
+            },
+        };
+
+        ok.push(image);
+    }
+
+    ProcessedImages { ok, err }
 }
 
 async fn import_images(state: &State, images: Vec<Image>) -> ImportedImages {
@@ -81,8 +208,9 @@ async fn import_images(state: &State, images: Vec<Image>) -> ImportedImages {
             insert into post_image (image_id, post_id)
                 select $1, post.id
                 from post
-                -- where ...",
-            image_id
+                where content ~~ $2",
+            image_id,
+            format!("%src=\"/uploads/{}\"%", image.filename)
         ).execute(&mut *tx).await;
 
         match result {
@@ -105,38 +233,4 @@ async fn import_images(state: &State, images: Vec<Image>) -> ImportedImages {
     }
 
     ImportedImages { ok, err }
-}
-
-fn process_images(img_paths: Vec<PathBuf>) -> ProcessedImages {
-    let mut ok = Vec::new();
-    let mut err = Vec::new();
-
-    for imgpath in img_paths {
-        let image = match imaging::process(&imgpath.as_path()) {
-            Ok(image) => image,
-            Err(e) => {
-                eprintln!("{:?}: {}", imgpath, e.to_string());
-                err.push(imgpath);
-                continue;
-            },
-        };
-
-        ok.push(image);
-    }
-
-    ProcessedImages { ok, err }
-}
-
-fn load_images(state: &State) -> IoResult<Vec<PathBuf>> {
-    Ok(fs::read_dir(&state.upload_path)?
-        .map(|entry| entry.ok())
-        .filter_map(|opt_entry| opt_entry)
-        .map(|entry| entry.path())
-        .filter(|path| !path.is_dir())
-
-        // Opening the image just to collect valid image filepaths is not
-        // fantastic, but this is not performance sensitive, so...
-        .map(|path| (image::open(path.clone()).map(|_| path).ok()))
-        .filter_map(|opt_path| opt_path)
-        .collect())
 }
