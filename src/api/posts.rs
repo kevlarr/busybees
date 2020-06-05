@@ -9,7 +9,6 @@ pub struct UpdatePublishedParams {
     published: bool,
 }
 
-#[deprecated(note = "Use ApiResult and ApiError instead of `map_err`")]
 pub async fn update(
     path: Path<(String,)>,
     props: Json<UpdatePostParams>,

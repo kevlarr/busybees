@@ -1,11 +1,10 @@
-use crate::store::images::Image;
-
 use image::{GenericImageView, ImageError};
 use image::imageops::FilterType;
 use std::{fmt, fs};
 use std::error::Error;
 use std::path::{Path, PathBuf};
 
+use crate::store::images::Image;
 
 type ImagingResult<T> = Result<T, ImagingError>;
 
@@ -49,13 +48,13 @@ impl Error for ImagingError {
 pub fn process(filepath: &Path) -> ImagingResult<Image> {
     use ImagingError::*;
 
-    let img = image::open(filepath).map_err(|e| ImageOpenError(e))?;
+    let img = image::open(filepath).map_err(ImageOpenError)?;
     let (mut width, mut height) = img.dimensions();
 
     if width > 1200 || height > 1200 {
         let resized = img.resize(1200, 1200, FilterType::CatmullRom);
 
-        resized.save(filepath).map_err(|e| ResizeError(e))?;
+        resized.save(filepath).map_err(ResizeError)?;
 
         let dims = resized.dimensions();
         width = dims.0;
@@ -67,7 +66,7 @@ pub fn process(filepath: &Path) -> ImagingResult<Image> {
 
         img.resize(400, 400, FilterType::CatmullRom)
             .save(&thumbpath)
-            .map_err(|e| ThumbnailError(e))?;
+            .map_err(ThumbnailError)?;
 
         Some(path_filename(&thumbpath)?)
     } else {
