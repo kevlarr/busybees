@@ -1,6 +1,6 @@
 use crate::{
     encryption,
-    models::{Author, AuthorWithoutPassword},
+    store::authors::{self, AuthorWithoutPassword},
     pages::Page,
     ActixResult,
     State,
@@ -71,7 +71,7 @@ impl Auth {
     ) -> Either<Result<HttpResponse, Error>, Page> {
         let secret = &state.secret_key;
 
-        let author = match Author::load(&state.pool, credentials.email.clone()).await {
+        let author = match authors::find(&state.pool, credentials.email.clone()).await {
             Ok(author) => author,
             Err(_) => {
                 // Hash the password anyway to help prevent timing attacks

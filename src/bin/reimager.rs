@@ -1,6 +1,6 @@
 use busybees::State;
 use busybees::imaging;
-use busybees::models::Image;
+use busybees::store::images::Image;
 
 use lazy_static::lazy_static;
 use regex::Regex;

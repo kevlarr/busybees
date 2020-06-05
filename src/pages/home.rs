@@ -1,6 +1,6 @@
 use crate::{
     imaging,
-    models::{PostPreview, TitleSlug},
+    store::posts::{self, PostPreview, TitleSlug},
     pages::Page,
     ActixResult,
     State,
@@ -11,7 +11,7 @@ use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 
 pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
-    match PostPreview::load_latest(&state.pool).await {
+    match posts::public_previews(&state.pool).await {
         Ok(posts) => Either::A(
             page.id("Home")
                 .title("Latest Posts")

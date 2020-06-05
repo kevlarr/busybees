@@ -1,6 +1,6 @@
 use crate::{
-    models::Post,
     pages::{notfound, Page},
+    store::posts::{self, Post},
     State,
     asset_path,
 };
@@ -31,7 +31,7 @@ impl PostView {
     ) -> Page {
         let auth = page.user.is_some();
 
-        match Post::load(&state.pool, path.0.clone()).await {
+        match posts::find(&state.pool, path.0.clone()).await {
             Ok(post) => page
                 .id("Post")
                 .title(post.title.clone())

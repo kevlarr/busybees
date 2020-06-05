@@ -1,15 +1,15 @@
+use actix_web::{web::{Data, Path}, HttpResponse};
+use horrorshow::{html, RenderOnce, TemplateBuffer};
+use sqlx::error::Error as SqlxError;
+
 use crate::{
-    models::{AdminPostPreview, Post, TitleSlug},
+    store::posts::{self, AdminPostPreview, TitleSlug},
     pages::Page,
     ActixResult,
     State,
     asset_path,
     redirect,
 };
-use actix_web::{web::{Data, Path}, HttpResponse};
-use horrorshow::{html, RenderOnce, TemplateBuffer};
-use sqlx::error::Error as SqlxError;
-
 
 pub struct Posts {
     posts: Result<Vec<AdminPostPreview>, SqlxError>,
@@ -20,12 +20,12 @@ impl Posts {
         page.id("AdminPosts")
             .title("Manage Posts")
             .content(Self {
-                posts: AdminPostPreview::load_all(&state.pool).await
+                posts: posts::admin_list(&state.pool).await
             })
     }
 
     pub async fn delete(path: Path<(String,)>, state: Data<State>) -> ActixResult {
-        match Post::delete(&state.pool, &path.0).await {
+        match posts::delete(&state.pool, &path.0).await {
             Ok(()) => Ok(redirect("/admin/posts")),
             Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
         }

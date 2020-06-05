@@ -8,8 +8,8 @@ pub mod error;
 pub mod extensions;
 pub mod imaging;
 pub mod middleware;
-pub mod models;
 mod state;
+pub mod store;
 pub mod pages;
 
 pub use error::ApiError;

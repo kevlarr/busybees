@@ -1,4 +1,6 @@
-use crate::{extensions::Assigns, models::AuthorWithoutPassword, asset_path};
+use crate::asset_path;
+use crate::extensions::Assigns;
+use crate::store::authors::AuthorWithoutPassword;
 
 use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, HttpResponse, Responder};
 use futures::future::{ok, Ready};

@@ -1,6 +1,6 @@
 use crate::{
     extensions::Assigns,
-    models::AuthorWithoutPassword,
+    store::authors::AuthorWithoutPassword,
 };
 
 use actix_web::{

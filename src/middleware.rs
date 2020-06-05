@@ -1,5 +1,5 @@
 use crate::extensions::Assigns;
-use crate::models::AuthorWithoutPassword;
+use crate::store::authors::AuthorWithoutPassword;
 
 use actix_service::Service;
 use actix_session::UserSession;

@@ -9,7 +9,7 @@ use std::io::Write;
 use std::path::Path;
 
 use crate::{imaging, ApiResult, State};
-use crate::models::Image;
+use crate::store::images;
 
 #[derive(Serialize)]
 pub struct UploadedImages {
@@ -52,7 +52,7 @@ pub async fn upload(
 
         let image = imaging::process(&filepath)?;
 
-        Image::create(&state.pool, &path.0, image).await?;
+        images::create(&state.pool, &path.0, image).await?;
     }
 
     Ok(web::Json(UploadedImages { srcpaths }))

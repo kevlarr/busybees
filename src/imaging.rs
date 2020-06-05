@@ -1,4 +1,4 @@
-use crate::models::Image;
+use crate::store::images::Image;
 
 use image::{GenericImageView, ImageError};
 use image::imageops::FilterType;

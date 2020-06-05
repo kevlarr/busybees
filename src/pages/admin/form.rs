@@ -1,6 +1,6 @@
 use crate::{
-    models::{Post, PostProps},
     pages::{notfound, Page},
+    store::posts::{self, Post, PostParams},
     ActixResult,
     State,
     asset_path,
@@ -19,12 +19,12 @@ pub struct PostForm {
 
 impl PostForm {
     pub async fn new(state: Data<State>) -> ActixResult {
-        let new_post = PostProps {
+        let new_post = PostParams {
             title: "New post".into(),
             content: String::new(),
         };
 
-        match Post::create(&state.pool, new_post).await {
+        match posts::create(&state.pool, new_post).await {
             Ok(key) => Ok(redirect(&format!("/admin/posts/edit/{}", key))),
             Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
         }
@@ -35,7 +35,7 @@ impl PostForm {
         path: Path<(String,)>,
         state: Data<State>,
     ) -> Page {
-        match Post::load(&state.pool, path.0.clone()).await {
+        match posts::find(&state.pool, path.0.clone()).await {
             Ok(post) => page
                 .id("PostForm")
                 .title("Edit Post")
