@@ -1,3 +1,4 @@
+//! Utilities for opening, resizing, and generating thumbnails for images.
 use image::{GenericImageView, ImageError};
 use image::imageops::FilterType;
 use std::{fmt, fs};
@@ -85,6 +86,7 @@ pub fn process(filepath: &Path) -> ImagingResult<Image> {
     })
 }
 
+/// Attempts to extract the filename as a `String` for the given path.
 fn path_filename(path: &Path) -> ImagingResult<String> {
     path.file_name()
         .ok_or_else(|| ImagingError::PathError("Filename not present".to_owned()))?

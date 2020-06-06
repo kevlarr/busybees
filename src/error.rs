@@ -1,3 +1,4 @@
+//! Error module
 use actix_multipart::MultipartError;
 use actix_web::HttpResponse;
 use actix_web::error::{Error as AwError, ResponseError};

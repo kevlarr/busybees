@@ -1,3 +1,4 @@
+//! Server middleware
 use crate::extensions::Assigns;
 use crate::store::authors::AuthorWithoutPassword;
 
@@ -7,7 +8,7 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::Error;
 
 
-/// Adds a new `Assigns` struct to the request extensions.
+/// Adds a new `Assigns` to the request extensions.
 pub fn set_assigns<S, B>(req: ServiceRequest, service: &mut S) -> S::Future
 where
     S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>
@@ -18,7 +19,7 @@ where
 
 
 /// Inspects the request session for an `auth` cookie and, if present,
-/// adds the user information into the request extensions' assigns.
+/// adds the user information into the request extension's `Assigns`.
 pub fn load_user<S, B>(req: ServiceRequest, service: &mut S) -> S::Future
 where
     S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>
