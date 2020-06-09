@@ -1,35 +1,11 @@
-use actix_web::{web::{Data, Path}, HttpResponse};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
-use sqlx::error::Error as SqlxError;
+use sqlx::Error as SqlxError;
 
-use crate::{
-    store::posts::{self, AdminPostPreview, TitleSlug},
-    pages::Page,
-    ActixResult,
-    State,
-    asset_path,
-    redirect,
-};
+use crate::asset_path;
+use crate::store::posts::{Post, AdminPostPreview, TitleSlug};
 
 pub struct Posts {
-    posts: Result<Vec<AdminPostPreview>, SqlxError>,
-}
-
-impl Posts {
-    pub async fn get(page: Page, state: Data<State>) -> Page {
-        page.id("AdminPosts")
-            .title("Manage Posts")
-            .content(Self {
-                posts: posts::admin_list(&state.pool).await
-            })
-    }
-
-    pub async fn delete(path: Path<(String,)>, state: Data<State>) -> ActixResult {
-        match posts::delete(&state.pool, &path.0).await {
-            Ok(()) => Ok(redirect("/admin/posts")),
-            Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
-        }
-    }
+    pub posts: Result<Vec<AdminPostPreview>, SqlxError>,
 }
 
 impl RenderOnce for Posts {
@@ -73,5 +49,31 @@ impl RenderOnce for PostItem {
                 }
             }
         }
+    }
+}
+
+pub struct PostForm {
+    pub post: Post,
+}
+
+impl RenderOnce for PostForm {
+    fn render_once(self, tmpl: &mut TemplateBuffer) {
+        let Post { key, title, content, .. } = self.post;
+
+        tmpl << html! {
+            form (id = "EditorForm", data-post-key = key) {
+                input(id = "PostTitle", name = "title", placeholder = "Title", autofocus = "true", value = title);
+                textarea(id = "SummernoteEditor", name = "content") : content;
+            }
+
+            p (id = "saveStatus") : "Saved";
+
+            // WYSIWYG editor
+            link (rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");
+
+            script (src = "https://code.jquery.com/jquery-3.4.1.min.js");
+            script (src = "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js");
+            script (src = asset_path("editor.js"));
+        };
     }
 }

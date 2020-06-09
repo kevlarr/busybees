@@ -1,11 +1,4 @@
-use crate::pages::Page;
 use horrorshow::{html, RenderOnce, TemplateBuffer};
-
-pub async fn get(page: Page) -> Page {
-    page.id("About")
-        .title("About Us")
-        .content(About{})
-}
 
 pub struct About;
 

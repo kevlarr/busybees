@@ -10,7 +10,7 @@ use std::{env, io};
 
 use ::busybees::{
     ASSET_BASEPATH,
-    api,
+    handlers,
     middleware,
     pages,
     State,
@@ -83,13 +83,13 @@ async fn main() -> io::Result<()> {
                 .service(uploaded_files)
                 .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")))
 
-            .route("/", get().to(pages::home::get))
-            .route("/about", get().to(pages::about::get))
-            .route("/sandbox", get().to(pages::sandbox::get))
-            .service(pages::auth::resource("/auth"))
-            .service(pages::post::resource("/posts"))
-            .service(pages::admin::resource("/admin"))
-            .service(api::resource("/api"))
+            .route("/", get().to(handlers::home))
+            .route("/about", get().to(handlers::about))
+            .route("/sandbox", get().to(handlers::sandbox))
+            .service(handlers::admin::resource("/admin"))
+            .service(handlers::api::resource("/api"))
+            .service(handlers::auth::resource("/auth"))
+            .service(handlers::posts::resource("/posts"))
     })
     .bind_openssl(address, ssl_builder)?
     .run()

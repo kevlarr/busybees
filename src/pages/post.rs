@@ -1,22 +1,13 @@
+use actix_web::web::{Data, Path};
+use horrorshow::{html, Raw, RenderOnce, TemplateBuffer};
+
 use crate::{
-    pages::{notfound, Page},
+    handlers::not_found,
+    pages::Page,
     store::posts::{self, Post},
     State,
     asset_path,
 };
-
-use actix_web::{
-    web::{self, Data, Path},
-    Scope,
-};
-use horrorshow::{html, Raw, RenderOnce, TemplateBuffer};
-
-
-pub fn resource(path: &str) -> Scope {
-    web::scope(path)
-        .route("/{key}/read/{slug}", web::get().to(PostView::get))
-}
-
 
 pub struct PostView {
     pub post: Post,
@@ -38,7 +29,7 @@ impl PostView {
                 .image(post.first_image.clone())
                 .content(Self{ auth, post }),
 
-            Err(_) => notfound::get_sync(page),
+            Err(_) => not_found(page).await,
         }
     }
 }

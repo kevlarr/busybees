@@ -6,23 +6,7 @@ use crate::{
     State,
 };
 
-use actix_web::{web::Data, Either, HttpResponse};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
-
-
-pub async fn get(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
-    match posts::public_previews(&state.pool).await {
-        Ok(posts) => Either::A(
-            page.id("Home")
-                .title("Latest Posts")
-                .content(Home { posts })
-        ),
-        Err(e) => Either::B(
-            // FIXME This should be an actual page
-            Ok(HttpResponse::BadRequest().body(e.to_string()))
-        ),
-    }
-}
 
 pub struct Home {
     pub posts: Vec<PostPreview>,
