@@ -77,7 +77,7 @@ impl FileLink {
         );
 
         if filename.is_thumbnail() {
-            Err("File is a thumbnail".to_owned())?;
+            return Err("File is a thumbnail".to_owned().into());
         }
 
         let encoded_filename = Filename(WHITESPACE.replace_all(&*filename, "+").to_string());
@@ -99,8 +99,7 @@ async fn main() -> IoResult<()> {
     let args: Vec<String> = std::env::args().collect();
     let dirpath = args
         .iter()
-        .skip(1)
-        .next()
+        .nth(1)
         .expect("Must provide images directory");
 
     if !Path::new(dirpath).is_dir() {

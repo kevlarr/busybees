@@ -8,7 +8,7 @@ use actix_web::{
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use std::{env, io};
 
-use ::busybees::{handlers, middleware, pages, State, ASSET_BASEPATH};
+use ::busybees::{handlers, middleware, State, ASSET_BASEPATH};
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {

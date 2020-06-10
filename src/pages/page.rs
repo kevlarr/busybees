@@ -124,7 +124,7 @@ impl RenderOnce for Page {
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:400&display=swap");
 
                     // Font Awesome assets are ~80kb - not huge but no reason to include for non-admins
-                    @ if let Some(_) = user {
+                    @ if user.is_some() {
                         script (src = "https://use.fontawesome.com/195e7e8d92.js");
                     }
                 }
@@ -139,7 +139,7 @@ impl RenderOnce for Page {
                                 }
                             }
 
-                            @ if let Some(_) = user {
+                            @ if user.is_some() {
                                 ul (id = "AdminLinks") {
                                     li {
                                         a (class = "icon-link", href = "/admin/posts") {

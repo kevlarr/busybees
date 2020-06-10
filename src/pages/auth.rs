@@ -1,15 +1,14 @@
 use crate::{asset_path, pages::Page};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
+#[derive(Default)]
 pub struct Auth {
     error_message: Option<String>,
 }
 
 impl Auth {
     pub fn new() -> Self {
-        Auth {
-            error_message: None,
-        }
+        Self::default()
     }
 
     pub fn with_error(msg: impl Into<String>) -> Self {
