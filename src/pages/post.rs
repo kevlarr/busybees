@@ -1,37 +1,13 @@
-use actix_web::web::{Data, Path};
 use horrorshow::{html, Raw, RenderOnce, TemplateBuffer};
 
 use crate::{
-    handlers::not_found,
-    pages::Page,
-    store::posts::{self, Post},
-    State,
+    store::posts::Post,
     asset_path,
 };
 
 pub struct PostView {
     pub post: Post,
     pub auth: bool,
-}
-
-impl PostView {
-    pub async fn get(
-        page: Page,
-        path: Path<(String, String)>,
-        state: Data<State>,
-    ) -> Page {
-        let auth = page.user.is_some();
-
-        match posts::find(&state.pool, path.0.clone()).await {
-            Ok(post) => page
-                .id("Post")
-                .title(post.title.clone())
-                .image(post.first_image.clone())
-                .content(Self{ auth, post }),
-
-            Err(_) => not_found(page).await,
-        }
-    }
 }
 
 impl RenderOnce for PostView {

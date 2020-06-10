@@ -1,9 +1,6 @@
 use crate::{
     imaging,
-    store::posts::{self, PostPreview, TitleSlug},
-    pages::Page,
-    ActixResult,
-    State,
+    store::posts::{PostPreview, TitleSlug},
 };
 
 use horrorshow::{html, RenderOnce, TemplateBuffer};

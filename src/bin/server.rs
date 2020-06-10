@@ -68,7 +68,7 @@ async fn main() -> io::Result<()> {
             .wrap(Logger::default())
 
             // Default 404 response
-            .default_service(route().to(pages::notfound::get))
+            .default_service(route().to(handlers::not_found))
 
             // Public assets and uploaded images
             .service(scope(&ASSET_BASEPATH)
