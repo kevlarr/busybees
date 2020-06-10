@@ -1,3 +1,3 @@
 mod posts;
 
-pub use posts::{Posts, PostForm};
+pub use posts::{PostForm, Posts};

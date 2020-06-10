@@ -1,10 +1,10 @@
-use actix_web::{web::Data, Either, HttpResponse};
 use actix_web::dev::RequestHead;
+use actix_web::{web::Data, Either, HttpResponse};
 
-use crate::{ActixResult, State};
 use crate::extensions::Assigns;
-use crate::pages::{Page, About, Home, NotFound, Sandbox};
+use crate::pages::{About, Home, NotFound, Page, Sandbox};
 use crate::store::{self, authors::AuthorWithoutPassword};
+use crate::{ActixResult, State};
 
 pub mod admin;
 pub mod api;
@@ -26,29 +26,23 @@ pub async fn home(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
         Ok(previews) => Either::A(
             page.id("Home")
                 .title("Latest Posts")
-                .content(Home { posts: previews })
+                .content(Home { posts: previews }),
         ),
         Err(_) => Either::B(
             // FIXME This should be an actual page
-            Ok(HttpResponse::InternalServerError().finish())
+            Ok(HttpResponse::InternalServerError().finish()),
         ),
     }
 }
 
 pub async fn about(page: Page) -> Page {
-    page.id("About")
-        .title("About Us")
-        .content(About{})
+    page.id("About").title("About Us").content(About {})
 }
 
 pub async fn not_found(page: Page) -> Page {
-    page.id("NotFound")
-        .title("Not Found")
-        .content(NotFound{})
+    page.id("NotFound").title("Not Found").content(NotFound {})
 }
 
 pub async fn sandbox(page: Page) -> Page {
-    page.id("Sandbox")
-        .title("Sandbox")
-        .content(Sandbox{})
+    page.id("Sandbox").title("Sandbox").content(Sandbox {})
 }

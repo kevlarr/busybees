@@ -20,17 +20,20 @@ pub struct AuthorWithoutPassword {
 
 impl From<Author> for AuthorWithoutPassword {
     fn from(author: Author) -> AuthorWithoutPassword {
-        let Author { id, name, email, .. } = author;
+        let Author {
+            id, name, email, ..
+        } = author;
 
         AuthorWithoutPassword { id, name, email }
     }
 }
-
 
 pub async fn find(pool: &PgPool, email: String) -> StoreResult<Author> {
     sqlx::query_as!(
         Author,
         "select id, email, name, password_hash from author where email = $1",
         email,
-    ).fetch_one(pool).await
+    )
+    .fetch_one(pool)
+    .await
 }

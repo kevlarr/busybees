@@ -1,9 +1,9 @@
 //! Error module
-use actix_multipart::MultipartError;
-use actix_web::HttpResponse;
-use actix_web::error::{Error as AwError, ResponseError};
 use crate::encryption::EncryptionError;
 use crate::imaging::ImagingError;
+use actix_multipart::MultipartError;
+use actix_web::error::{Error as AwError, ResponseError};
+use actix_web::HttpResponse;
 use regex::Error as RegexError;
 use sqlx::Error as SqlxError;
 use std::fmt;

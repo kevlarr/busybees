@@ -11,7 +11,8 @@ pub struct Image {
 }
 
 pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<()> {
-    let image_id = sqlx::query!("
+    let image_id = sqlx::query!(
+        "
         insert into image (filename, thumbnail_filename, width, height, kb)
             values ($1, $2, $3, $4, $5)
             returning id",
@@ -21,15 +22,19 @@ pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<
         props.height,
         props.kb,
     )
-        .fetch_one(pool)
-        .await?;
+    .fetch_one(pool)
+    .await?;
 
-    sqlx::query!(r#"
+    sqlx::query!(
+        r#"
         insert into post_image (post_id, image_id)
             values ((select id from post where key = $1), $2)
-    "#, post_key.to_owned(), image_id.id)
-        .execute(pool)
-        .await?;
+    "#,
+        post_key.to_owned(),
+        image_id.id
+    )
+    .execute(pool)
+    .await?;
 
     Ok(())
 }

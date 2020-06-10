@@ -8,14 +8,7 @@ use actix_web::{
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use std::{env, io};
 
-use ::busybees::{
-    ASSET_BASEPATH,
-    handlers,
-    middleware,
-    pages,
-    State,
-};
-
+use ::busybees::{handlers, middleware, pages, State, ASSET_BASEPATH};
 
 #[actix_rt::main]
 async fn main() -> io::Result<()> {
@@ -29,7 +22,9 @@ async fn main() -> io::Result<()> {
         let cert_file = env::var("SSL_CERT_FILE").expect("SSL_CERT_FILE not set");
 
         let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-        builder.set_private_key_file(&key_file, SslFiletype::PEM).unwrap();
+        builder
+            .set_private_key_file(&key_file, SslFiletype::PEM)
+            .unwrap();
         builder.set_certificate_chain_file(&cert_file).unwrap();
 
         builder
@@ -59,30 +54,30 @@ async fn main() -> io::Result<()> {
 
         App::new()
             .data(state)
-
             // First applied is last to execute, so user/session management needs to
             // be applied prior to the cookie session backend
             .wrap_fn(middleware::load_user)
             .wrap_fn(middleware::set_assigns)
             .wrap(cookie_session)
             .wrap(Logger::default())
-
             // Default 404 response
             .default_service(route().to(handlers::not_found))
-
             // Public assets and uploaded images
-            .service(scope(&ASSET_BASEPATH)
-                .service(assets)
-                .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")))
-
-            .service(scope("/public")
-                .service(static_files)
-                .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")))
-
-            .service(scope("/uploads")
-                .service(uploaded_files)
-                .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")))
-
+            .service(
+                scope(&ASSET_BASEPATH)
+                    .service(assets)
+                    .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")),
+            )
+            .service(
+                scope("/public")
+                    .service(static_files)
+                    .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")),
+            )
+            .service(
+                scope("/uploads")
+                    .service(uploaded_files)
+                    .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")),
+            )
             .route("/", get().to(handlers::home))
             .route("/about", get().to(handlers::about))
             .route("/sandbox", get().to(handlers::sandbox))

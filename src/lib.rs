@@ -8,9 +8,9 @@ pub mod extensions;
 pub mod handlers;
 pub mod imaging;
 pub mod middleware;
+pub mod pages;
 pub mod state;
 pub mod store;
-pub mod pages;
 
 pub use error::ApiError;
 pub use state::State;
@@ -21,7 +21,6 @@ pub type ActixResult = Result<HttpResponse, ActixError>;
 /// Generic result type based on `crate::error::ApiError` variants
 /// that can directly be converted to `HttpResponse`.
 pub type ApiResult<T> = Result<T, ApiError>;
-
 
 lazy_static! {
     /// The dynamic static asset path, generated at server start-up,
@@ -36,5 +35,7 @@ pub fn asset_path(filename: &str) -> String {
 
 /// Helper to create redirect responses
 pub fn redirect(path: &str) -> HttpResponse {
-    HttpResponse::Found().header(header::LOCATION, path).finish()
+    HttpResponse::Found()
+        .header(header::LOCATION, path)
+        .finish()
 }

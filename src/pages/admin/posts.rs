@@ -2,7 +2,7 @@ use horrorshow::{html, RenderOnce, TemplateBuffer};
 use sqlx::Error as SqlxError;
 
 use crate::asset_path;
-use crate::store::posts::{Post, AdminPostPreview, TitleSlug};
+use crate::store::posts::{AdminPostPreview, Post, TitleSlug};
 
 pub struct Posts {
     pub posts: Result<Vec<AdminPostPreview>, SqlxError>,
@@ -13,21 +13,24 @@ impl RenderOnce for Posts {
         let Posts { posts } = self;
 
         match posts {
-            Ok(posts) => tmpl << html! {
-                admin-posts {
-                    @ for post in posts {
-                        : PostItem { post };
+            Ok(posts) => {
+                tmpl << html! {
+                    admin-posts {
+                        @ for post in posts {
+                            : PostItem { post };
+                        }
                     }
+                    script(src = asset_path("admin.js"));
                 }
-                script(src = asset_path("admin.js"));
-            },
-            Err(e) => tmpl << html! {
-                p : e.to_string();
-            },
+            }
+            Err(e) => {
+                tmpl << html! {
+                    p : e.to_string();
+                }
+            }
         }
     }
 }
-
 
 pub struct PostItem {
     post: AdminPostPreview,
@@ -58,7 +61,12 @@ pub struct PostForm {
 
 impl RenderOnce for PostForm {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Post { key, title, content, .. } = self.post;
+        let Post {
+            key,
+            title,
+            content,
+            ..
+        } = self.post;
 
         tmpl << html! {
             form (id = "EditorForm", data-post-key = key) {

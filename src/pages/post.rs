@@ -1,9 +1,6 @@
 use horrorshow::{html, Raw, RenderOnce, TemplateBuffer};
 
-use crate::{
-    store::posts::Post,
-    asset_path,
-};
+use crate::{asset_path, store::posts::Post};
 
 pub struct PostView {
     pub post: Post,

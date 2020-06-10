@@ -1,9 +1,9 @@
 //! Utilities for opening, resizing, and generating thumbnails for images.
-use image::{GenericImageView, ImageError};
 use image::imageops::FilterType;
-use std::{fmt, fs};
+use image::{GenericImageView, ImageError};
 use std::error::Error;
 use std::path::{Path, PathBuf};
+use std::{fmt, fs};
 
 use crate::store::images::Image;
 
@@ -42,7 +42,7 @@ impl Error for ImagingError {
     }
 }
 
-/// Opens `imgpath` and resizes the image so that the maximum dimension is 1200px, 
+/// Opens `imgpath` and resizes the image so that the maximum dimension is 1200px,
 /// maintaining the aspect ratio and overwriting the existing file. Additionally,
 /// if the image is over 400px in either dimension, it will generate a thumbnail
 /// with maximum dimension of 400px and aspect ratio preserved.
@@ -75,7 +75,9 @@ pub fn process(filepath: &Path) -> ImagingResult<Image> {
     };
 
     // Failing to obtain file size is fine, so just discard any error
-    let kb = fs::metadata(filepath).ok().map(|meta| (meta.len() / 1024) as i32);
+    let kb = fs::metadata(filepath)
+        .ok()
+        .map(|meta| (meta.len() / 1024) as i32);
 
     Ok(Image {
         filename: path_filename(filepath)?,

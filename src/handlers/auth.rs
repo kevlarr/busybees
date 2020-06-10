@@ -2,20 +2,16 @@ use actix_session::Session;
 use actix_web::{
     http::header::LOCATION,
     web::{self, Data, Form},
-    Either,
-    Error,
-    HttpResponse,
-    Scope,
+    Either, Error, HttpResponse, Scope,
 };
 use serde::Deserialize;
 
 use crate::{
     encryption,
-    store::authors::{self, AuthorWithoutPassword},
-    pages::{Page, Auth},
-    ActixResult,
-    State,
+    pages::{Auth, Page},
     redirect,
+    store::authors::{self, AuthorWithoutPassword},
+    ActixResult, State,
 };
 
 #[derive(Deserialize)]
@@ -55,14 +51,17 @@ pub async fn post(
     Either::B(
         match encryption::verify(secret, &author.password_hash, &credentials.password) {
             Ok(true) => match session.set::<AuthorWithoutPassword>("auth", author.into()) {
-                Ok(_) => return Either::A(Ok(
-                    HttpResponse::Found().header(LOCATION, "/admin/posts").finish().into_body()
-                )),
+                Ok(_) => {
+                    return Either::A(Ok(HttpResponse::Found()
+                        .header(LOCATION, "/admin/posts")
+                        .finish()
+                        .into_body()))
+                }
                 Err(e) => Auth::with_error(e.to_string()).in_page(page),
             },
             Ok(_) => Auth::with_error("Invalid credentials").in_page(page),
             Err(e) => Auth::with_error(e.to_string()).in_page(page),
-        }
+        },
     )
 }
 

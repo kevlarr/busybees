@@ -1,6 +1,6 @@
 use actix_multipart::{Field, Multipart, MultipartError};
+use actix_web::error::Error as ActixError;
 use actix_web::web;
-use actix_web::error::{Error as ActixError};
 use chrono::Utc;
 use futures::StreamExt;
 use regex::Regex;
@@ -8,8 +8,8 @@ use serde::Serialize;
 use std::io::Write;
 use std::path::Path;
 
-use crate::{imaging, ApiResult, State};
 use crate::store::images;
+use crate::{imaging, ApiResult, State};
 
 #[derive(Serialize)]
 pub struct UploadedImages {

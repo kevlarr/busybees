@@ -28,10 +28,7 @@ impl Page {
     }
 
     pub fn content(mut self, content: impl RenderOnce) -> Self {
-        self.content = Some(content
-            .into_string()
-            .unwrap_or_else(|e| e.to_string())
-        );
+        self.content = Some(content.into_string().unwrap_or_else(|e| e.to_string()));
         self
     }
 
@@ -68,7 +65,8 @@ impl FromRequest for Page {
     type Future = Ready<Result<Page, Error>>;
 
     fn from_request(req: &HttpRequest, _: &mut Payload) -> Self::Future {
-        let user = req.extensions()
+        let user = req
+            .extensions()
             .get::<Assigns>()
             .map(|a| a.author.clone())
             .flatten();

@@ -1,5 +1,5 @@
-use actix_web::{web, Scope};
 use actix_web::guard::fn_guard;
+use actix_web::{web, Scope};
 
 use crate::handlers::auth_guard;
 
@@ -14,7 +14,6 @@ pub fn resource(path: &str) -> Scope {
         .route("/posts", get().to(posts::get))
         .route("/posts/new", get().to(posts::new))
         .route("/posts/edit/{key}", get().to(posts::edit))
-
         // TODO GET for DELETE is a little weird
         .route("/posts/delete/{key}", get().to(posts::delete))
 }

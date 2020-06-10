@@ -1,8 +1,11 @@
-use actix_web::{web::{Data, Json, Path}, HttpResponse};
+use actix_web::{
+    web::{Data, Json, Path},
+    HttpResponse,
+};
 use serde::Deserialize;
 
-use crate::{ApiResult, State};
 use crate::store::posts::{self, UpdatePostParams};
+use crate::{ApiResult, State};
 
 #[derive(Deserialize)]
 pub struct UpdatePublishedParams {

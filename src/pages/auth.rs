@@ -1,7 +1,4 @@
-use crate::{
-    pages::Page,
-    asset_path,
-};
+use crate::{asset_path, pages::Page};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 pub struct Auth {
@@ -10,7 +7,9 @@ pub struct Auth {
 
 impl Auth {
     pub fn new() -> Self {
-        Auth { error_message: None }
+        Auth {
+            error_message: None,
+        }
     }
 
     pub fn with_error(msg: impl Into<String>) -> Self {
@@ -20,9 +19,7 @@ impl Auth {
     }
 
     pub fn in_page(self, page: Page) -> Page {
-        page.title("Sign In")
-            .id("Auth")
-            .content(self)
+        page.title("Sign In").id("Auth").content(self)
     }
 }
 

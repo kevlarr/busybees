@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
-use sqlx::{PgConnection, PgPool, Transaction};
 use sqlx::pool::PoolConnection;
+use sqlx::{PgConnection, PgPool, Transaction};
 
 use super::StoreResult;
 
@@ -21,7 +21,7 @@ pub struct Post {
     pub published: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    pub first_image: Option<String>
+    pub first_image: Option<String>,
 }
 
 #[derive(Clone, Deserialize)]
@@ -72,21 +72,24 @@ impl TitleSlug for AdminPostPreview {
 }
 
 pub async fn create(pool: &PgPool, params: PostParams) -> StoreResult<String> {
-    sqlx::query!("
+    sqlx::query!(
+        "
         insert into post (title, content, published, created_at, updated_at)
             values ($1, $2, false, now(), now())
             returning key",
         params.title,
         params.content
     )
-        .fetch_one(pool)
-        .await
-        .map(|row| row.key)
+    .fetch_one(pool)
+    .await
+    .map(|row| row.key)
 }
 
 #[deprecated(note = "Use a view instead of hardcoded query here")]
 pub async fn public_previews(pool: &PgPool) -> StoreResult<Vec<PostPreview>> {
-    sqlx::query_as!(PostPreview, r#"
+    sqlx::query_as!(
+        PostPreview,
+        r#"
         select
             author.name as author,
             key,
@@ -98,11 +101,16 @@ pub async fn public_previews(pool: &PgPool) -> StoreResult<Vec<PostPreview>> {
         where published
         order by created_at desc
         limit 4
-    "#).fetch_all(pool).await
+    "#
+    )
+    .fetch_all(pool)
+    .await
 }
 
 pub async fn admin_list(pool: &PgPool) -> StoreResult<Vec<AdminPostPreview>> {
-    sqlx::query_as!(AdminPostPreview, r#"
+    sqlx::query_as!(
+        AdminPostPreview,
+        r#"
         select
             key,
             title,
@@ -111,12 +119,17 @@ pub async fn admin_list(pool: &PgPool) -> StoreResult<Vec<AdminPostPreview>> {
             updated_at
         from post
         order by created_at desc
-    "#).fetch_all(pool).await
+    "#
+    )
+    .fetch_all(pool)
+    .await
 }
 
 #[deprecated(note = "Use a view instead of hardcoded query here")]
 pub async fn find(pool: &PgPool, key: String) -> StoreResult<Post> {
-    sqlx::query_as!(Post, "
+    sqlx::query_as!(
+        Post,
+        "
         select
                 author.name as author,
                 post.key,
@@ -129,7 +142,11 @@ pub async fn find(pool: &PgPool, key: String) -> StoreResult<Post> {
 
             from post left join author on author.id = post.author_id
             where key = $1
-    ", key).fetch_one(pool).await
+    ",
+        key
+    )
+    .fetch_one(pool)
+    .await
 }
 
 pub async fn update_post(
@@ -137,7 +154,10 @@ pub async fn update_post(
     key: String,
     params: UpdatePostParams,
 ) -> StoreResult<()> {
-    let UpdatePostParams { post, linked_uploads } = params;
+    let UpdatePostParams {
+        post,
+        linked_uploads,
+    } = params;
     let PostParams { title, content } = post;
 
     sqlx::query!(
@@ -146,23 +166,29 @@ pub async fn update_post(
                 select id from post where key = $1
             )",
         key.clone()
-    ).execute(&mut *tx).await?;
+    )
+    .execute(&mut *tx)
+    .await?;
 
-    sqlx::query!("
+    sqlx::query!(
+        "
         update post
             set title = $2, content = $3, updated_at = now()
             where key = $1",
         key.clone(),
         title,
         content
-    ).execute(&mut *tx).await?;
+    )
+    .execute(&mut *tx)
+    .await?;
 
     // This is less than ideal, but until support for dynamic VALUES list drops...
     // (see https://github.com/launchbadge/sqlx/issues/291)
     // ... I would rather take the performance hit of multiple queries in favor
     // of having compile-time guarantees.
     for filename in linked_uploads {
-        sqlx::query!("
+        sqlx::query!(
+            "
             insert into post_image (post_id, image_id)
                 values (
                     (select id from post where key = $1),
@@ -174,19 +200,25 @@ pub async fn update_post(
                 on conflict do nothing",
             key,
             filename,
-        ).execute(&mut *tx).await?;
+        )
+        .execute(&mut *tx)
+        .await?;
     }
 
     Ok(())
 }
 
 pub async fn update_status(pool: &PgPool, key: String, published: bool) -> StoreResult<()> {
-    sqlx::query!(r#"
+    sqlx::query!(
+        r#"
         update post set published = $2, updated_at = now() where key = $1
-    "#, key, published)
-        .execute(pool)
-        .await
-        .map(|_| ())
+    "#,
+        key,
+        published
+    )
+    .execute(pool)
+    .await
+    .map(|_| ())
 }
 
 pub async fn delete(pool: &PgPool, key: &str) -> StoreResult<()> {

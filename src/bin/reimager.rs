@@ -1,12 +1,12 @@
-use busybees::State;
 use busybees::imaging;
 use busybees::store::images::Image;
+use busybees::State;
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::{fmt, fs, ops};
 use std::io::Result as IoResult;
 use std::path::{Path, PathBuf};
+use std::{fmt, fs, ops};
 
 lazy_static! {
     pub static ref WHITESPACE: Regex = Regex::new(r"\s+").expect("Could not compile regex");
@@ -68,19 +68,20 @@ impl FileLink {
     /// be loaded as an image with an accessible filename. Returns `None`
     /// otherwise.
     fn new(path: Box<Path>) -> Result<Self, FileLinkError> {
-        let filename = Filename(path.file_name()
-            .ok_or_else(|| "Filename is not present".to_owned())?
-            .to_os_string().into_string()
-            .map_err(|_| "Filename is not valid unicode".to_owned())?);
+        let filename = Filename(
+            path.file_name()
+                .ok_or_else(|| "Filename is not present".to_owned())?
+                .to_os_string()
+                .into_string()
+                .map_err(|_| "Filename is not valid unicode".to_owned())?,
+        );
 
         if filename.is_thumbnail() {
             Err("File is a thumbnail".to_owned())?;
         }
 
         let encoded_filename = Filename(WHITESPACE.replace_all(&*filename, "+").to_string());
-        let encoded_path = path
-            .with_file_name(&*encoded_filename)
-            .into_boxed_path();
+        let encoded_path = path.with_file_name(&*encoded_filename).into_boxed_path();
 
         Ok(FileLink {
             existing_path: path,
@@ -96,7 +97,11 @@ async fn main() -> IoResult<()> {
     dotenv::dotenv().ok();
 
     let args: Vec<String> = std::env::args().collect();
-    let dirpath = args.iter().skip(1).next().expect("Must provide images directory");
+    let dirpath = args
+        .iter()
+        .skip(1)
+        .next()
+        .expect("Must provide images directory");
 
     if !Path::new(dirpath).is_dir() {
         panic!("Must specify a valid directory");
@@ -142,14 +147,13 @@ fn process_images(paths: Vec<PathBuf>) -> ProcessedImages {
             Err(e) => {
                 println!("\t{}", e);
                 continue;
-            },
+            }
         };
 
         if link.existing_path != link.encoded_path {
             println!(
                 "\tRenaming {} to {}",
-                *link.existing_filename,
-                *link.encoded_filename,
+                *link.existing_filename, *link.encoded_filename,
             );
 
             if let Err(e) = fs::rename(&link.existing_path, &link.encoded_path) {
@@ -166,7 +170,7 @@ fn process_images(paths: Vec<PathBuf>) -> ProcessedImages {
                 eprintln!("\tError: {}", e);
                 err.push(link);
                 continue;
-            },
+            }
         };
 
         ok.push(image);
@@ -183,7 +187,8 @@ async fn import_images(state: &State, images: Vec<Image>) -> ImportedImages {
         let mut tx = state.pool.begin().await.unwrap();
         let filename = Filename(image.filename.clone());
 
-        let result = sqlx::query!("
+        let result = sqlx::query!(
+            "
             insert into image (filename, thumbnail_filename, width, height, kb)
                 values ($1, $2, $3, $4, $5)
                 on conflict do nothing
@@ -193,7 +198,9 @@ async fn import_images(state: &State, images: Vec<Image>) -> ImportedImages {
             image.width,
             image.height,
             image.kb,
-        ).fetch_one(&mut *tx).await;
+        )
+        .fetch_one(&mut *tx)
+        .await;
 
         let image_id = match result {
             Ok(row) => row.id,
@@ -204,31 +211,34 @@ async fn import_images(state: &State, images: Vec<Image>) -> ImportedImages {
             }
         };
 
-        let result = sqlx::query!("
+        let result = sqlx::query!(
+            "
             insert into post_image (image_id, post_id)
                 select $1, post.id
                 from post
                 where content ~~ $2",
             image_id,
             format!("%src=\"/uploads/{}\"%", image.filename)
-        ).execute(&mut *tx).await;
+        )
+        .execute(&mut *tx)
+        .await;
 
         match result {
             Ok(_) => match tx.commit().await {
                 Ok(_) => {
                     ok.push(filename);
-                },
+                }
                 Err(e) => {
                     eprintln!("Image {}: {}", image_id, e.to_string());
                     err.push(filename);
                     continue;
-                },
+                }
             },
             Err(e) => {
                 eprintln!("Image {}: {}", image_id, e.to_string());
                 err.push(filename);
                 continue;
-            },
+            }
         }
     }
 
