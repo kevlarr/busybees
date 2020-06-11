@@ -1,5 +1,8 @@
-use actix_web::dev::RequestHead;
-use actix_web::{web::Data, Either, HttpResponse};
+use actix_web::{
+    Either, HttpResponse,
+    dev::RequestHead,
+    web::Data,
+};
 
 use crate::extensions::Assigns;
 use crate::pages::{About, Home, NotFound, Page, Sandbox};

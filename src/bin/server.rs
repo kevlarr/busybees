@@ -39,45 +39,31 @@ async fn main() -> io::Result<()> {
             .http_only(true)
             .secure(true);
 
-        // TODO Okay, this is some copy/paste...
-        let assets = Files::new("/", "www/assets")
-            .show_files_listing()
-            .use_last_modified(true);
+        let cache_headers =
+            DefaultHeaders::new().header("Cache-Control", "max-age=31536000");
 
-        let static_files = Files::new("/", "www/public")
-            .show_files_listing()
-            .use_last_modified(true);
-
-        let uploaded_files = Files::new("/", &state.upload_path)
-            .show_files_listing()
-            .use_last_modified(true);
+        let assets = file_handler(&ASSET_BASEPATH, "www/assets");
+        let public = file_handler("/public", "www/public");
+        let uploads = file_handler("/uploads", &state.upload_path);
 
         App::new()
             .data(state)
+
             // First applied is last to execute, so user/session management needs to
             // be applied prior to the cookie session backend
             .wrap_fn(middleware::load_user)
             .wrap_fn(middleware::set_assigns)
             .wrap(cookie_session)
             .wrap(Logger::default())
+
             // Default 404 response
             .default_service(route().to(handlers::not_found))
+
             // Public assets and uploaded images
-            .service(
-                scope(&ASSET_BASEPATH)
-                    .service(assets)
-                    .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")),
-            )
-            .service(
-                scope("/public")
-                    .service(static_files)
-                    .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")),
-            )
-            .service(
-                scope("/uploads")
-                    .service(uploaded_files)
-                    .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000")),
-            )
+            .service(assets).wrap(cache_headers.clone())
+            .service(public).wrap(cache_headers.clone())
+            .service(uploads).wrap(cache_headers.clone())
+
             .route("/", get().to(handlers::home))
             .route("/about", get().to(handlers::about))
             .route("/sandbox", get().to(handlers::sandbox))
@@ -89,4 +75,10 @@ async fn main() -> io::Result<()> {
     .bind_openssl(address, ssl_builder)?
     .run()
     .await
+}
+
+fn file_handler(url_path: &str, dir_path: &str) -> Files {
+    Files::new(url_path, dir_path)
+        .show_files_listing()
+        .use_last_modified(true)
 }
