@@ -2,11 +2,10 @@ use actix_web::{
     web::{self, Data, Path},
     Scope,
 };
-
+use busybees::store;
 use crate::{
     handlers::not_found,
     pages::{Page, PostView},
-    store::posts,
     State,
 };
 
@@ -17,7 +16,7 @@ pub fn resource(path: &str) -> Scope {
 pub async fn get_post(page: Page, path: Path<(String, String)>, state: Data<State>) -> Page {
     let auth = page.user.is_some();
 
-    match posts::find(&state.pool, path.0.clone()).await {
+    match store::posts::find(&state.pool, path.0.clone()).await {
         Ok(post) => page
             .id("Post")
             .title(post.title.clone())

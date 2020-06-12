@@ -2,10 +2,9 @@ use actix_web::{
     web::{Data, Json, Path},
     HttpResponse,
 };
-use serde::Deserialize;
-
-use crate::store::posts::{self, UpdatePostParams};
+use busybees::store::{self, posts::UpdatePostParams};
 use crate::{ApiResult, State};
+use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct UpdatePublishedParams {
@@ -20,7 +19,7 @@ pub async fn update(
     let mut tx = state.pool.begin().await?;
     let key = &path.0;
 
-    posts::update_post(&mut tx, key.clone(), props.into_inner()).await?;
+    store::posts::update_post(&mut tx, key.clone(), props.into_inner()).await?;
     tx.commit().await?;
 
     Ok(HttpResponse::NoContent().finish())
@@ -31,6 +30,6 @@ pub async fn update_published(
     props: Json<UpdatePublishedParams>,
     state: Data<State>,
 ) -> ApiResult<HttpResponse> {
-    posts::update_status(&state.pool, path.0.clone(), props.published).await?;
+    store::posts::update_status(&state.pool, path.0.clone(), props.published).await?;
     Ok(HttpResponse::NoContent().finish())
 }

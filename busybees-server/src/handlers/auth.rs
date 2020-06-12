@@ -4,15 +4,16 @@ use actix_web::{
     web::{self, Data, Form},
     Either, Error, HttpResponse, Scope,
 };
-use serde::Deserialize;
-
-use crate::{
+use busybees::{
     encryption,
+    store::{self, authors::AuthorWithoutPassword},
+};
+use crate::{
     pages::{Auth, Page},
     redirect,
-    store::authors::{self, AuthorWithoutPassword},
     ActixResult, State,
 };
+use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct Credentials {
@@ -39,7 +40,7 @@ pub async fn post(
 ) -> Either<Result<HttpResponse, Error>, Page> {
     let secret = &state.secret_key;
 
-    let author = match authors::find(&state.pool, credentials.email.clone()).await {
+    let author = match store::authors::find(&state.pool, credentials.email.clone()).await {
         Ok(author) => author,
         Err(_) => {
             // Hash the password anyway to help prevent timing attacks

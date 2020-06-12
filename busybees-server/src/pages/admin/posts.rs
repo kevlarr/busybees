@@ -1,8 +1,10 @@
 use horrorshow::{html, RenderOnce, TemplateBuffer};
-use sqlx::Error as SqlxError;
+use busybees::{
+    store::posts::{AdminPostPreview, Post, TitleSlug},
+    deps::sqlx::Error as SqlxError,
+};
 
 use crate::asset_path;
-use crate::store::posts::{AdminPostPreview, Post, TitleSlug};
 
 pub struct Posts {
     pub posts: Result<Vec<AdminPostPreview>, SqlxError>,

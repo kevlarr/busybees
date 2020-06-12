@@ -1,7 +1,9 @@
 //! Server application state
-use futures::FutureExt;
-use sqlx::PgPool;
 use std::env;
+use busybees::deps::{
+    futures::FutureExt,
+    sqlx::PgPool,
+};
 
 /// Container for singleton objects needed across different modules.
 #[derive(Debug)]

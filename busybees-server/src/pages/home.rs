@@ -1,4 +1,4 @@
-use crate::{
+use busybees::{
     imaging,
     store::posts::{PostPreview, TitleSlug},
 };

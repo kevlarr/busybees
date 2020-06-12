@@ -1,4 +1,9 @@
-use busybees::encryption;
+use busybees::{
+    encryption,
+    deps::{
+        dotenv,
+    },
+};
 use std::env;
 
 fn main() {

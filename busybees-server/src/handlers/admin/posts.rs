@@ -2,21 +2,22 @@ use actix_web::{
     web::{Data, Path},
     HttpResponse,
 };
-
-use crate::handlers::not_found;
-use crate::pages::admin::{PostForm, Posts};
-use crate::pages::Page;
-use crate::store::posts::{self, PostParams};
-use crate::{redirect, ActixResult, State};
+use busybees::store::{self, posts::PostParams};
+use crate::{
+    handlers::not_found,
+    pages::admin::{PostForm, Posts},
+    pages::Page,
+    redirect, ActixResult, State,
+};
 
 pub async fn get(page: Page, state: Data<State>) -> Page {
     page.id("AdminPosts").title("Manage Posts").content(Posts {
-        posts: posts::admin_list(&state.pool).await,
+        posts: store::posts::admin_list(&state.pool).await,
     })
 }
 
 pub async fn delete(path: Path<(String,)>, state: Data<State>) -> ActixResult {
-    match posts::delete(&state.pool, &path.0).await {
+    match store::posts::delete(&state.pool, &path.0).await {
         Ok(()) => Ok(redirect("/admin/posts")),
         Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
     }
@@ -28,14 +29,14 @@ pub async fn new(state: Data<State>) -> ActixResult {
         content: String::new(),
     };
 
-    match posts::create(&state.pool, new_post).await {
+    match store::posts::create(&state.pool, new_post).await {
         Ok(key) => Ok(redirect(&format!("/admin/posts/edit/{}", key))),
         Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
     }
 }
 
 pub async fn edit(page: Page, path: Path<(String,)>, state: Data<State>) -> Page {
-    match posts::find(&state.pool, path.0.clone()).await {
+    match store::posts::find(&state.pool, path.0.clone()).await {
         Ok(post) => page
             .id("PostForm")
             .title("Edit Post")

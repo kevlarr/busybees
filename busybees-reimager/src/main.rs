@@ -1,15 +1,25 @@
-use busybees::imaging;
-use busybees::store::images::Image;
-use busybees::State;
-
-use lazy_static::lazy_static;
-use regex::Regex;
-use std::io::Result as IoResult;
-use std::path::{Path, PathBuf};
-use std::{fmt, fs, ops};
+use busybees::{
+    State,
+    imaging,
+    store::images::Image,
+    deps::{
+        actix_rt,
+        dotenv,
+        lazy_static::lazy_static,
+        regex::Regex,
+        sqlx,
+    },
+};
+use std::{
+    fmt,
+    fs,
+    io::Result as IoResult,
+    ops,
+    path::{Path, PathBuf},
+};
 
 lazy_static! {
-    pub static ref WHITESPACE: Regex = Regex::new(r"\s+").expect("Could not compile regex");
+    pub static ref WHITESPACE: Regex = Regex::new(r"\s+").unwrap();
 }
 
 #[derive(Debug)]
@@ -191,7 +201,8 @@ async fn import_images(state: &State, images: Vec<Image>) -> ImportedImages {
             insert into image (filename, thumbnail_filename, width, height, kb)
                 values ($1, $2, $3, $4, $5)
                 on conflict do nothing
-                returning id",
+                returning id
+            ",
             image.filename,
             image.thumbnail_filename,
             image.width,
@@ -215,7 +226,8 @@ async fn import_images(state: &State, images: Vec<Image>) -> ImportedImages {
             insert into post_image (image_id, post_id)
                 select $1, post.id
                 from post
-                where content ~~ $2",
+                where content ~~ $2
+            ",
             image_id,
             format!("%src=\"/uploads/{}\"%", image.filename)
         )

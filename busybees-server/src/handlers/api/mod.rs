@@ -1,6 +1,5 @@
-use crate::handlers::auth_guard;
-
 use actix_web::{guard::fn_guard, web, Scope};
+use crate::handlers::auth_guard;
 
 mod images;
 mod posts;

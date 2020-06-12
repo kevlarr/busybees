@@ -3,10 +3,9 @@ use actix_web::{
     dev::RequestHead,
     web::Data,
 };
-
+use busybees::store::{self, authors::AuthorWithoutPassword};
 use crate::extensions::Assigns;
 use crate::pages::{About, Home, NotFound, Page, Sandbox};
-use crate::store::{self, authors::AuthorWithoutPassword};
 use crate::{ActixResult, State};
 
 pub mod admin;

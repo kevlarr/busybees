@@ -1,9 +1,9 @@
-use crate::asset_path;
-use crate::extensions::Assigns;
-use crate::store::authors::AuthorWithoutPassword;
-
 use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, HttpResponse, Responder};
-use futures::future::{ok, Ready};
+use busybees::{
+    store::authors::AuthorWithoutPassword,
+    deps::futures::future::{ok, Ready},
+};
+use crate::{asset_path, extensions::Assigns};
 use horrorshow::{helper::doctype, html, Raw, RenderOnce, Template, TemplateBuffer};
 
 pub struct Page {

@@ -1,15 +1,19 @@
 use actix_multipart::{Field, Multipart, MultipartError};
 use actix_web::error::Error as ActixError;
 use actix_web::web;
-use chrono::Utc;
-use futures::StreamExt;
-use regex::Regex;
+use crate::{ApiResult, State};
+use busybees::{
+    imaging,
+    store,
+    deps::{
+        chrono::Utc,
+        futures::StreamExt,
+        regex::Regex,
+    },
+};
 use serde::Serialize;
 use std::io::Write;
 use std::path::Path;
-
-use crate::store::images;
-use crate::{imaging, ApiResult, State};
 
 #[derive(Serialize)]
 pub struct UploadedImages {
@@ -50,7 +54,7 @@ pub async fn upload(
 
         let image = imaging::process(&filepath)?;
 
-        images::create(&state.pool, &path.0, image).await?;
+        store::images::create(&state.pool, &path.0, image).await?;
     }
 
     Ok(web::Json(UploadedImages { srcpaths }))
