@@ -25,8 +25,6 @@ pub async fn upload(
     state: web::Data<State>,
 ) -> ApiResult<web::Json<UploadedImages>> {
     let mut srcpaths = Vec::new();
-
-    // TODO use lazy_static for compilation?
     let rgx = Regex::new(r"\s+")?;
 
     while let Some(item) = payload.next().await {

@@ -2,10 +2,10 @@ use actix_files::Files;
 use actix_session::CookieSession;
 use actix_web::{
     middleware::{DefaultHeaders, Logger},
-    web::{get, route, scope},
+    web::{get, route},
     App, HttpServer,
 };
-use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
+use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslFiletype, SslMethod};
 use std::{env, io};
 
 use ::busybees::{handlers, middleware, State, ASSET_BASEPATH};
@@ -17,20 +17,7 @@ async fn main() -> io::Result<()> {
 
     let address = env::var("ADDRESS").expect("ADDRESS not set");
 
-    let ssl_builder = {
-        let key_file = env::var("SSL_KEY_FILE").expect("SSL_KEY_FILE not set");
-        let cert_file = env::var("SSL_CERT_FILE").expect("SSL_CERT_FILE not set");
-
-        let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-        builder
-            .set_private_key_file(&key_file, SslFiletype::PEM)
-            .unwrap();
-        builder.set_certificate_chain_file(&cert_file).unwrap();
-
-        builder
-    };
-
-    HttpServer::new(|| {
+    let app = || {
         let upload_path = env::var("UPLOAD_PATH").expect("UPLOAD_PATH not set");
         let state = State::new(upload_path);
 
@@ -39,8 +26,7 @@ async fn main() -> io::Result<()> {
             .http_only(true)
             .secure(true);
 
-        let cache_headers =
-            DefaultHeaders::new().header("Cache-Control", "max-age=31536000");
+        let cache_headers = DefaultHeaders::new().header("Cache-Control", "max-age=31536000");
 
         let assets = file_handler(&ASSET_BASEPATH, "www/assets");
         let public = file_handler("/public", "www/public");
@@ -56,29 +42,44 @@ async fn main() -> io::Result<()> {
             .wrap(cookie_session)
             .wrap(Logger::default())
 
-            // Default 404 response
+            // Render "not found" page (200 response)
             .default_service(route().to(handlers::not_found))
 
-            // Public assets and uploaded images
+            // File handlers
             .service(assets).wrap(cache_headers.clone())
             .service(public).wrap(cache_headers.clone())
-            .service(uploads).wrap(cache_headers.clone())
+            .service(uploads).wrap(cache_headers)
 
             .route("/", get().to(handlers::home))
             .route("/about", get().to(handlers::about))
             .route("/sandbox", get().to(handlers::sandbox))
+
             .service(handlers::admin::resource("/admin"))
             .service(handlers::api::resource("/api"))
             .service(handlers::auth::resource("/auth"))
             .service(handlers::posts::resource("/posts"))
-    })
-    .bind_openssl(address, ssl_builder)?
-    .run()
-    .await
+    };
+
+    HttpServer::new(app)
+        .bind_openssl(address, ssl_builder())?
+        .run()
+        .await
 }
 
 fn file_handler(url_path: &str, dir_path: &str) -> Files {
     Files::new(url_path, dir_path)
         .show_files_listing()
         .use_last_modified(true)
+}
+
+fn ssl_builder() -> SslAcceptorBuilder {
+    let key_file = env::var("SSL_KEY_FILE").expect("SSL_KEY_FILE not set");
+    let cert_file = env::var("SSL_CERT_FILE").expect("SSL_CERT_FILE not set");
+
+    let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+
+    builder.set_private_key_file(&key_file, SslFiletype::PEM).unwrap();
+    builder.set_certificate_chain_file(&cert_file).unwrap();
+
+    builder
 }
