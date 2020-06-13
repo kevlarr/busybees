@@ -1,16 +1,17 @@
 use busybees::{
-    State,
     imaging,
     store::images::Image,
     deps::{
         actix_rt,
         dotenv,
+        futures::FutureExt,
         lazy_static::lazy_static,
         regex::Regex,
-        sqlx,
+        sqlx::{self, PgPool},
     },
 };
 use std::{
+    env,
     fmt,
     fs,
     io::Result as IoResult,
@@ -106,6 +107,12 @@ impl FileLink {
 async fn main() -> IoResult<()> {
     dotenv::dotenv().ok();
 
+    let database_url = env::var("DATABASE_URL").unwrap();
+    let pool = PgPool::new(&database_url)
+        .now_or_never()
+        .unwrap()
+        .unwrap();
+
     let args: Vec<String> = std::env::args().collect();
     let dirpath = args
         .iter()
@@ -116,10 +123,9 @@ async fn main() -> IoResult<()> {
         panic!("Must specify a valid directory");
     }
 
-    let state = State::new(dirpath.clone());
-    let file_paths = load_paths(&state)?;
+    let file_paths = load_paths(&dirpath)?;
 
-    println!("Searching {} for images", state.upload_path);
+    println!("Searching {} for images", dirpath);
     println!("Found {} files", file_paths.len());
 
     let processed = process_images(file_paths);
@@ -127,7 +133,7 @@ async fn main() -> IoResult<()> {
     println!("Processed {} images", processed.ok.len());
     println!("Failed to process {} images:", processed.err.len());
 
-    let imported = import_images(&state, processed.ok).await;
+    let imported = import_images(&pool, processed.ok).await;
 
     println!("Imported {} images", imported.ok.len());
     println!("Failed to import {} images:", imported.err.len());
@@ -135,8 +141,8 @@ async fn main() -> IoResult<()> {
     Ok(())
 }
 
-fn load_paths(state: &State) -> IoResult<Vec<PathBuf>> {
-    Ok(fs::read_dir(&state.upload_path)?
+fn load_paths(dir: &str) -> IoResult<Vec<PathBuf>> {
+    Ok(fs::read_dir(dir)?
         .map(|entry| entry.ok())
         .filter_map(|opt_entry| opt_entry)
         .map(|entry| entry.path())
@@ -188,12 +194,12 @@ fn process_images(paths: Vec<PathBuf>) -> ProcessedImages {
     ProcessedImages { ok, err }
 }
 
-async fn import_images(state: &State, images: Vec<Image>) -> ImportedImages {
+async fn import_images(pool: &PgPool, images: Vec<Image>) -> ImportedImages {
     let mut ok = Vec::new();
     let mut err = Vec::new();
 
     for image in images {
-        let mut tx = state.pool.begin().await.unwrap();
+        let mut tx = pool.begin().await.unwrap();
         let filename = Filename(image.filename.clone());
 
         let result = sqlx::query!(
