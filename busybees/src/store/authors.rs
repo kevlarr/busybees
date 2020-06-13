@@ -31,9 +31,10 @@ impl From<Author> for AuthorWithoutPassword {
 pub async fn find(pool: &PgPool, email: String) -> StoreResult<Author> {
     sqlx::query_as!(
         Author,
-        "select id, email, name, password_hash from author where email = $1",
+        "
+        select id, email, name, password_hash
+        from author where email = $1
+        ",
         email,
-    )
-    .fetch_one(pool)
-    .await
+    ).fetch_one(pool).await
 }

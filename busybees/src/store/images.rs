@@ -15,7 +15,8 @@ pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<
         "
         insert into image (filename, thumbnail_filename, width, height, kb)
             values ($1, $2, $3, $4, $5)
-            returning id",
+            returning id
+        ",
         props.filename,
         props.thumbnail_filename,
         props.width,
@@ -26,10 +27,10 @@ pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<
     .await?;
 
     sqlx::query!(
-        r#"
+        "
         insert into post_image (post_id, image_id)
             values ((select id from post where key = $1), $2)
-    "#,
+        ",
         post_key.to_owned(),
         image_id.id
     )
