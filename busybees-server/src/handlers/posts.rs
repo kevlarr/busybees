@@ -20,7 +20,7 @@ pub async fn get_post(page: Page, path: Path<(String, String)>, state: Data<Stat
         Ok(post) => page
             .id("Post")
             .title(post.title.clone())
-            .image(post.first_image.clone())
+            .image(post.thumbnail.clone())
             .content(PostView { auth, post }),
 
         Err(_) => not_found(page).await,

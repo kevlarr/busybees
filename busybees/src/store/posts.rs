@@ -21,7 +21,7 @@ pub struct Post {
     pub published: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    pub first_image: Option<String>,
+    pub thumbnail: Option<String>,
 }
 
 #[derive(Clone, Deserialize)]
@@ -115,23 +115,20 @@ pub async fn admin_list(pool: &PgPool) -> StoreResult<Vec<AdminPostPreview>> {
     ).fetch_all(pool).await
 }
 
-#[deprecated(note = "Use a view instead of hardcoded query here")]
 pub async fn find(pool: &PgPool, key: String) -> StoreResult<Post> {
     sqlx::query_as!(
         Post,
         "
         select
-                author.name as author,
-                post.key,
-                post.title,
-                post.content,
-                post.published,
-                post.created_at,
-                post.updated_at,
-                first_image(post.content)
-
-        from post
-        left join author on author.id = post.author_id
+            author,
+            key,
+            title,
+            content,
+            published,
+            created_at,
+            updated_at,
+            thumbnail
+        from post_detail_vw
         where key = $1
         ",
         key,
