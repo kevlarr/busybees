@@ -25,9 +25,7 @@ async fn main() -> io::Result<()> {
     let address = env::var("ADDRESS").expect("ADDRESS not set");
 
     let app = || {
-        let upload_path = env::var("UPLOAD_PATH").expect("UPLOAD_PATH not set");
-        let state = State::new(upload_path);
-
+        let state = State::new();
         let cookie_session = CookieSession::private(&state.secret_key.as_bytes())
             .name("busybeelife")
             .http_only(true)

@@ -41,7 +41,7 @@ pub struct PostPreview {
     pub author: Option<String>,
     pub key: String,
     pub title: String,
-    pub first_image: Option<String>,
+    pub thumbnail: Option<String>,
     pub created_at: DateTime<Utc>,
 }
 
@@ -83,21 +83,17 @@ pub async fn create(pool: &PgPool, params: PostParams) -> StoreResult<String> {
     ).fetch_one(pool).await.map(|row| row.key)
 }
 
-#[deprecated(note = "Use a view instead of hardcoded query here")]
 pub async fn public_previews(pool: &PgPool) -> StoreResult<Vec<PostPreview>> {
     sqlx::query_as!(
         PostPreview,
         "
         select
-            author.name as author,
+            author,
             key,
             title,
             created_at,
-            first_image(content)
-        from post
-        left join author on author.id = post.author_id
-        where published
-        order by created_at desc
+            thumbnail
+        from published_post_preview_vw
         limit 4
         ",
     ).fetch_all(pool).await

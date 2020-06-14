@@ -23,7 +23,7 @@ impl RenderOnce for Home {
                             class = "primary post-link"
                         ) {
                             preview (type = "primary") {
-                                img (src = match &preview.first_image {
+                                img (src = match &preview.thumbnail {
                                     Some(s) => s.to_string(),
                                     None => format!("https://picsum.photos/seed/{}/600/300", &preview.key),
                                 });
@@ -47,7 +47,7 @@ impl RenderOnce for Home {
                                 class = "secondary post-link"
                             ) {
                                 preview (type = "secondary") {
-                                    img (src = match &preview.first_image {
+                                    img (src = match &preview.thumbnail {
                                         Some(s) => imaging::thumbnail_path_string(&s),
                                         None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
                                     });
