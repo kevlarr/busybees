@@ -583,28 +583,50 @@ checksum = "12ae9db68ad7fac5fe51304d20f016c911539251075a214f8e663babefa35187"
 
 [[package]]
 name = "busybees"
-version = "0.3.2"
+version = "0.4.0"
 dependencies = [
- "actix-files",
- "actix-multipart",
  "actix-rt",
- "actix-service",
- "actix-session",
- "actix-web",
  "argonautica",
  "chrono",
  "dotenv",
  "futures 0.3.4",
- "horrorshow",
  "image",
  "lazy_static",
- "openssl",
- "pretty_env_logger",
  "rand 0.7.3",
  "regex",
  "serde",
  "slug",
  "sqlx",
+]
+
+[[package]]
+name = "busybees-encrypter"
+version = "0.4.0"
+dependencies = [
+ "busybees",
+]
+
+[[package]]
+name = "busybees-reimager"
+version = "0.4.0"
+dependencies = [
+ "busybees",
+]
+
+[[package]]
+name = "busybees-server"
+version = "0.4.0"
+dependencies = [
+ "actix-files",
+ "actix-multipart",
+ "actix-service",
+ "actix-session",
+ "actix-web",
+ "busybees",
+ "horrorshow",
+ "openssl",
+ "pretty_env_logger",
+ "serde",
 ]
 
 [[package]]
