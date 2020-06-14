@@ -601,14 +601,14 @@ dependencies = [
 
 [[package]]
 name = "busybees-encrypter"
-version = "0.1.0"
+version = "0.4.0"
 dependencies = [
  "busybees",
 ]
 
 [[package]]
 name = "busybees-reimager"
-version = "0.1.0"
+version = "0.4.0"
 dependencies = [
  "busybees",
 ]

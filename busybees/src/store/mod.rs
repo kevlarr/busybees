@@ -1,3 +1,4 @@
+//! Models and utilities for interesting with the data store
 use sqlx::Error as SqlxError;
 
 pub mod authors;
