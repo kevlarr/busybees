@@ -89,7 +89,7 @@ pub fn process(filepath: &Path) -> ImagingResult<Image> {
 }
 
 /// Attempts to extract the filename as a `String` for the given path.
-fn path_filename(path: &Path) -> ImagingResult<String> {
+pub fn path_filename(path: &Path) -> ImagingResult<String> {
     path.file_name()
         .ok_or_else(|| ImagingError::PathError("Filename not present".to_owned()))?
         .to_os_string()
@@ -98,7 +98,8 @@ fn path_filename(path: &Path) -> ImagingResult<String> {
 }
 
 /// Generates a thumbnail path string from the given filepath.
-fn thumbnail_path(filepath: &Path) -> ImagingResult<PathBuf> {
+#[deprecated(note = "Get rid of `first_image` and thumbnail magic")]
+pub fn thumbnail_path(filepath: &Path) -> ImagingResult<PathBuf> {
     let mut thumbpath = PathBuf::new();
 
     if let Some(parent) = filepath.parent() {
@@ -107,13 +108,4 @@ fn thumbnail_path(filepath: &Path) -> ImagingResult<PathBuf> {
 
     thumbpath.push(format!("thumb.{}", path_filename(filepath)?));
     Ok(thumbpath)
-}
-
-#[deprecated(note = "Use `thumbnail_path` with a `&Path` argument instead")]
-pub fn thumbnail_path_string(imgpath: &str) -> String {
-    let mut parts: Vec<&str> = imgpath.rsplitn(2, '/').collect();
-
-    parts.reverse();
-    parts.insert(1, "/thumb.");
-    parts.join("")
 }
