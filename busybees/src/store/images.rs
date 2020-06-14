@@ -14,8 +14,9 @@ pub struct Image {
 
 /// Attempts to create an `Image` with the provided properties
 /// and then associates it to the `Post` with the given key.
-#[deprecated(note = "Use a transaction")]
 pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<()> {
+    let mut tx = pool.begin().await?;
+
     let image_id = sqlx::query!(
         "
         insert into image (filename, thumbnail_filename, width, height, kb)
@@ -27,7 +28,7 @@ pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<
         props.width,
         props.height,
         props.kb,
-    ).fetch_one(pool).await?;
+    ).fetch_one(&mut *tx).await?;
 
     sqlx::query!(
         "
@@ -36,7 +37,8 @@ pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<
         ",
         post_key.to_owned(),
         image_id.id
-    ).execute(pool).await?;
+    ).execute(&mut *tx).await?;
 
+    tx.commit().await?;
     Ok(())
 }
