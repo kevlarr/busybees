@@ -583,7 +583,7 @@ checksum = "12ae9db68ad7fac5fe51304d20f016c911539251075a214f8e663babefa35187"
 
 [[package]]
 name = "busybees"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "actix-rt",
  "argonautica",
@@ -601,21 +601,21 @@ dependencies = [
 
 [[package]]
 name = "busybees-encrypter"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "busybees",
 ]
 
 [[package]]
 name = "busybees-reimager"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "busybees",
 ]
 
 [[package]]
 name = "busybees-server"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "actix-files",
  "actix-multipart",
