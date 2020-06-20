@@ -1,11 +1,6 @@
-use busybees::{
-    imaging,
-    store::posts::{PostMeta, TitleSlug},
-};
+use busybees::store::posts::{PostMeta, TitleSlug};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
-use std::path::Path;
 
-#[deprecated(note = "Fix behavior of `thumbnail`")]
 pub struct Home {
     pub posts: Vec<PostMeta>,
 }

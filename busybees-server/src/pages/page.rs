@@ -27,7 +27,6 @@ impl Page {
         }
     }
 
-    #[deprecated(note = "set up a trait instead on other pages")]
     pub fn content(mut self, content: impl RenderOnce) -> Self {
         self.content = Some(content.into_string().unwrap_or_else(|e| e.to_string()));
         self
