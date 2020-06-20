@@ -1,8 +1,16 @@
 create function first_image(content text) returns text as $$
     select substring(content, 'src="([a-zA-Z0-9\.\-_~:\/%\?#=]+)"');
-$$ language sql immutable;
+$$ language sql immutable
+;
 
-drop view post_detail_vw;
+alter table post_image rename is_preview to thumbnail
+;
+drop index post_image_image_id_key
+;
+drop view post_published_by_date_vw
+;
+drop view post_detail_vw
+;
 
 create view post_detail_vw as
     select
@@ -15,9 +23,8 @@ create view post_detail_vw as
         post.updated_at,
         first_image(post.content) as thumbnail
     from post
-    left join author on author.id = post.author_id;
-
-drop view published_post_preview_vw;
+    left join author on author.id = post.author_id
+;
 
 create view published_post_preview_vw as
     select
@@ -29,8 +36,8 @@ create view published_post_preview_vw as
     from post
     left join author on author.id = post.author_id
     where published
-    order by created_at desc;
+    order by created_at desc
+;
 
-drop view post_thumbnail_vw;
-
-drop index post_image_image_id_key;
+drop view post_preview_image_vw
+;

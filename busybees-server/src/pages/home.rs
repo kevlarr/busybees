@@ -1,13 +1,13 @@
 use busybees::{
     imaging,
-    store::posts::{PostPreview, TitleSlug},
+    store::posts::{PostMeta, TitleSlug},
 };
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 use std::path::Path;
 
 #[deprecated(note = "Fix behavior of `thumbnail`")]
 pub struct Home {
-    pub posts: Vec<PostPreview>,
+    pub posts: Vec<PostMeta>,
 }
 
 impl RenderOnce for Home {
@@ -24,10 +24,7 @@ impl RenderOnce for Home {
                             class = "primary post-link"
                         ) {
                             preview (type = "primary") {
-                                img (src = match &preview.thumbnail {
-                                    // DEPRECATED
-                                    // For now, assume "thumbnail" refers actually to the first
-                                    // full image, so just return it directly
+                                img (src = match &preview.preview_image_filename {
                                     Some(s) => s.to_string(),
                                     None => format!("https://picsum.photos/seed/{}/600/300", &preview.key),
                                 });
@@ -51,22 +48,8 @@ impl RenderOnce for Home {
                                 class = "secondary post-link"
                             ) {
                                 preview (type = "secondary") {
-                                    img (src = match &preview.thumbnail {
-                                        // DEPRECATED
-                                        // Assumes that `thumbnail` is actually a full image, so
-                                        // use the helper to generate the thumbnail path
-                                        Some(s) => {
-                                            let p = Path::new(&s);
-                                            imaging::thumbnail_path(&p)
-                                                .map(|pathbuf| pathbuf.into_boxed_path())
-                                                .map(|path| imaging::path_filename(&path)) // result<result<..>>
-                                                .map(|result| result.unwrap_or_else(|_|
-                                                    format!("https://picsum.photos/seed/{}/300/150", &preview.key)
-                                                ))
-                                                .unwrap_or_else(|_|
-                                                    format!("https://picsum.photos/seed/{}/300/150", &preview.key)
-                                                )
-                                        },
+                                    img (src = match &preview.preview_image_filename {
+                                        Some(s) => s.to_string(),
                                         None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
                                     });
 

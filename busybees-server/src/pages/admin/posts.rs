@@ -1,13 +1,13 @@
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 use busybees::{
-    store::posts::{AdminPostPreview, Post, TitleSlug},
+    store::posts::{AdminPostMeta, PostDetail, TitleSlug},
     deps::sqlx::Error as SqlxError,
 };
 
 use crate::asset_path;
 
 pub struct Posts {
-    pub posts: Result<Vec<AdminPostPreview>, SqlxError>,
+    pub posts: Result<Vec<AdminPostMeta>, SqlxError>,
 }
 
 impl RenderOnce for Posts {
@@ -35,7 +35,7 @@ impl RenderOnce for Posts {
 }
 
 pub struct PostItem {
-    post: AdminPostPreview,
+    post: AdminPostMeta,
 }
 
 impl RenderOnce for PostItem {
@@ -58,12 +58,12 @@ impl RenderOnce for PostItem {
 }
 
 pub struct PostForm {
-    pub post: Post,
+    pub post: PostDetail,
 }
 
 impl RenderOnce for PostForm {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let Post {
+        let PostDetail {
             key,
             title,
             content,
