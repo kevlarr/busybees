@@ -29,6 +29,11 @@ pub fn asset_path(filename: &str) -> String {
     format!("{}/{}", *ASSET_BASEPATH, filename)
 }
 
+/// Helper to generate the img src attribute for uploaded images
+pub fn upload_path(filename: &str) -> String {
+    format!("/uploads/{}", filename)
+}
+
 /// Helper to create redirect responses
 pub fn redirect(path: &str) -> HttpResponse {
     HttpResponse::Found()

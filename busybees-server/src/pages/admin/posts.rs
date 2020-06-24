@@ -1,10 +1,12 @@
-use horrorshow::{html, RenderOnce, TemplateBuffer};
 use busybees::{
-    store::posts::{AdminPostMeta, PostDetail, TitleSlug},
+    store::{
+        images::PostImage,
+        posts::{AdminPostMeta, PostDetail, TitleSlug},
+    },
     deps::sqlx::Error as SqlxError,
 };
-
-use crate::asset_path;
+use crate::{asset_path, upload_path};
+use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 pub struct Posts {
     pub posts: Result<Vec<AdminPostMeta>, SqlxError>,
@@ -59,6 +61,7 @@ impl RenderOnce for PostItem {
 
 pub struct PostForm {
     pub post: PostDetail,
+    pub images: Vec<PostImage>,
 }
 
 impl RenderOnce for PostForm {
@@ -69,14 +72,40 @@ impl RenderOnce for PostForm {
             content,
             ..
         } = self.post;
+        let images = self.images;
 
         tmpl << html! {
-            form (id = "EditorForm", data-post-key = key) {
-                input(id = "PostTitle", name = "title", placeholder = "Title", autofocus = "true", value = title);
-                textarea(id = "SummernoteEditor", name = "content") : content;
+            form(id = "editor-form", data-post-key = key) {
+                input(id = "post-title", name = "title", placeholder = "Title", autofocus = "true", value = title);
+                textarea(id = "summernote-editor", name = "content") : content;
+
+                @ if images.len() > 0 {
+                    label: "Select a preview image for the post";
+
+                    ul(id = "post-images") {
+                        @ for image in images {
+                            li {
+                                input(
+                                    type = "radio",
+                                    name = "previewImageId",
+                                    id = format!("preview-image-{}", image.image_id),
+                                    value = image.image_id,
+                                    checked? = image.is_preview,
+                                    hidden
+                                );
+                                label(for = format!("preview-image-{}", image.image_id)) {
+                                    img(
+                                        class = if image.is_preview {"post-image is-preview"} else {"post-image"},
+                                        src = upload_path(&image.filename)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            p (id = "saveStatus") : "Saved";
+            p (id = "save-status") : "Saved";
 
             // WYSIWYG editor
             link (rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");

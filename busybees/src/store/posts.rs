@@ -54,6 +54,7 @@ pub struct PostParams {
 pub struct UpdatePostParams {
     pub post: PostParams,
     pub linked_uploads: Vec<String>,
+    pub preview_image_id: Option<i32>,
 }
 
 impl TitleSlug for PostParams {
@@ -151,20 +152,21 @@ pub async fn update_post(
     key: String,
     params: UpdatePostParams,
 ) -> StoreResult<()> {
-    let UpdatePostParams {
-        post,
-        linked_uploads,
-    } = params;
+    let UpdatePostParams { post, linked_uploads, preview_image_id } = params;
     let PostParams { title, content } = post;
+
+    let post = sqlx::query!(
+        "
+        select id from post where key = $1
+        ",
+        &key
+    ).fetch_one(&mut *tx).await?;
 
     sqlx::query!(
         "
-        delete from post_image
-        where post_id = (
-            select id from post where key = $1
-        )
+        delete from post_image where post_id = $1
         ",
-        key.clone()
+        post.id,
     ).execute(&mut *tx).await?;
 
     sqlx::query!(
@@ -173,9 +175,9 @@ pub async fn update_post(
             title = $2,
             content = $3,
             updated_at = now()
-        where key = $1
+        where id = $1
         ",
-        key.clone(),
+        post.id,
         title,
         content
     ).execute(&mut *tx).await?;
@@ -199,6 +201,17 @@ pub async fn update_post(
             ",
             key,
             filename,
+        ).execute(&mut *tx).await?;
+    }
+
+    if let Some(image_id) = preview_image_id {
+        sqlx::query!(
+            "
+            update post_image set is_preview = true
+            where post_id = $1 and image_id = $2
+            ",
+            post.id,
+            image_id,
         ).execute(&mut *tx).await?;
     }
 

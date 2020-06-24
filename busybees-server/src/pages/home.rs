@@ -1,4 +1,5 @@
 use busybees::store::posts::{PostMeta, TitleSlug};
+use crate::upload_path;
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 pub struct Home {
@@ -20,7 +21,7 @@ impl RenderOnce for Home {
                         ) {
                             preview (type = "primary") {
                                 img (src = match &preview.preview_image_filename {
-                                    Some(s) => s.to_string(),
+                                    Some(s) => upload_path(s),
                                     None => format!("https://picsum.photos/seed/{}/600/300", &preview.key),
                                 });
                                 footer {
@@ -44,7 +45,7 @@ impl RenderOnce for Home {
                             ) {
                                 preview (type = "secondary") {
                                     img (src = match &preview.preview_image_filename {
-                                        Some(s) => s.to_string(),
+                                        Some(s) => upload_path(s),
                                         None => format!("https://picsum.photos/seed/{}/300/150", &preview.key),
                                     });
 

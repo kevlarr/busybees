@@ -33,7 +33,7 @@ pub async fn edit(page: Page, path: Path<(String,)>, state: Data<State>) -> Page
         Ok((post, images)) => page
             .id("PostForm")
             .title("Edit Post")
-            .content(PostForm { post }),
+            .content(PostForm { post, images }),
 
         Err(e) => {
             eprintln!("{}", e.to_string());

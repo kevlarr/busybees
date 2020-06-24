@@ -13,9 +13,9 @@ pub struct Image {
 }
 
 pub struct PostImage {
-    pub image_id: Option<i32>,
-    pub filename: Option<String>,
-    pub is_preview: Option<bool>,
+    pub image_id: i32,
+    pub filename: String,
+    pub is_preview: bool,
 }
 
 /// Attempts to create an `Image` with the provided properties
@@ -49,6 +49,7 @@ pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<
     Ok(())
 }
 
+#[deprecated(note = "use a view")]
 pub async fn for_post(pool: &PgPool, post_key: &str) -> StoreResult<Vec<PostImage>> {
     sqlx::query_as!(
         PostImage,
