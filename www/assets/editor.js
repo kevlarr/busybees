@@ -188,13 +188,19 @@ const API = (function() {
       },
     })
       .then(() => {
-        saveStatus.innerText = SAVED;
+        // For now just reload the page to update the preview image thumbnails
+        // saveStatus.innerText = SAVED;
+        window.location.reload();
       })
       .catch(err => {
         saveStatus.innerText = UNSAVED;
         window.alert(JSON.stringify(err));
       });
   }
+
+  document.querySelectorAll('#post-images .post-image').forEach(img => {
+    img.addEventListener('click', scheduleSave);
+  });
 
   postTitle.addEventListener('input', scheduleSave);
 })();
