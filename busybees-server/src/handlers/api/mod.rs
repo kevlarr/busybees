@@ -11,8 +11,5 @@ pub fn resource(path: &str) -> Scope {
         .guard(fn_guard(auth_guard))
         .route("/posts/{key}", patch().to(posts::update))
         .route("/posts/{key}/images/new", post().to(images::upload))
-        .route(
-            "/posts/{key}/published",
-            patch().to(posts::update_published),
-        )
+        .route("/posts/{key}/published", patch().to(posts::update_published))
 }

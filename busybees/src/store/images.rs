@@ -12,6 +12,12 @@ pub struct Image {
     pub kb: Option<i32>,
 }
 
+pub struct PostImage {
+    pub image_id: i32,
+    pub filename: String,
+    pub is_preview: bool,
+}
+
 /// Attempts to create an `Image` with the provided properties
 /// and then associates it to the `Post` with the given key.
 pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<()> {
@@ -41,4 +47,22 @@ pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<
 
     tx.commit().await?;
     Ok(())
+}
+
+#[deprecated(note = "use a view")]
+pub async fn for_post(pool: &PgPool, post_key: &str) -> StoreResult<Vec<PostImage>> {
+    sqlx::query_as!(
+        PostImage,
+        "
+        select
+            image_id,
+            coalesce(thumbnail_filename, filename) as filename,
+            is_preview
+        from post_image
+        join image on image.id = post_image.image_id
+        join post on post.id = post_image.post_id
+        where post.key = $1
+        ",
+        post_key
+    ).fetch_all(pool).await
 }

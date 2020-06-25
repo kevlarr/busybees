@@ -98,8 +98,7 @@ pub fn path_filename(path: &Path) -> ImagingResult<String> {
 }
 
 /// Generates a thumbnail path string from the given filepath.
-#[deprecated(note = "Get rid of `first_image` and thumbnail magic")]
-pub fn thumbnail_path(filepath: &Path) -> ImagingResult<PathBuf> {
+fn thumbnail_path(filepath: &Path) -> ImagingResult<PathBuf> {
     let mut thumbpath = PathBuf::new();
 
     if let Some(parent) = filepath.parent() {

@@ -2,8 +2,10 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use sqlx::pool::PoolConnection;
 use sqlx::{PgConnection, PgPool, Transaction};
-
-use super::StoreResult;
+use super::{
+    images::{self, PostImage},
+    StoreResult,
+};
 
 pub trait TitleSlug {
     fn title_slug(&self) -> String {
@@ -13,15 +15,32 @@ pub trait TitleSlug {
     fn title(&self) -> &str;
 }
 
-pub struct Post {
+pub struct PostDetail {
     pub author: Option<String>,
     pub key: String,
     pub title: String,
     pub content: String,
+    pub created_at: DateTime<Utc>,
+    pub published: bool,
+    pub preview_image_filename: Option<String>,
+    pub preview_image_alt_text: Option<String>,
+}
+
+pub struct PostMeta {
+    pub author: Option<String>,
+    pub key: String,
+    pub title: String,
+    pub created_at: DateTime<Utc>,
+    pub preview_image_filename: Option<String>,
+    pub preview_image_alt_text: Option<String>,
+}
+
+pub struct AdminPostMeta {
+    pub key: String,
+    pub title: String,
     pub published: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    pub thumbnail: Option<String>,
 }
 
 #[derive(Clone, Deserialize)]
@@ -35,22 +54,7 @@ pub struct PostParams {
 pub struct UpdatePostParams {
     pub post: PostParams,
     pub linked_uploads: Vec<String>,
-}
-
-pub struct PostPreview {
-    pub author: Option<String>,
-    pub key: String,
-    pub title: String,
-    pub thumbnail: Option<String>,
-    pub created_at: DateTime<Utc>,
-}
-
-pub struct AdminPostPreview {
-    pub key: String,
-    pub title: String,
-    pub published: bool,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    pub preview_image_id: Option<i32>,
 }
 
 impl TitleSlug for PostParams {
@@ -59,13 +63,13 @@ impl TitleSlug for PostParams {
     }
 }
 
-impl TitleSlug for PostPreview {
+impl TitleSlug for PostMeta {
     fn title(&self) -> &str {
         &self.title
     }
 }
 
-impl TitleSlug for AdminPostPreview {
+impl TitleSlug for AdminPostMeta {
     fn title(&self) -> &str {
         &self.title
     }
@@ -83,25 +87,26 @@ pub async fn create(pool: &PgPool, params: PostParams) -> StoreResult<String> {
     ).fetch_one(pool).await.map(|row| row.key)
 }
 
-pub async fn public_previews(pool: &PgPool) -> StoreResult<Vec<PostPreview>> {
+pub async fn recent_published(pool: &PgPool) -> StoreResult<Vec<PostMeta>> {
     sqlx::query_as!(
-        PostPreview,
+        PostMeta,
         "
         select
             author,
             key,
             title,
             created_at,
-            thumbnail
-        from published_post_preview_vw
+            preview_image_filename,
+            preview_image_alt_text
+        from post_published_by_date_vw
         limit 4
         ",
     ).fetch_all(pool).await
 }
 
-pub async fn admin_list(pool: &PgPool) -> StoreResult<Vec<AdminPostPreview>> {
+pub async fn admin_list(pool: &PgPool) -> StoreResult<Vec<AdminPostMeta>> {
     sqlx::query_as!(
-        AdminPostPreview,
+        AdminPostMeta,
         "
         select
             key,
@@ -115,19 +120,19 @@ pub async fn admin_list(pool: &PgPool) -> StoreResult<Vec<AdminPostPreview>> {
     ).fetch_all(pool).await
 }
 
-pub async fn find(pool: &PgPool, key: String) -> StoreResult<Post> {
+pub async fn get(pool: &PgPool, key: String) -> StoreResult<PostDetail> {
     sqlx::query_as!(
-        Post,
+        PostDetail,
         "
         select
             author,
             key,
             title,
             content,
-            published,
             created_at,
-            updated_at,
-            thumbnail
+            published,
+            preview_image_filename,
+            preview_image_alt_text
         from post_detail_vw
         where key = $1
         ",
@@ -135,25 +140,33 @@ pub async fn find(pool: &PgPool, key: String) -> StoreResult<Post> {
     ).fetch_one(pool).await
 }
 
+pub async fn get_with_images(pool: &PgPool, key: String) -> StoreResult<(PostDetail, Vec<PostImage>)> {
+    let post = get(pool, key).await?;
+    let post_images = images::for_post(pool, &post.key).await?;
+
+    Ok((post, post_images))
+}
+
 pub async fn update_post(
     tx: &mut Transaction<PoolConnection<PgConnection>>,
     key: String,
     params: UpdatePostParams,
 ) -> StoreResult<()> {
-    let UpdatePostParams {
-        post,
-        linked_uploads,
-    } = params;
+    let UpdatePostParams { post, linked_uploads, preview_image_id } = params;
     let PostParams { title, content } = post;
+
+    let post = sqlx::query!(
+        "
+        select id from post where key = $1
+        ",
+        &key
+    ).fetch_one(&mut *tx).await?;
 
     sqlx::query!(
         "
-        delete from post_image
-        where post_id = (
-            select id from post where key = $1
-        )
+        delete from post_image where post_id = $1
         ",
-        key.clone()
+        post.id,
     ).execute(&mut *tx).await?;
 
     sqlx::query!(
@@ -162,9 +175,9 @@ pub async fn update_post(
             title = $2,
             content = $3,
             updated_at = now()
-        where key = $1
+        where id = $1
         ",
-        key.clone(),
+        post.id,
         title,
         content
     ).execute(&mut *tx).await?;
@@ -188,6 +201,17 @@ pub async fn update_post(
             ",
             key,
             filename,
+        ).execute(&mut *tx).await?;
+    }
+
+    if let Some(image_id) = preview_image_id {
+        sqlx::query!(
+            "
+            update post_image set is_preview = true
+            where post_id = $1 and image_id = $2
+            ",
+            post.id,
+            image_id,
         ).execute(&mut *tx).await?;
     }
 

@@ -2,7 +2,7 @@ use actix_files::Files;
 use actix_session::CookieSession;
 use actix_web::{
     middleware::{DefaultHeaders, Logger},
-    web::{get, route},
+    web::{get, route, scope},
     App, HttpServer,
 };
 use busybees::{
@@ -31,11 +31,15 @@ async fn main() -> io::Result<()> {
             .http_only(true)
             .secure(true);
 
-        let cache_headers = DefaultHeaders::new().header("Cache-Control", "max-age=31536000");
+        let file_scope = |url_path, dir_path| scope(url_path)
+            .service(file_handler("/", dir_path))
+            .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000"));
 
-        let assets = file_handler(&ASSET_BASEPATH, "www/assets");
-        let public = file_handler("/public", "www/public");
-        let uploads = file_handler("/uploads", &state.upload_path);
+        // File handlers - I *think* each needs to be scoped to allow for
+        // assigning cache headers just on these routes
+        let assets = file_scope(&ASSET_BASEPATH, "www/assets");
+        let public = file_scope("/public", "www/public");
+        let uploads = file_scope("/uploads", &state.upload_path);
 
         App::new()
             .data(state)
@@ -50,10 +54,9 @@ async fn main() -> io::Result<()> {
             // Render "not found" page (200 response)
             .default_service(route().to(handlers::not_found))
 
-            // File handlers
-            .service(assets).wrap(cache_headers.clone())
-            .service(public).wrap(cache_headers.clone())
-            .service(uploads).wrap(cache_headers)
+            .service(assets)
+            .service(public)
+            .service(uploads)
 
             .route("/", get().to(handlers::home))
             .route("/about", get().to(handlers::about))

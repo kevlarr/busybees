@@ -536,7 +536,34 @@ main#PostForm {
     padding: 20px 65px;
 }
 
-#EditorForm {
+#post-images {
+    display: flex;
+    list-style-type: none;
+    margin: 5px 0;
+    padding: 0 5px;
+}
+
+#post-images .post-image {
+    box-sizing: content-box;
+    border: 3px solid transparent;
+    cursor: pointer;
+    height: 50px;
+    margin-right: 20px;
+    transition: transform 0.1s;
+    width: 50px;
+}
+
+#post-images .post-image.is-preview {
+    border-color: #B98100;
+}
+
+#post-images img:hover,
+#post-images img:focus {
+    transform: scale(1.2);
+    transition: transform 0.1s;
+}
+
+#editor-form {
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -544,26 +571,33 @@ main#PostForm {
     padding-bottom: 5px;
 }
 
-#PostForm #saveStatus {
+#PostForm #save-status {
+    font-size: 14px;
     font-style: italic;
+    margin: 0;
+    text-align: right;
 }
 
 input {
-    border: 0;
     line-height: 1.25em;
     margin-top: 0;
     margin-bottom: 10px;
     padding: 10px 15px;
-    transition: box-shadow .2s;
 }
 
-input:focus, input:active {
-    box-shadow: inset 0px 0px 5px 0px #477FBB;
-    transition: box-shadow .2s;
+input, .note-editable {
+    border: 1px solid #504B40;
+    transition: border-color .2s;
 }
 
-#PostTitle {
-    font-size: 36px;
+input:focus, input:active,
+.note-editable:focus, .note-editable:active {
+    border-color: #005D8F;
+    transition: border-color .2s;
+}
+
+#post-title {
+    font-size: 24px;
     font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
     line-height: 1.25em;
@@ -572,40 +606,27 @@ input:focus, input:active {
     padding: 5px 15px;
 }
 
-#PostTitle,
-.note-editable {
-    box-shadow: inset 3px -1px 9px 0px #ddd;
-    transition: box-shadow .2s;
+
+#editor-form textarea {
+    /*border: 0;*/
 }
 
-#PostTitle:focus,
-#PostTitle:active,
-.note-editable:focus,
-.note-editable:active {
-    box-shadow: inset 0px 0px 9px 0px #477FBB;
-    transition: box-shadow .2s;
-}
-
-#EditorForm textarea {
-    border: 0;
-}
-
-#EditorForm .note-editor.note-frame {
+#editor-form .note-editor.note-frame {
     border: 0;
     display: flex;
     flex: 1;
     flex-direction: column;
     font-family: 'Work Sans', sans-serif;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     overflow: auto;
 }
 
-#EditorForm .note-toolbar {
+#editor-form .note-toolbar {
     background-color: #E3E0DB;
     border: 0;
 }
 
-#EditorForm .note-dropdown-menu {
+#editor-form .note-dropdown-menu {
     background: #E3E0DB;
 }
 
@@ -623,7 +644,7 @@ input:focus, input:active {
     flex: 1;
 }
 
-#EditorForm .note-editor.note-frame .note-statusbar {
+#editor-form .note-editor.note-frame .note-statusbar {
     border: 0;
 }
 

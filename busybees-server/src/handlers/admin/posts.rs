@@ -16,13 +16,6 @@ pub async fn get(page: Page, state: Data<State>) -> Page {
     })
 }
 
-pub async fn delete(path: Path<(String,)>, state: Data<State>) -> ActixResult {
-    match store::posts::delete(&state.pool, &path.0).await {
-        Ok(()) => Ok(redirect("/admin/posts")),
-        Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
-    }
-}
-
 pub async fn new(state: Data<State>) -> ActixResult {
     let new_post = PostParams {
         title: "New post".into(),
@@ -36,15 +29,22 @@ pub async fn new(state: Data<State>) -> ActixResult {
 }
 
 pub async fn edit(page: Page, path: Path<(String,)>, state: Data<State>) -> Page {
-    match store::posts::find(&state.pool, path.0.clone()).await {
-        Ok(post) => page
+    match store::posts::get_with_images(&state.pool, path.0.clone()).await {
+        Ok((post, images)) => page
             .id("PostForm")
             .title("Edit Post")
-            .content(PostForm { post }),
+            .content(PostForm { post, images }),
 
         Err(e) => {
             eprintln!("{}", e.to_string());
             not_found(page).await
         }
+    }
+}
+
+pub async fn delete(path: Path<(String,)>, state: Data<State>) -> ActixResult {
+    match store::posts::delete(&state.pool, &path.0).await {
+        Ok(()) => Ok(redirect("/admin/posts")),
+        Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
     }
 }

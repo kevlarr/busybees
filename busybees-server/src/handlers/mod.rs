@@ -24,7 +24,7 @@ pub fn auth_guard(head: &RequestHead) -> bool {
 }
 
 pub async fn home(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
-    match store::posts::public_previews(&state.pool).await {
+    match store::posts::recent_published(&state.pool).await {
         Ok(previews) => Either::A(
             page.id("Home")
                 .title("Latest Posts")

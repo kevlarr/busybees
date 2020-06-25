@@ -1,16 +1,16 @@
 use horrorshow::{html, Raw, RenderOnce, TemplateBuffer};
-use busybees::store::posts::Post;
+use busybees::store::posts::PostDetail;
 use crate::asset_path;
 
 pub struct PostView {
-    pub post: Post,
+    pub post: PostDetail,
     pub auth: bool,
 }
 
 impl RenderOnce for PostView {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         let auth = self.auth;
-        let Post {
+        let PostDetail {
             author,
             key,
             title,

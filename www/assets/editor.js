@@ -57,10 +57,10 @@ const API = (function() {
  
   const RGX = new RegExp(`(${window.location.host}/uploads/)(.+)`);
 
-  const postKey = document.getElementById('EditorForm').getAttribute('data-post-key');
-  const postTitle = document.getElementById('PostTitle');
-  const postContent = document.getElementById('SummernoteEditor');
-  const saveStatus = document.getElementById('saveStatus');
+  const form = document.getElementById('editor-form');
+  const postKey = form.getAttribute('data-post-key');
+  const postTitle = form['post-title'];
+  const saveStatus = document.getElementById('save-status');
 
   let textDisplay;
   let statusBar;
@@ -80,7 +80,7 @@ const API = (function() {
     statusBar.appendChild(errorAlert);
   }
 
-  $('#SummernoteEditor').summernote({
+  $('#summernote-editor').summernote({
     toolbar: [
       ['style', ['style']],
       ['font', ['forecolor', 'backcolor', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
@@ -121,6 +121,7 @@ const API = (function() {
         API.post(`/api/posts/${postKey}/images/new`, { headers: {}, body: data })
           .then(resp => resp.json())
           .then(json => {
+            // FIXME this needs to append radio button with image id...?
             json.srcpaths.forEach(path => {
               console.log(`[onImageUpload::insertImage] PATH: ${path}`);
               $(this).summernote('insertImage', `/${path}`)
@@ -147,7 +148,7 @@ const API = (function() {
 
     saveStatus.innerText = UNSAVED;
 
-    if (uploading > 0) {
+    if (uploading > 0 || !postTitle.value) {
       return;
     }
 
@@ -170,24 +171,36 @@ const API = (function() {
       }
     });
 
+    let previewImageRadio = document.querySelector('input[name=previewImageId]:checked');
+    let previewImageId = previewImageRadio ?
+      Number(previewImageRadio.value) :
+      null;
+
     API.patch(`/api/posts/${postKey}`, {
       expect: 204,
       body: {
         post: {
           title: postTitle.value,
-          content: postContent.value,
+          content: form['summernote-editor'].value,
         },
+        previewImageId,
         linkedUploads,
       },
     })
       .then(() => {
-        saveStatus.innerText = SAVED;
+        // For now just reload the page to update the preview image thumbnails
+        // saveStatus.innerText = SAVED;
+        window.location.reload();
       })
       .catch(err => {
         saveStatus.innerText = UNSAVED;
         window.alert(JSON.stringify(err));
       });
   }
+
+  document.querySelectorAll('#post-images .post-image').forEach(img => {
+    img.addEventListener('click', scheduleSave);
+  });
 
   postTitle.addEventListener('input', scheduleSave);
 })();
