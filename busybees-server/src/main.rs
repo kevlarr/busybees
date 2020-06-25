@@ -14,7 +14,6 @@ use busybees_server::{
     State,
     ASSET_BASEPATH,
 };
-use openssl::ssl::{SslAcceptor, SslAcceptorBuilder, SslFiletype, SslMethod};
 use std::{env, io};
 
 #[actix_rt::main]
@@ -69,7 +68,7 @@ async fn main() -> io::Result<()> {
     };
 
     HttpServer::new(app)
-        .bind_openssl(address, ssl_builder())?
+        .bind(address)?
         .run()
         .await
 }
@@ -78,16 +77,4 @@ fn file_handler(url_path: &str, dir_path: &str) -> Files {
     Files::new(url_path, dir_path)
         .show_files_listing()
         .use_last_modified(true)
-}
-
-fn ssl_builder() -> SslAcceptorBuilder {
-    let key_file = env::var("SSL_KEY_FILE").expect("SSL_KEY_FILE not set");
-    let cert_file = env::var("SSL_CERT_FILE").expect("SSL_CERT_FILE not set");
-
-    let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-
-    builder.set_private_key_file(&key_file, SslFiletype::PEM).unwrap();
-    builder.set_certificate_chain_file(&cert_file).unwrap();
-
-    builder
 }
