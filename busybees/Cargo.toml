@@ -1,6 +1,6 @@
 [package]
 name = "busybees"
-version = "0.5.0"
+version = "0.6.0"
 authors = ["kevlarr <6306496+kevlarr@users.noreply.github.com>"]
 edition = "2018"
 
