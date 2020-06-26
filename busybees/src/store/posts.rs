@@ -164,13 +164,6 @@ pub async fn update_post(
 
     sqlx::query!(
         "
-        delete from post_image where post_id = $1
-        ",
-        post.id,
-    ).execute(&mut *tx).await?;
-
-    sqlx::query!(
-        "
         update post set
             title = $2,
             content = $3,
@@ -182,24 +175,37 @@ pub async fn update_post(
         content
     ).execute(&mut *tx).await?;
 
-    // This is less than ideal, but until support for dynamic VALUES list drops...
-    // (see https://github.com/launchbadge/sqlx/issues/291)
-    // ... I would rather take the performance hit of multiple queries in favor
+    sqlx::query!(
+        "
+        delete from post_image
+        using image
+        where
+            post_id = $1 and
+            image.id = image_id and
+            image.filename <> all($2)
+        ",
+        post.id,
+        &linked_uploads
+    ).execute(&mut *tx).await?;
+
+    // This is less than ideal, but until support for dynamic VALUES list drops,
+    // I would rather take the performance hit of multiple queries in favor
     // of having compile-time guarantees.
+    //
+    // See: https://github.com/launchbadge/sqlx/issues/291
     for filename in linked_uploads {
         sqlx::query!(
             "
             insert into post_image (post_id, image_id)
-                values (
-                    (select id from post where key = $1),
-                    (select id from image where filename = $2)
-                )
+                values ($1, (select id from image where filename = $2))
 
-                -- It is dumb to try linking to an image embedded in the same post,
-                -- but it's not worth an error at all. Just don't need an extra record.
+                -- Conflict could arise not only from trying to save a linked upload
+                -- that already exists, but also from a post that links to the same
+                -- file twice. The latter probably isn't common, but it shouldn't lead
+                -- to a duplicate record.
                 on conflict do nothing
             ",
-            key,
+            post.id,
             filename,
         ).execute(&mut *tx).await?;
     }
