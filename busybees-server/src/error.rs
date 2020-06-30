@@ -28,6 +28,8 @@ impl ResponseError for ApiError {
     fn error_response(&self) -> HttpResponse {
         use ApiError::*;
 
+        eprintln!("{}", self);
+
         match self {
             Database(e) => match e {
                 SqlxError::RowNotFound => HttpResponse::NotFound().finish(),

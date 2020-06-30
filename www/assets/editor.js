@@ -141,7 +141,7 @@ const API = (function() {
 
   let autosaveTimeout;
 
-  function scheduleSave(evt) {
+  function scheduleSave(timeout = null) {
     if (autosaveTimeout) {
       window.clearTimeout(autosaveTimeout);
     }
@@ -152,7 +152,8 @@ const API = (function() {
       return;
     }
 
-    autosaveTimeout = window.setTimeout(save, 2500);
+    timeout = typeof timeout == 'number' ? timeout : 2500;
+    autosaveTimeout = window.setTimeout(save, timeout);
   }
 
   function save() {
@@ -199,8 +200,8 @@ const API = (function() {
   }
 
   document.querySelectorAll('#post-images .post-image').forEach(img => {
-    img.addEventListener('click', scheduleSave);
+    img.addEventListener('click', _evt => scheduleSave(50));
   });
 
-  postTitle.addEventListener('input', scheduleSave);
+  postTitle.addEventListener('input', _evt => scheduleSave());
 })();

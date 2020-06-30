@@ -157,31 +157,26 @@ pub async fn update_post(
 
     let post = sqlx::query!(
         "
-        select id from post where key = $1
-        ",
-        &key
-    ).fetch_one(&mut *tx).await?;
-
-    sqlx::query!(
-        "
-        update post set
+        update post
+        set
             title = $2,
             content = $3,
             updated_at = now()
-        where id = $1
+        where key = $1
+        returning id
         ",
-        post.id,
+        key,
         title,
         content
-    ).execute(&mut *tx).await?;
+    ).fetch_one(&mut *tx).await?;
 
     sqlx::query!(
         "
         delete from post_image
         using image
         where
-            post_id = $1 and
             image.id = image_id and
+            post_id = $1 and
             image.filename <> all($2)
         ",
         post.id,
@@ -211,10 +206,24 @@ pub async fn update_post(
     }
 
     if let Some(image_id) = preview_image_id {
+        // This two-updates/one-statement approach actually helps to minimize
+        // *both* updating rows needlessly *and* number of statements issued.
+        // Eg. if the same post-image is selected, 0 updates will be made.
         sqlx::query!(
             "
-            update post_image set is_preview = true
-            where post_id = $1 and image_id = $2
+            -- Clears existing `is_preview` if on different post-image
+            with clear_different_preview as (
+                update post_image
+                set is_preview = false
+                where post_id = $1 and image_id != $2 and is_preview
+                returning true
+            )
+
+            -- Only updates relevant post-image to `is_preview` if unset
+            update post_image
+            set is_preview = true
+            from clear_different_preview
+            where post_id = $1 and image_id = $2;
             ",
             post.id,
             image_id,
