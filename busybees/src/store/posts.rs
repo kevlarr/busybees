@@ -211,19 +211,23 @@ pub async fn update_post(
         // Eg. if the same post-image is selected, 0 updates will be made.
         sqlx::query!(
             "
-            -- Clears existing `is_preview` if on different post-image
-            with clear_different_preview as (
+            with cleared as (
                 update post_image
                 set is_preview = false
                 where post_id = $1 and image_id != $2 and is_preview
-                returning true
+                returning id
             )
-
-            -- Only updates relevant post-image to `is_preview` if unset
-            update post_image
+            update post_image a
             set is_preview = true
-            from clear_different_preview
-            where post_id = $1 and image_id = $2;
+
+            -- Results from CTE might be empty, but even if not this needs an outer join
+            -- to re-select the post-image with image_id = $2 for that row to be updated.
+            from cleared
+            right join post_image b on
+                cleared.id = b.id and
+                b.post_id = $1
+
+            where a.image_id = $2;
             ",
             post.id,
             image_id,
