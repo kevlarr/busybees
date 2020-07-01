@@ -90,7 +90,7 @@ Server requires HTTPS even locally, but a test certificate can be generated with
 The application relies on `pgcrypto` to generate random post keys.
 
 - `create schema exts;`
-- `create extensions pgcrypto with schema exts;`
+- `create extension pgcrypto with schema exts;`
 
 ## So, why Rust?
 

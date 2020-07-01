@@ -1,0 +1,45 @@
+#!/usr/bin/bash
+
+if [ -z "$BUSYBEES_TARGETDIR" ]
+then
+    echo Error: Must set BUSYBEES_TARGETDIR
+    exit 1
+fi
+
+set -e
+
+DIR=`dirname "$0"`
+VERSION=$(cat $DIR/busybees-server/Cargo.toml | grep version -m 1 | grep -oE '[0-9\.]+')
+TARGETDIR="$BUSYBEES_TARGETDIR/$VERSION"
+
+printf "Building busybees:$VERSION\n"
+(
+    cd ~/busybees
+    set -x
+    cargo build --release
+)
+
+printf "\nCopying binary and assets\n"
+(
+    set -x
+
+    mkdir -p $TARGETDIR
+
+    # Append version number for better process inspection
+    cp target/release/busybees-server $TARGETDIR/server-$VERSION
+    cp .env $TARGETDIR/
+    rm -rf $TARGETDIR/www
+    cp -r www $TARGETDIR
+)
+
+printf "\nStarting server\n"
+(
+    cd $TARGETDIR
+
+    set -x
+    cd $TARGETDIR
+    nohup ./server-$VERSION &
+)
+sleep 1
+
+cat $TARGETDIR/nohup.out
