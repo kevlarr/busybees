@@ -4,7 +4,7 @@ use actix_web::web;
 use crate::{ApiResult, State};
 use busybees::{
     imaging,
-    store,
+    store::{self, images::PostImage}, 
     deps::{
         chrono::Utc,
         futures::StreamExt,
@@ -14,6 +14,11 @@ use busybees::{
 use serde::Serialize;
 use std::io::Write;
 use std::path::Path;
+
+#[derive(Serialize)]
+pub struct PostImages {
+    pub images: Vec<PostImage>,
+}
 
 #[derive(Serialize)]
 pub struct UploadResponse {
@@ -26,6 +31,17 @@ pub struct UploadedImage {
     filename: String,
     thumbnail_filename: Option<String>,
     image_id: i32
+}
+
+/// Retrieves uploaded images associated with the post matching
+/// the given key.
+pub async fn list(
+    path: web::Path<(String,)>,
+    state: web::Data<State>,
+) -> ApiResult<web::Json<PostImages>> {
+    let post_images = store::images::for_post(&state.pool, &path.0).await?;
+
+    Ok(web::Json(PostImages{ images: post_images }))
 }
 
 /// Streams each included image, saving each to the application upload path with

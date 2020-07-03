@@ -2,10 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use sqlx::pool::PoolConnection;
 use sqlx::{PgConnection, PgPool, Transaction};
-use super::{
-    images::{self, PostImage},
-    StoreResult,
-};
+use super::StoreResult;
 
 pub trait TitleSlug {
     fn title_slug(&self) -> String {
@@ -138,13 +135,6 @@ pub async fn get(pool: &PgPool, key: String) -> StoreResult<PostDetail> {
         ",
         key,
     ).fetch_one(pool).await
-}
-
-pub async fn get_with_images(pool: &PgPool, key: String) -> StoreResult<(PostDetail, Vec<PostImage>)> {
-    let post = get(pool, key).await?;
-    let post_images = images::for_post(pool, &post.key).await?;
-
-    Ok((post, post_images))
 }
 
 pub async fn update_post(

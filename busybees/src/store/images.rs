@@ -1,4 +1,5 @@
 //! Basic image modeling and creation.
+use serde::Serialize;
 use sqlx::PgPool;
 use super::StoreResult;
 
@@ -13,6 +14,7 @@ pub struct Image {
     pub kb: Option<i32>,
 }
 
+#[derive(Serialize)]
 pub struct PostImage {
     pub image_id: i32,
     pub filename: String,
