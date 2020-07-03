@@ -88,12 +88,12 @@ impl RenderOnce for PostForm {
                                 input(
                                     type = "radio",
                                     name = "previewImageId",
-                                    id = format!("preview-image-{}", image.image_id),
+                                    id = format!("image-{}", image.image_id),
                                     value = image.image_id,
                                     checked? = image.is_preview,
                                     hidden
                                 );
-                                label(for = format!("preview-image-{}", image.image_id)) {
+                                label(for = format!("image-{}", image.image_id)) {
                                     img(
                                         class = if image.is_preview {"post-image is-preview"} else {"post-image"},
                                         src = upload_path(&image.filename)

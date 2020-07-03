@@ -61,6 +61,7 @@ const API = (function() {
   const postKey = form.getAttribute('data-post-key');
   const postTitle = form['post-title'];
   const saveStatus = document.getElementById('save-status');
+  const postImages = document.getElementById('post-images');
 
   let textDisplay;
   let statusBar;
@@ -121,10 +122,31 @@ const API = (function() {
         API.post(`/api/posts/${postKey}/images/new`, { headers: {}, body: data })
           .then(resp => resp.json())
           .then(json => {
-            // FIXME this needs to append radio button with image id...?
-            json.srcpaths.forEach(path => {
-              console.log(`[onImageUpload::insertImage] PATH: ${path}`);
-              $(this).summernote('insertImage', `/${path}`)
+            json.images.forEach(image => {
+              console.log(`[onImageUpload::insertImage] FILENAME: ${image.filename}`);
+              $(this).summernote('insertImage', `/uploads/${image.filename}`)
+
+              let img = document.createElement('img');
+              img.className = 'post-image';
+              img.src = `/uploads/${image.thumbnailFilename || image.filename}`;
+              img.addEventListener('click', _evt => scheduleSave(50));
+
+              let label = document.createElement('label');
+              label.htmlFor = `image-${image.imageId}`;
+              label.appendChild(img);
+
+              let input = document.createElement('input');
+              input.type = 'radio';
+              input.name = 'previewImageId';
+              input.id = `image-${image.imageId}`;
+              input.value = image.imageId;
+              input.hidden = true;
+
+              let li = document.createElement('li');
+              li.appendChild(input);
+              li.appendChild(label);
+
+              postImages.appendChild(li);
             });
           })
           .catch(showError)
@@ -189,9 +211,7 @@ const API = (function() {
       },
     })
       .then(() => {
-        // For now just reload the page to update the preview image thumbnails
-        // saveStatus.innerText = SAVED;
-        window.location.reload();
+         saveStatus.innerText = SAVED;
       })
       .catch(err => {
         saveStatus.innerText = UNSAVED;

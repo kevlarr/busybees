@@ -81,10 +81,6 @@ There are no build systems to coordinate and there is a single source of truth.
 
 ## Setup
 
-### HTTPS
-
-Server requires HTTPS even locally, but a test certificate can be generated with `gencert.sh`.
-
 ### Database
 
 The application relies on `pgcrypto` to generate random post keys.
@@ -96,18 +92,20 @@ The application relies on `pgcrypto` to generate random post keys.
 
 I know a lot of people say Rust is ridiculous for web development because "we don't need that level of performance". That's a fair viewpoint -
 it's also a complicated language,
-the compiler is harder to please than a truckload of dads,
+the compiler is harder to please than my dad with report cards,
 and it can be tough to build the same kind of 'feature momentum' compared to using common web languages.
 
 Well, *"Butts to that,"* I say - Rust is perfect for the web.
 This started as a proof-of-concept, and the experience continues to be enjoyable.
 
-**10/10 would choose again.**
+**tl;dr: 10/10 would choose again.**
 
 ### 1. we should **always** strive for 'that level of performance'
 
 I'm busy, you're busy, most of us are busy, busy bees.
-We have to wait far too long when viewing far too many sites, both from server speed and the bloat (and blight) of modern JS-heavy "apps". Between bundle fetching, parsing, network requests to build a data 'store' on the client-side, and DOM manipulation, modern apps have a lot of overhead.
+We have to wait far too long when viewing far too many sites, both from server speed and the bloat (and blight) of modern JS-heavy "apps".
+Between bundle fetching, parsing, network requests to build a data 'store' on the client-side, and DOM manipulation, modern apps have a lot of overhead,
+and they've often led to less satisfying experiences than traditional request/reload approaches.
 
 We deserve better, and it's sad that we (as users) have become used to slow, bloated, memory-hogging software
 despite having radically powerful hardware.
