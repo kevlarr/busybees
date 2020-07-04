@@ -68,17 +68,52 @@ const API = (function() {
 
   let uploading = 0;
 
-  function showError({received: { code, reason, text }}) {
-    let errorAlert = document.createElement('div');
-    let msg = String(code);
+  function createImagesList() {
+    let ul = document.createElement('ul');
 
-    if (reason) { msg += ` ${reason}`; }
-    if (text) { msg += `: ${text}`; }
+    ul.id = 'post-images-list';
+    postImages.appendChild(ul);
 
-    errorAlert.classList.add('alert', 'alert-danger');
-    errorAlert.innerHTML = msg;
+    return ul
+  }
 
-    statusBar.appendChild(errorAlert);
+  function fetchImages() {
+    API.get(`/api/posts/${postKey}/images`, { expect: 200 })
+      .then(resp => resp.json())
+      .then(json => {
+        postImages.innerHTML = null;
+
+        if (!json.images || !json.images.length) {
+          postImages.innerText = 'Upload images to select a preview image for the post';
+          return;
+        }
+
+        let ul = createImagesList();
+        json.images.forEach(image => appendImage(ul, image));
+      })
+      .catch(err => {
+        postImages.innerHTML = null;
+        showError(postImages)(err);
+      });
+  }
+
+  fetchImages()
+
+  function showError(parentNode) {
+    function buildAlert({received: { code, reason, text }}) {
+      let errorAlert = document.createElement('div');
+      let msg = String(code);
+
+      if (reason) { msg += ` ${reason}`; }
+      if (text) { msg += `: ${text}`; }
+
+      errorAlert.classList.add('alert', 'alert-danger');
+      errorAlert.innerHTML = msg;
+
+      parentNode.appendChild(alert);
+    }
+
+    return buildAlert
   }
 
   $('#summernote-editor').summernote({
@@ -102,6 +137,7 @@ const API = (function() {
       },
 
       onImageUpload(files) {
+        statusBar.innerHTML = null;
         saveStatus.innerText = UNSAVED;
         uploading++;
 
@@ -122,34 +158,16 @@ const API = (function() {
         API.post(`/api/posts/${postKey}/images/new`, { headers: {}, body: data })
           .then(resp => resp.json())
           .then(json => {
+            let imagesList =
+              document.getElementById('post-images-list') ||
+              createImagesList();
+
             json.images.forEach(image => {
-              console.log(`[onImageUpload::insertImage] FILENAME: ${image.filename}`);
               $(this).summernote('insertImage', `/uploads/${image.filename}`)
-
-              let img = document.createElement('img');
-              img.className = 'post-image';
-              img.src = `/uploads/${image.thumbnailFilename || image.filename}`;
-              img.addEventListener('click', _evt => scheduleSave(50));
-
-              let label = document.createElement('label');
-              label.htmlFor = `image-${image.imageId}`;
-              label.appendChild(img);
-
-              let input = document.createElement('input');
-              input.type = 'radio';
-              input.name = 'previewImageId';
-              input.id = `image-${image.imageId}`;
-              input.value = image.imageId;
-              input.hidden = true;
-
-              let li = document.createElement('li');
-              li.appendChild(input);
-              li.appendChild(label);
-
-              postImages.appendChild(li);
+              appendImage(imagesList, image);
             });
           })
-          .catch(showError)
+          .catch(showError(statusBar))
           .finally(() => {
             uploadingAlert.remove();
             uploading--;
@@ -157,6 +175,30 @@ const API = (function() {
       },
     },
   });
+
+  function appendImage(parentNode, image) {
+    let img = document.createElement('img');
+    img.className = 'post-image';
+    img.src = `/uploads/${image.thumbnailFilename || image.filename}`;
+    img.addEventListener('click', _evt => scheduleSave(50));
+
+    let label = document.createElement('label');
+    label.htmlFor = `image-${image.imageId}`;
+    label.appendChild(img);
+
+    let input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'previewImageId';
+    input.id = `image-${image.imageId}`;
+    input.value = image.imageId;
+    input.hidden = true;
+
+    let li = document.createElement('li');
+    li.appendChild(input);
+    li.appendChild(label);
+
+    parentNode.appendChild(li);
+  }
 
   textDisplay = document.getElementsByClassName('note-editable')[0];
   statusBar = document.getElementsByClassName('note-status-output')[0];
@@ -174,7 +216,7 @@ const API = (function() {
       return;
     }
 
-    timeout = typeof timeout == 'number' ? timeout : 2500;
+    timeout = typeof timeout == 'number' ? timeout : 1000;
     autosaveTimeout = window.setTimeout(save, timeout);
   }
 
@@ -211,7 +253,11 @@ const API = (function() {
       },
     })
       .then(() => {
-         saveStatus.innerText = SAVED;
+        postImages.innerHTML = null;
+        return fetchImages();
+      })
+      .then(() => {
+        saveStatus.innerText = SAVED;
       })
       .catch(err => {
         saveStatus.innerText = UNSAVED;
