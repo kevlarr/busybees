@@ -67,9 +67,35 @@
       this.form = document.getElementById('editor-form');
       this.postImages = document.getElementById('post-images');
       this.saveStatus = document.getElementById('save-status');
-      this.statusBar = null;
-      this.textDisplay = null;
       this.uploading = 0;
+
+      // Need to use jquery for the editor node
+      this.editor = $('#summernote-editor');
+      this.editor.summernote({
+        toolbar: [
+          ['style', ['style']],
+          ['font', ['forecolor', 'backcolor', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
+          ['paragraph', ['ol', 'ul', 'paragraph']],
+          ['insert', ['picture', 'link', 'video', 'table', 'hr']],
+          ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
+        ],
+
+        placeholder: 'First step: Lie about having stopped it...',
+
+        dialogsInBody: true,
+
+        styleTags: ['h2', 'h3', 'h4', 'p', 'blockquote', 'code'],
+
+        callbacks: {
+          onChange: (/* contents, $editable */) => this.scheduleSave(),
+
+          onImageUpload: files => this.uploadImages(files),
+        },
+      });
+
+      // These won't exist until after initializing Summernote editor
+      this.statusBar = document.getElementsByClassName('note-status-output')[0];
+      this.textDisplay = document.getElementsByClassName('note-editable')[0];
 
       this.postTitle.addEventListener('input', _evt => this.scheduleSave());
     }
@@ -83,15 +109,19 @@
     }
 
     markUnsaved() {
-      this.saveStatus.innerText = 'Unsaved';
+      this.setSaveStatus('Unsaved');
     }
 
     markSaving() {
-      this.saveStatus.innerText = 'Saving...';
+      this.setSaveStatus('Saving...');
     }
 
     markSaved() {
-      this.saveStatus.innerText = 'Saved';
+      this.setSaveStatus('Saved');
+    }
+
+    setSaveStatus(status) {
+      this.saveStatus.innerText = status;
     }
 
     createImagesList() {
@@ -113,10 +143,10 @@
         });
     }
 
-    setImages(json) {
+    setImages({ images }) {
       this.postImages.innerHTML = null;
 
-      if (!json.images || !json.images.length) {
+      if (!images || !images.length) {
         this.postImages.innerText =
           'Upload images to select a preview image for the post';
 
@@ -124,7 +154,7 @@
       }
 
       let ul = this.createImagesList();
-      json.images.forEach(image => this.appendImage(ul, image));
+      images.forEach(image => this.appendImage(ul, image));
     }
 
     appendImage(parentNode, image) {
@@ -152,7 +182,9 @@
     }
 
     showError(parentNode) {
-      function buildAlert({received: { code, reason, text }}) {
+      //function buildAlert({received: { code, reason, text }}) {
+      function buildAlert(err) {
+        let {received: { code, reason, text }} = err;
         let errorAlert = document.createElement('div');
         let msg = String(code);
 
@@ -183,9 +215,7 @@
       this.autosaveTimeout = window.setTimeout(this.save.bind(this), timeout);
     }
 
-    save() {
-      this.markSaving();
-
+    extractUploaded() {
       const linkedUploads = [];
 
       document.querySelectorAll('.note-editable img').forEach(img => {
@@ -199,17 +229,25 @@
         }
       });
 
+      return linkedUploads;
+    }
+
+    save() {
+      this.markSaving();
+
+      const linkedUploads = this.extractUploaded();
+
       let previewImageRadio = document.querySelector('input[name=previewImageId]:checked');
       let previewImageId = previewImageRadio ?
         Number(previewImageRadio.value) :
         null;
 
-      API.patch(`/api/posts/${PAGE.postKey}`, {
+      API.patch(`/api/posts/${this.postKey}`, {
         expect: 204,
         body: {
           post: {
-            title: PAGE.postTitle.value,
-            content: PAGE.form['summernote-editor'].value,
+            title: this.postTitle.value,
+            content: this.form['summernote-editor'].value,
           },
           previewImageId,
           linkedUploads,
@@ -219,83 +257,55 @@
           this.postImages.innerHTML = null;
           return this.fetchImages();
         })
-        .then(() => {
-          this.markSaved();
-        })
+        .then(() => this.markSaved())
         .catch(err => {
           this.markUnsaved();
           window.alert(JSON.stringify(err));
         });
     }
+
+    uploadImages(files) {
+      this.statusBar.innerHTML = null;
+      this.markUnsaved();
+
+      const data = new FormData()
+
+      for (const file of files) {
+        data.append('files', file, file.name);
+        this.uploading++;
+      }
+
+      let filenames = Array.from(files).map(f => f.name).join(', ');
+      let uploadingAlert = document.createElement('div');
+
+      uploadingAlert.classList.add('alert', 'alert-primary');
+      uploadingAlert.innerHTML = `<progress value=1 max=2></progress> Uploading ${filenames}`;
+
+      this.statusBar.appendChild(uploadingAlert);
+
+      API.post(`/api/posts/${this.postKey}/images/new`, { headers: {}, body: data })
+        .then(resp => resp.json())
+        .then(json => this.addNewImages(json))
+        .catch(this.showError(this.statusBar))
+        .finally(() => uploadingAlert.remove());
+    }
+
+    addNewImages({ images }) {
+      let imagesList = document.getElementById('post-images-list');
+
+      if (!imagesList) {
+        // Clear content in case there was an error message present
+        this.postImages.innerHTML = null;
+        imagesList = this.createImagesList();
+      }
+
+      images.forEach(image => {
+        this.editor.summernote('insertImage', `/uploads/${image.filename}`)
+        this.appendImage(imagesList, image);
+        this.uploading--;
+      });
+    }
   })();
 
   PAGE.fetchImages();
-
-  $('#summernote-editor').summernote({
-    toolbar: [
-      ['style', ['style']],
-      ['font', ['forecolor', 'backcolor', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
-      ['paragraph', ['ol', 'ul', 'paragraph']],
-      ['insert', ['picture', 'link', 'video', 'table', 'hr']],
-      ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
-    ],
-
-    placeholder: 'First step: Lie about having stopped it...',
-
-    dialogsInBody: true,
-
-    styleTags: ['h2', 'h3', 'h4', 'p', 'blockquote', 'code'],
-
-    callbacks: {
-      onChange(contents, $editable) {
-        PAGE.scheduleSave();
-      },
-
-      onImageUpload(files) {
-        PAGE.statusBar.innerHTML = null;
-        PAGE.markUnsaved();
-
-        const data = new FormData()
-
-        for (const file of files) {
-          data.append('files', file, file.name);
-          PAGE.uploading++;
-        }
-
-        let filenames = Array.from(files).map(f => f.name).join(', ');
-        let uploadingAlert = document.createElement('div');
-
-        uploadingAlert.classList.add('alert', 'alert-primary');
-        uploadingAlert.innerHTML = `<progress value=1 max=2></progress> Uploading ${filenames}`;
-
-        PAGE.statusBar.appendChild(uploadingAlert);
-
-        API.post(`/api/posts/${PAGE.postKey}/images/new`, { headers: {}, body: data })
-          .then(resp => resp.json())
-          .then(json => {
-            let imagesList = document.getElementById('post-images-list');
-
-            if (!imagesList) {
-              PAGE.postImages.innerHTML = null;
-              imagesList = PAGE.createImagesList();
-            }
-
-            json.images.forEach(image => {
-              $(this).summernote('insertImage', `/uploads/${image.filename}`)
-
-              PAGE.appendImage(imagesList, image);
-              PAGE.uploading--;
-            });
-          })
-          .catch(PAGE.showError(PAGE.statusBar))
-          .finally(() => {
-            uploadingAlert.remove();
-          });
-      },
-    },
-  });
-
-  // These won't exist until after initializing Summernote editor
-  PAGE.textDisplay = document.getElementsByClassName('note-editable')[0];
-  PAGE.statusBar = document.getElementsByClassName('note-status-output')[0];
 })();
