@@ -1,73 +1,17 @@
 /**
- * Configuration for the embedded Summernote editor and listeners
- * to enable and disable the submit button
+ * Configuration for the Summernote editor, autosave, etc.
  */
 (function() {
-  const RGX = new RegExp(`(${window.location.host}/uploads/)(.+)`);
+  const uploaded_img_rgx = new RegExp(`(${window.location.host}/uploads/)(.+)`);
 
-  /**
-   * Singleton utility object to ease the experience with `fetch`,
-   * primarily by setting headers and rejecting the response
-   * if the status code does not match expectation.
-   */
-  const API = new (class {
-    request(method, url, { expect = 200, headers, body }) {
-      if (headers === undefined) {
-        headers = {'Content-Type': 'application/json'};
-      }
-
-      if (headers['Content-Type'] === 'application/json') {
-        body = JSON.stringify(body);
-      }
-
-      let status, statusText;
-
-      return fetch(url, { method, headers, body })
-        .then(resp => new Promise((resolve, reject) => {
-          if (resp.status !== expect) {
-            status = resp.status;
-            statusText = resp.statusText;
-
-            return resp.text().then(text => reject(text))
-          }
-
-          return resolve(resp);
-        }))
-        .catch(text => new Promise((_, reject) => {
-          return reject({
-              expected: expect,
-              received: {
-                code: status,
-                reason: statusText,
-                text,
-              },
-          });
-        }))
-    }
-
-    get(url, { expect, headers }) {
-      return this.request('GET', url, { expect, headers });
-    }
-
-    post(url, { expect, headers, body }) {
-      return this.request('POST', url, { expect, headers, body });
-    }
-
-    patch(url, { expect, headers, body }) {
-      return this.request('PATCH', url, { expect, headers, body });
-    }
-  })();
-
-  /**
-   * Singleton object to encapsulate interacting with API and DOM
-   */
-  const PAGE = new (class Page {
+  const page = new (class Page {
     constructor() {
       this.autosaveTimeout = null;
+      this.uploading = 0;
+
       this.form = document.getElementById('editor-form');
       this.postImages = document.getElementById('post-images');
       this.saveStatus = document.getElementById('save-status');
-      this.uploading = 0;
 
       // Need to use jquery for the editor node
       this.editor = $('#summernote-editor');
@@ -80,15 +24,12 @@
           ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
         ],
 
-        placeholder: 'First step: Lie about having stopped it...',
-
         dialogsInBody: true,
 
         styleTags: ['h2', 'h3', 'h4', 'p', 'blockquote', 'code'],
 
         callbacks: {
           onChange: (/* contents, $editable */) => this.scheduleSave(),
-
           onImageUpload: files => this.uploadImages(files),
         },
       });
@@ -125,12 +66,9 @@
     }
 
     createImagesList() {
-      let ul = document.createElement('ul');
-
-      ul.id = 'post-images-list';
-      this.postImages.appendChild(ul);
-
-      return ul
+      let ul = HTML.Ul({ id: 'post-images-list' });
+      this.postImages.append(ul);
+      return ul;
     }
 
     fetchImages() {
@@ -158,43 +96,43 @@
     }
 
     appendImage(parentNode, image) {
-      let img = document.createElement('img');
-      img.className = 'post-image';
-      img.src = `/uploads/${image.thumbnailFilename || image.filename}`;
-      img.addEventListener('click', _evt => this.scheduleSave(50));
-
-      let label = document.createElement('label');
-      label.htmlFor = `image-${image.imageId}`;
-      label.appendChild(img);
-
-      let input = document.createElement('input');
-      input.type = 'radio';
-      input.name = 'previewImageId';
-      input.id = `image-${image.imageId}`;
-      input.value = image.imageId;
-      input.hidden = true;
-
-      let li = document.createElement('li');
-      li.appendChild(input);
-      li.appendChild(label);
-
-      parentNode.appendChild(li);
+      parentNode.append(
+        HTML.Li(null, [
+          HTML.Input({
+            hidden: true,
+            id: `image-${image.imageId}`,
+            name: 'previewImageId',
+            type: 'radio',
+            value: image.imageId,
+          }),
+          HTML.Label({
+            htmlFor: `image-${image.imageId}`,
+          }, [
+            HTML.Img({
+              className: 'post-image',
+              src: `/uploads/${image.thumbnailFilename || image.filename}`,
+              events: {
+                click: (/* event */) => this.scheduleSave(50),
+              },
+            }),
+          ]),
+        ])
+      );
     }
 
     showError(parentNode) {
-      //function buildAlert({received: { code, reason, text }}) {
       function buildAlert(err) {
         let {received: { code, reason, text }} = err;
-        let errorAlert = document.createElement('div');
         let msg = String(code);
 
         if (reason) { msg += ` ${reason}`; }
         if (text) { msg += `: ${text}`; }
 
-        errorAlert.classList.add('alert', 'alert-danger');
-        errorAlert.innerHTML = msg;
-
-        parentNode.appendChild(alert);
+        parentNode.append(HTML.Div({
+          className: 'alert alert-danger',
+        }, [
+          msg,
+        ]));
       }
 
       return buildAlert
@@ -219,7 +157,7 @@
       const linkedUploads = [];
 
       document.querySelectorAll('.note-editable img').forEach(img => {
-        const matches = RGX.exec(img.src);
+        const matches = uploaded_img_rgx.exec(img.src);
 
         if (matches) {
           const filename = matches[2];
@@ -276,18 +214,18 @@
       }
 
       let filenames = Array.from(files).map(f => f.name).join(', ');
-      let uploadingAlert = document.createElement('div');
+      let alert = HTML.Div({ className: 'alert alert-primary' }, [
+        HTML.Progress({max: 2, value: 1}),
+        `Uploading ${filenames}`,
+      ]);
 
-      uploadingAlert.classList.add('alert', 'alert-primary');
-      uploadingAlert.innerHTML = `<progress value=1 max=2></progress> Uploading ${filenames}`;
-
-      this.statusBar.appendChild(uploadingAlert);
+      this.statusBar.append(alert);
 
       API.post(`/api/posts/${this.postKey}/images/new`, { headers: {}, body: data })
         .then(resp => resp.json())
         .then(json => this.addNewImages(json))
         .catch(this.showError(this.statusBar))
-        .finally(() => uploadingAlert.remove());
+        .finally(() => alert.remove());
     }
 
     addNewImages({ images }) {
@@ -307,5 +245,5 @@
     }
   })();
 
-  PAGE.fetchImages();
+  page.fetchImages();
 })();
