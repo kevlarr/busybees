@@ -536,39 +536,58 @@ main#PostForm {
     padding: 20px 65px;
 }
 
-#post-images {
-    display: flex;
-    list-style-type: none;
-    margin: 5px 0;
-    padding: 0 5px;
-}
-
-#post-images .post-image {
-    box-sizing: content-box;
-    border: 3px solid transparent;
-    cursor: pointer;
-    height: 50px;
-    margin-right: 20px;
-    transition: transform 0.1s;
-    width: 50px;
-}
-
-#post-images .post-image.is-preview {
-    border-color: #B98100;
-}
-
-#post-images img:hover,
-#post-images img:focus {
-    transform: scale(1.2);
-    transition: transform 0.1s;
-}
-
 #editor-form {
     display: flex;
     flex: 1;
     flex-direction: column;
     overflow: auto;
     padding-bottom: 5px;
+}
+
+#editor-form fieldset {
+    border: 1px solid #BFBBB4;
+    height: 105px;
+    overflow: auto;
+}
+
+#editor-form legend {
+    margin-left: 10px;
+    padding: 0 5px;
+}
+
+#post-images {
+    padding: 15px 15px 0 15px;
+}
+
+#post-images-list {
+    display: flex;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#post-images .post-image {
+    border: 3px solid transparent;
+    box-sizing: content-box;
+    cursor: pointer;
+    height: 35px;
+    margin: 0px 20px 20px 0;
+    transition: transform 0.1s;
+    width: 35px;
+}
+
+#post-images .post-image.is-preview {
+    border-color: #fff;
+    box-shadow: 0px 0px 5px 0px #999;
+    transform: scale(1.3);
+    transition: transform 0.1s;
+}
+
+#post-images img:hover,
+#post-images img:focus {
+    transform: scale(1.2);
+    transition: transform 0.1s;
 }
 
 #PostForm #save-status {
@@ -586,8 +605,13 @@ input {
 }
 
 input, .note-editable {
-    border: 1px solid #504B40;
+    border: 1px solid #BFBBB4;
+    border-radius: 0;
     transition: border-color .2s;
+}
+
+.note-editable {
+    border-top: 0;
 }
 
 input:focus, input:active,
@@ -613,6 +637,7 @@ input:focus, input:active,
 
 #editor-form .note-editor.note-frame {
     border: 0;
+    border-radius: 0;
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -623,7 +648,7 @@ input:focus, input:active,
 
 #editor-form .note-toolbar {
     background-color: #E3E0DB;
-    border: 0;
+    border: 1px solid #BFBBB4;
 }
 
 #editor-form .note-dropdown-menu {

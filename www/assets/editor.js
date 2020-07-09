@@ -1,207 +1,247 @@
 /**
- * Configuration for the embedded Summernote editor and listeners
- * to enable and disable the submit button
+ * Configuration for the Summernote editor, autosave, etc.
  */
-const API = (function() {
-  function request(method, url, { expect = 200, headers, body }) {
-    if (headers === undefined) {
-      headers = {'Content-Type': 'application/json'};
-    }
-
-    if (headers['Content-Type'] === 'application/json') {
-      body = JSON.stringify(body);
-    }
-
-    let status, statusText;
-
-    return fetch(url, { method, headers, body })
-      .then(resp => new Promise((resolve, reject) => {
-        if (resp.status !== expect) {
-          status = resp.status;
-          statusText = resp.statusText;
-
-          return resp.text().then(text => reject(text))
-        }
-
-        return resolve(resp);
-      }))
-      .catch(text => new Promise((_, reject) => {
-        return reject({
-            expected: expect,
-            received: {
-              code: status,
-              reason: statusText,
-              text,
-            },
-        });
-      }))
-  }
-
-  return {
-    get(url, { expect, headers }) {
-      return request('GET', url, { expect, headers });
-    },
-    post(url, { expect, headers, body }) {
-      return request('POST', url, { expect, headers, body });
-    },
-    patch(url, { expect, headers, body }) {
-      return request('PATCH', url, { expect, headers, body });
-    },
-  };
-})();
-
 (function() {
-  const SAVED = 'Saved';
-  const UNSAVED = 'Unsaved';
-  const SAVING = 'Saving...';
- 
-  const RGX = new RegExp(`(${window.location.host}/uploads/)(.+)`);
+  const uploaded_img_rgx = new RegExp(`(${window.location.host}/uploads/)(.+)`);
 
-  const form = document.getElementById('editor-form');
-  const postKey = form.getAttribute('data-post-key');
-  const postTitle = form['post-title'];
-  const saveStatus = document.getElementById('save-status');
+  const page = new (class Page {
+    constructor() {
+      this.autosaveTimeout = null;
+      this.uploading = 0;
 
-  let textDisplay;
-  let statusBar;
+      this.form = document.getElementById('editor-form');
+      this.postImages = document.getElementById('post-images');
+      this.saveStatus = document.getElementById('save-status');
 
-  let uploading = 0;
+      // Need to use jquery for the editor node
+      this.editor = $('#summernote-editor');
+      this.editor.summernote({
+        toolbar: [
+          ['style', ['style']],
+          ['font', ['forecolor', 'backcolor', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
+          ['paragraph', ['ol', 'ul', 'paragraph']],
+          ['insert', ['picture', 'link', 'video', 'table', 'hr']],
+          ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
+        ],
 
-  function showError({received: { code, reason, text }}) {
-    let errorAlert = document.createElement('div');
-    let msg = String(code);
+        dialogsInBody: true,
 
-    if (reason) { msg += ` ${reason}`; }
-    if (text) { msg += `: ${text}`; }
+        styleTags: ['h2', 'h3', 'h4', 'p', 'blockquote', 'code'],
 
-    errorAlert.classList.add('alert', 'alert-danger');
-    errorAlert.innerHTML = msg;
-
-    statusBar.appendChild(errorAlert);
-  }
-
-  $('#summernote-editor').summernote({
-    toolbar: [
-      ['style', ['style']],
-      ['font', ['forecolor', 'backcolor', 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript']],
-      ['paragraph', ['ol', 'ul', 'paragraph']],
-      ['insert', ['picture', 'link', 'video', 'table', 'hr']],
-      ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']],
-    ],
-
-    placeholder: 'First step: Lie about having stopped it...',
-
-    dialogsInBody: true,
-
-    styleTags: ['h2', 'h3', 'h4', 'p', 'blockquote', 'code'],
-
-    callbacks: {
-      onChange(contents, $editable) {
-        scheduleSave();
-      },
-
-      onImageUpload(files) {
-        saveStatus.innerText = UNSAVED;
-        uploading++;
-
-        const data = new FormData()
-
-        for (const file of files) {
-          data.append('files', file, file.name);
-        }
-
-        let filenames = Array.from(files).map(f => f.name).join(', ');
-        let uploadingAlert = document.createElement('div');
-
-        uploadingAlert.classList.add('alert', 'alert-primary');
-        uploadingAlert.innerHTML = `<progress value=1 max=2></progress> Uploading ${filenames}`;
-
-        statusBar.appendChild(uploadingAlert);
-
-        API.post(`/api/posts/${postKey}/images/new`, { headers: {}, body: data })
-          .then(resp => resp.json())
-          .then(json => {
-            // FIXME this needs to append radio button with image id...?
-            json.srcpaths.forEach(path => {
-              console.log(`[onImageUpload::insertImage] PATH: ${path}`);
-              $(this).summernote('insertImage', `/${path}`)
-            });
-          })
-          .catch(showError)
-          .finally(() => {
-            uploadingAlert.remove();
-            uploading--;
-          });
-      },
-    },
-  });
-
-  textDisplay = document.getElementsByClassName('note-editable')[0];
-  statusBar = document.getElementsByClassName('note-status-output')[0];
-
-  let autosaveTimeout;
-
-  function scheduleSave(timeout = null) {
-    if (autosaveTimeout) {
-      window.clearTimeout(autosaveTimeout);
-    }
-
-    saveStatus.innerText = UNSAVED;
-
-    if (uploading > 0 || !postTitle.value) {
-      return;
-    }
-
-    timeout = typeof timeout == 'number' ? timeout : 2500;
-    autosaveTimeout = window.setTimeout(save, timeout);
-  }
-
-  function save() {
-    saveStatus.innerText = SAVING;
-
-    const linkedUploads = [];
-
-    document.querySelectorAll('.note-editable img').forEach(img => {
-      const matches = RGX.exec(img.src);
-
-      if (matches) {
-        const filename = matches[2];
-
-        console.log(`[save::linkedUpload] MATCHED FILENAME: ${filename}`);
-        linkedUploads.push(filename);
-      }
-    });
-
-    let previewImageRadio = document.querySelector('input[name=previewImageId]:checked');
-    let previewImageId = previewImageRadio ?
-      Number(previewImageRadio.value) :
-      null;
-
-    API.patch(`/api/posts/${postKey}`, {
-      expect: 204,
-      body: {
-        post: {
-          title: postTitle.value,
-          content: form['summernote-editor'].value,
+        callbacks: {
+          onChange: (/* contents, $editable */) => this.scheduleSave(),
+          onImageUpload: files => this.uploadImages(files),
         },
-        previewImageId,
-        linkedUploads,
-      },
-    })
-      .then(() => {
-        // For now just reload the page to update the preview image thumbnails
-        // saveStatus.innerText = SAVED;
-        window.location.reload();
-      })
-      .catch(err => {
-        saveStatus.innerText = UNSAVED;
-        window.alert(JSON.stringify(err));
       });
-  }
 
-  document.querySelectorAll('#post-images .post-image').forEach(img => {
-    img.addEventListener('click', _evt => scheduleSave(50));
-  });
+      // These won't exist until after initializing Summernote editor
+      this.statusBar = document.getElementsByClassName('note-status-output')[0];
+      this.textDisplay = document.getElementsByClassName('note-editable')[0];
 
-  postTitle.addEventListener('input', _evt => scheduleSave());
+      this.postTitle.addEventListener('input', _evt => this.scheduleSave());
+    }
+
+    get postTitle() {
+      return this.form['post-title'];
+    }
+
+    get postKey() {
+      return this.form.getAttribute('data-post-key');
+    }
+
+    markUnsaved() {
+      this.setSaveStatus('Unsaved');
+    }
+
+    markSaving() {
+      this.setSaveStatus('Saving...');
+    }
+
+    markSaved() {
+      this.setSaveStatus('Saved');
+    }
+
+    setSaveStatus(status) {
+      this.saveStatus.innerText = status;
+    }
+
+    createImagesList() {
+      let ul = HTML.Ul({ id: 'post-images-list' });
+      this.postImages.append(ul);
+      return ul;
+    }
+
+    fetchImages() {
+      API.get(`/api/posts/${this.postKey}/images`, { expect: 200 })
+        .then(resp => resp.json())
+        .then(this.setImages.bind(this))
+        .catch(err => {
+          this.postImages.innerHTML = null;
+          this.showError(this.postImages)(err);
+        });
+    }
+
+    setImages({ images }) {
+      this.postImages.innerHTML = null;
+
+      if (!images || !images.length) {
+        this.postImages.innerText = 'No images have been uploaded.';
+
+        return;
+      }
+
+      let ul = this.createImagesList();
+      images.forEach(image => this.appendImage(ul, image));
+    }
+
+    appendImage(parentNode, image) {
+      parentNode.append(
+        HTML.Li(null, [
+          HTML.Input({
+            hidden: true,
+            id: `image-${image.imageId}`,
+            name: 'previewImageId',
+            type: 'radio',
+            value: image.imageId,
+          }),
+          HTML.Label({
+            htmlFor: `image-${image.imageId}`,
+          }, [
+            HTML.Img({
+              className: image.isPreview ? 'post-image is-preview' : 'post-image',
+              src: `/uploads/${image.thumbnailFilename || image.filename}`,
+              events: {
+                click: (/* event */) => this.scheduleSave(50),
+              },
+            }),
+          ]),
+        ])
+      );
+    }
+
+    showError(parentNode) {
+      function buildAlert(err) {
+        let {received: { code, reason, text }} = err;
+        let msg = String(code);
+
+        if (reason) { msg += ` ${reason}`; }
+        if (text) { msg += `: ${text}`; }
+
+        parentNode.append(HTML.Div({
+          className: 'alert alert-danger',
+        }, [
+          msg,
+        ]));
+      }
+
+      return buildAlert
+    }
+
+    scheduleSave(timeout = null) {
+      if (this.autosaveTimeout) {
+        window.clearTimeout(this.autosaveTimeout);
+      }
+
+      this.markUnsaved();
+
+      if (this.uploading > 0 || !this.postTitle.value) {
+        return;
+      }
+
+      timeout = typeof timeout == 'number' ? timeout : 500;
+      this.autosaveTimeout = window.setTimeout(this.save.bind(this), timeout);
+    }
+
+    extractUploaded() {
+      const linkedUploads = [];
+
+      document.querySelectorAll('.note-editable img').forEach(img => {
+        const matches = uploaded_img_rgx.exec(img.src);
+
+        if (matches) {
+          const filename = matches[2];
+
+          console.log(`[save::linkedUpload] MATCHED FILENAME: ${filename}`);
+          linkedUploads.push(filename);
+        }
+      });
+
+      return linkedUploads;
+    }
+
+    save() {
+      this.markSaving();
+
+      const linkedUploads = this.extractUploaded();
+
+      let previewImageRadio = document.querySelector('input[name=previewImageId]:checked');
+      let previewImageId = previewImageRadio ?
+        Number(previewImageRadio.value) :
+        null;
+
+      API.patch(`/api/posts/${this.postKey}`, {
+        expect: 204,
+        body: {
+          post: {
+            title: this.postTitle.value,
+            content: this.form['summernote-editor'].value,
+          },
+          previewImageId,
+          linkedUploads,
+        },
+      })
+        .then(() => {
+          this.postImages.innerHTML = null;
+          return this.fetchImages();
+        })
+        .then(() => this.markSaved())
+        .catch(err => {
+          this.markUnsaved();
+          window.alert(JSON.stringify(err));
+        });
+    }
+
+    uploadImages(files) {
+      this.statusBar.innerHTML = null;
+      this.markUnsaved();
+
+      const data = new FormData()
+
+      for (const file of files) {
+        data.append('files', file, file.name);
+        this.uploading++;
+      }
+
+      let alert = HTML.Div({ className: 'alert alert-primary' }, [
+        HTML.Progress({max: 2, value: 1}),
+        ` Uploading ${files.length} file(s)`,
+      ]);
+
+      this.statusBar.append(alert);
+
+      API.post(`/api/posts/${this.postKey}/images/new`, { headers: {}, body: data })
+        .then(resp => resp.json())
+        .then(json => this.addNewImages(json))
+        .catch(this.showError(this.statusBar))
+        .finally(() => alert.remove());
+    }
+
+    addNewImages({ images }) {
+      let imagesList = document.getElementById('post-images-list');
+
+      if (!imagesList) {
+        // Clear content in case there was an error message present
+        this.postImages.innerHTML = null;
+        imagesList = this.createImagesList();
+      }
+
+      images.forEach(image => {
+        this.editor.summernote('insertImage', `/uploads/${image.filename}`)
+        this.appendImage(imagesList, image);
+        this.uploading--;
+      });
+    }
+  })();
+
+  page.fetchImages();
 })();

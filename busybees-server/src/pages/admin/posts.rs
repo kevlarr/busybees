@@ -1,11 +1,8 @@
 use busybees::{
-    store::{
-        images::PostImage,
-        posts::{AdminPostMeta, PostDetail, TitleSlug},
-    },
+    store::posts::{AdminPostMeta, PostDetail, TitleSlug},
     deps::sqlx::Error as SqlxError,
 };
-use crate::{asset_path, upload_path};
+use crate::asset_path;
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 pub struct Posts {
@@ -61,7 +58,6 @@ impl RenderOnce for PostItem {
 
 pub struct PostForm {
     pub post: PostDetail,
-    pub images: Vec<PostImage>,
 }
 
 impl RenderOnce for PostForm {
@@ -72,36 +68,15 @@ impl RenderOnce for PostForm {
             content,
             ..
         } = self.post;
-        let images = self.images;
 
         tmpl << html! {
             form(id = "editor-form", data-post-key = key) {
                 input(id = "post-title", name = "title", placeholder = "Title", autofocus = "true", value = title);
                 textarea(id = "summernote-editor", name = "content") : content;
 
-                @ if images.len() > 0 {
-                    label: "Select a preview image for the post";
-
-                    ul(id = "post-images") {
-                        @ for image in images {
-                            li {
-                                input(
-                                    type = "radio",
-                                    name = "previewImageId",
-                                    id = format!("preview-image-{}", image.image_id),
-                                    value = image.image_id,
-                                    checked? = image.is_preview,
-                                    hidden
-                                );
-                                label(for = format!("preview-image-{}", image.image_id)) {
-                                    img(
-                                        class = if image.is_preview {"post-image is-preview"} else {"post-image"},
-                                        src = upload_path(&image.filename)
-                                    )
-                                }
-                            }
-                        }
-                    }
+                fieldset {
+                    legend : "Cover Image";
+                    div(id = "post-images");
                 }
             }
 
@@ -112,6 +87,9 @@ impl RenderOnce for PostForm {
 
             script (src = "https://code.jquery.com/jquery-3.4.1.min.js");
             script (src = "https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js");
+
+            script (src = asset_path("modules/api.js"));
+            script (src = asset_path("modules/html.js"));
             script (src = asset_path("editor.js"));
         };
     }

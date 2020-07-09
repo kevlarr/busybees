@@ -4,7 +4,7 @@ use actix_web::web;
 use crate::{ApiResult, State};
 use busybees::{
     imaging,
-    store,
+    store::{self, images::PostImage}, 
     deps::{
         chrono::Utc,
         futures::StreamExt,
@@ -16,8 +16,32 @@ use std::io::Write;
 use std::path::Path;
 
 #[derive(Serialize)]
-pub struct UploadedImages {
-    srcpaths: Vec<String>,
+pub struct PostImages {
+    pub images: Vec<PostImage>,
+}
+
+#[derive(Serialize)]
+pub struct UploadResponse {
+    images: Vec<UploadedImage>,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UploadedImage {
+    filename: String,
+    thumbnail_filename: Option<String>,
+    image_id: i32
+}
+
+/// Retrieves uploaded images associated with the post matching
+/// the given key.
+pub async fn list(
+    path: web::Path<(String,)>,
+    state: web::Data<State>,
+) -> ApiResult<web::Json<PostImages>> {
+    let post_images = store::images::for_post(&state.pool, &path.0).await?;
+
+    Ok(web::Json(PostImages{ images: post_images }))
 }
 
 /// Streams each included image, saving each to the application upload path with
@@ -27,8 +51,8 @@ pub async fn upload(
     mut payload: Multipart,
     path: web::Path<(String,)>,
     state: web::Data<State>,
-) -> ApiResult<web::Json<UploadedImages>> {
-    let mut srcpaths = Vec::new();
+) -> ApiResult<web::Json<UploadResponse>> {
+    let mut images = Vec::new();
     let rgx = Regex::new(r"\s+")?;
 
     while let Some(item) = payload.next().await {
@@ -45,19 +69,23 @@ pub async fn upload(
             .map(|f| format!("{}.{}", timestamp, f))
             .ok_or_else(|| MultipartError::Incomplete)?;
 
-        srcpaths.push(format!("uploads/{}", filename));
-
         let filepath = format!("{}/{}", state.upload_path, filename);
         let filepath = Path::new(&filepath);
 
         save_file(&mut field, filepath).await?;
 
         let image = imaging::process(&filepath)?;
+        let image_id = store::images::create(&state.pool, &path.0, image.clone())
+            .await?;
 
-        store::images::create(&state.pool, &path.0, image).await?;
+        images.push(UploadedImage {
+            image_id,
+            filename: image.filename,
+            thumbnail_filename: image.thumbnail_filename,
+        });
     }
 
-    Ok(web::Json(UploadedImages { srcpaths }))
+    Ok(web::Json(UploadResponse { images }))
 }
 
 async fn save_file(field: &mut Field, filepath: &Path) -> Result<(), ActixError> {

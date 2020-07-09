@@ -6,6 +6,8 @@ use busybees::store::{self, posts::UpdatePostParams};
 use crate::{ApiResult, State};
 use serde::Deserialize;
 
+pub mod images;
+
 #[derive(Deserialize)]
 pub struct UpdatePublishedParams {
     published: bool,

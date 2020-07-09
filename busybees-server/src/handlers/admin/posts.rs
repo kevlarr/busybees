@@ -29,11 +29,11 @@ pub async fn new(state: Data<State>) -> ActixResult {
 }
 
 pub async fn edit(page: Page, path: Path<(String,)>, state: Data<State>) -> Page {
-    match store::posts::get_with_images(&state.pool, path.0.clone()).await {
-        Ok((post, images)) => page
+    match store::posts::get(&state.pool, path.0.clone()).await {
+        Ok(post) => page
             .id("PostForm")
             .title("Edit Post")
-            .content(PostForm { post, images }),
+            .content(PostForm { post }),
 
         Err(e) => {
             eprintln!("{}", e.to_string());
