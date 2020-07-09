@@ -74,7 +74,10 @@ impl RenderOnce for PostForm {
                 input(id = "post-title", name = "title", placeholder = "Title", autofocus = "true", value = title);
                 textarea(id = "summernote-editor", name = "content") : content;
 
-                fieldset(id = "post-images");
+                fieldset {
+                    legend : "Cover Image";
+                    div(id = "post-images");
+                }
             }
 
             p (id = "save-status") : "Saved";

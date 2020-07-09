@@ -15,6 +15,7 @@ pub struct Image {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PostImage {
     pub image_id: i32,
     pub filename: String,

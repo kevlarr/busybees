@@ -85,8 +85,7 @@
       this.postImages.innerHTML = null;
 
       if (!images || !images.length) {
-        this.postImages.innerText =
-          'Upload images to select a preview image for the post';
+        this.postImages.innerText = 'No images have been uploaded.';
 
         return;
       }
@@ -109,7 +108,7 @@
             htmlFor: `image-${image.imageId}`,
           }, [
             HTML.Img({
-              className: 'post-image',
+              className: image.isPreview ? 'post-image is-preview' : 'post-image',
               src: `/uploads/${image.thumbnailFilename || image.filename}`,
               events: {
                 click: (/* event */) => this.scheduleSave(50),
@@ -213,10 +212,9 @@
         this.uploading++;
       }
 
-      let filenames = Array.from(files).map(f => f.name).join(', ');
       let alert = HTML.Div({ className: 'alert alert-primary' }, [
         HTML.Progress({max: 2, value: 1}),
-        `Uploading ${filenames}`,
+        ` Uploading ${files.length} file(s)`,
       ]);
 
       this.statusBar.append(alert);
