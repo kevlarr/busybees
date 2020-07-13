@@ -1,4 +1,4 @@
-use busybees::store::posts::{PostMeta, TitleSlug};
+use busybees::store::posts::{PostMeta, PostLink};
 use crate::upload_path;
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
@@ -15,10 +15,7 @@ impl RenderOnce for Home {
             Some(preview) => {
                 tmpl << html! {
                     section (id = "PrimaryPost") {
-                        a (
-                            href = format!("/posts/{}/read/{}", preview.key, preview.title_slug()),
-                            class = "primary post-link"
-                        ) {
+                        a (href = preview.href(), class = "primary post-link") {
                             preview (type = "primary") {
                                 img (src = match &preview.preview_image_filename {
                                     Some(s) => upload_path(s),
@@ -39,10 +36,7 @@ impl RenderOnce for Home {
 
                     section (id = "SecondaryPosts") {
                         @ for preview in posts {
-                            a (
-                                href = format!("/posts/{}/read/{}", preview.key, preview.title_slug()),
-                                class = "secondary post-link"
-                            ) {
+                            a (href = preview.href(), class = "secondary post-link") {
                                 preview (type = "secondary") {
                                     img (src = match &preview.preview_image_filename {
                                         Some(s) => upload_path(s),

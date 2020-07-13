@@ -487,17 +487,13 @@ main#Post post-meta {
 }
 
 post-controls {
-    align-items: center;
-    background: #585650;
+    border-bottom: 1px solid #585650;
     color: #BFBBB4;
     display: flex;
     height: 65px;
     justify-content: space-between;
-    left: 0;
     margin-bottom: 20px;
     padding: 10px 20px;
-    position: absolute;
-    top: 0;
     width: 100%;
 }
 
@@ -510,11 +506,11 @@ a.icon-link {
     border: 0;
     color: white;
     font-size: 14px;
-    /*font-weight: 600;*/
 }
 
-a.icon-link .fa {
-    color: #BFBBB4;
+a.icon-link .icon {
+    background-color: #FFF;
+    padding: 2px;
     width: 1.05em;
 }
 
@@ -590,12 +586,70 @@ main#PostForm {
     transition: transform 0.1s;
 }
 
-#PostForm #save-status {
+#PostForm #form-meta {
     font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#PostForm #save-status-text {
     font-style: italic;
     margin: 0;
-    text-align: right;
+    margin-right: 10px;
 }
+
+/* The loading spinner with keyframes */
+
+#save-status .spinner {
+    animation: rotator 1.4s linear infinite;
+    display: none;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+@keyframes rotator {
+      0% { transform: rotate(0deg); }
+    100% { transform: rotate(270deg); }
+}
+
+.spinner-path {
+    /* These are accessible on the keyframes as well */
+    --dasharray: 185;
+    --duration: 1.4s;
+}
+
+.spinner-path {
+    stroke-dasharray: var(--dasharray);
+    stroke-dashoffset: 0;
+    transform-origin: center;
+    animation:
+        dash var(--duration) ease-in-out infinite,
+        colors calc(var(--duration) * 4) ease-in-out infinite;
+}
+
+@keyframes colors {
+      0% { stroke: #4285F4; }
+     25% { stroke: #DE3E35; }
+     50% { stroke: #F7C223; }
+     75% { stroke: #1B9A59; }
+    100% { stroke: #4285F4; }
+}
+
+@keyframes dash {
+      0% {
+        stroke-dashoffset: var(--dasharray);
+    }
+     50% {
+        stroke-dashoffset: 45;
+        transform:rotate(135deg);
+    }
+    100% {
+        stroke-dashoffset: var(--dasharray);
+        transform:rotate(450deg);
+    }
+}
+
+/* The form fields */
 
 input {
     line-height: 1.25em;
@@ -679,6 +733,14 @@ input:focus, input:active,
 
 .note-modal-footer {
     box-sizing: content-box;
+}
+
+.note-float-left {
+    margin-right: 10px;
+}
+
+.note-float-right {
+    margin-left: 10px;
 }
 
 

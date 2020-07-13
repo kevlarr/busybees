@@ -1,9 +1,9 @@
 use busybees::{
-    store::posts::{AdminPostMeta, PostDetail, TitleSlug},
+    store::posts::{AdminPostMeta, PostDetail, PostLink},
     deps::sqlx::Error as SqlxError,
 };
 use crate::asset_path;
-use horrorshow::{html, RenderOnce, TemplateBuffer};
+use horrorshow::{html, Raw, RenderOnce, TemplateBuffer};
 
 pub struct Posts {
     pub posts: Result<Vec<AdminPostMeta>, SqlxError>,
@@ -48,7 +48,7 @@ impl RenderOnce for PostItem {
                     data-post-key = &post.key
                 );
 
-                a (class = "admin-post-title", href = format!("/posts/{}/read/{}", &post.key, post.title_slug())) {
+                a (class = "admin-post-title", href = post.href()) {
                     h2 : &post.title;
                 }
             }
@@ -62,17 +62,10 @@ pub struct PostForm {
 
 impl RenderOnce for PostForm {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
-        let PostDetail {
-            key,
-            title,
-            content,
-            ..
-        } = self.post;
-
         tmpl << html! {
-            form(id = "editor-form", data-post-key = key) {
-                input(id = "post-title", name = "title", placeholder = "Title", autofocus = "true", value = title);
-                textarea(id = "summernote-editor", name = "content") : content;
+            form(id = "editor-form", data-post-key = &self.post.key) {
+                input(id = "post-title", name = "title", placeholder = "Title", autofocus = "true", value = &self.post.title);
+                textarea(id = "summernote-editor", name = "content") : &self.post.content;
 
                 fieldset {
                     legend : "Cover Image";
@@ -80,7 +73,15 @@ impl RenderOnce for PostForm {
                 }
             }
 
-            p (id = "save-status") : "Saved";
+            div (id = "form-meta") {
+                div (id = "save-status") {
+                    span (id = "save-status-text") : "Saved";
+                    svg (class = "spinner", width = "15px", height = "15px", viewBox="0 0 66 66") {
+                        circle (class="spinner-path", fill="none", stroke-width="6", stroke-linecap="round", cx="33", cy="33", r="30");
+                    }
+                }
+                a (id = "preview-link", href = self.post.href()) : Raw("View post &rarr;");
+            }
 
             // WYSIWYG editor
             link (rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");

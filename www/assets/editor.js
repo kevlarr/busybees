@@ -11,7 +11,9 @@
 
       this.form = document.getElementById('editor-form');
       this.postImages = document.getElementById('post-images');
-      this.saveStatus = document.getElementById('save-status');
+
+      this.saveStatusSpinner = document.querySelector('#save-status .spinner');
+      this.saveStatusText = document.getElementById('save-status-text');
 
       // Need to use jquery for the editor node
       this.editor = $('#summernote-editor');
@@ -50,19 +52,26 @@
     }
 
     markUnsaved() {
+      this.showSpinner(false);
       this.setSaveStatus('Unsaved');
     }
 
     markSaving() {
-      this.setSaveStatus('Saving...');
+      this.showSpinner(true);
+      this.setSaveStatus('Saving');
     }
 
     markSaved() {
+      this.showSpinner(false);
       this.setSaveStatus('Saved');
     }
 
+    showSpinner(bool) {
+      this.saveStatusSpinner.style.display = bool ? "initial" : "none";
+    }
+
     setSaveStatus(status) {
-      this.saveStatus.innerText = status;
+      this.saveStatusText.innerText = status;
     }
 
     createImagesList() {
@@ -172,33 +181,39 @@
     save() {
       this.markSaving();
 
-      const linkedUploads = this.extractUploaded();
+      // As weird as this is, the endpoint is so fast that there's no
+      // real feedback (ie. the loading spinner doesn't really shows up)
+      // so add a delay after marking it as saving to make it obvious on
+      // the page that something is happening.
+      window.setTimeout(() => {
+        const linkedUploads = this.extractUploaded();
 
-      let previewImageRadio = document.querySelector('input[name=previewImageId]:checked');
-      let previewImageId = previewImageRadio ?
-        Number(previewImageRadio.value) :
-        null;
+        let previewImageRadio = document.querySelector('input[name=previewImageId]:checked');
+        let previewImageId = previewImageRadio ?
+          Number(previewImageRadio.value) :
+          null;
 
-      API.patch(`/api/posts/${this.postKey}`, {
-        expect: 204,
-        body: {
-          post: {
-            title: this.postTitle.value,
-            content: this.form['summernote-editor'].value,
+        API.patch(`/api/posts/${this.postKey}`, {
+          expect: 204,
+          body: {
+            post: {
+              title: this.postTitle.value,
+              content: this.form['summernote-editor'].value,
+            },
+            previewImageId,
+            linkedUploads,
           },
-          previewImageId,
-          linkedUploads,
-        },
-      })
-        .then(() => {
-          this.postImages.innerHTML = null;
-          return this.fetchImages();
         })
-        .then(() => this.markSaved())
-        .catch(err => {
-          this.markUnsaved();
-          window.alert(JSON.stringify(err));
-        });
+          .then(() => {
+            this.postImages.innerHTML = null;
+            return this.fetchImages();
+          })
+          .then(() => this.markSaved())
+          .catch(err => {
+            this.markUnsaved();
+            window.alert(JSON.stringify(err));
+          });
+      }, 1000);
     }
 
     uploadImages(files) {

@@ -122,11 +122,6 @@ impl RenderOnce for Page {
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Dancing+Script:wght@600&display=swap");
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Work+Sans:300,300i,400,600&display=swap");
                     link(rel = "stylesheet", type = "text/css", href = "https://fonts.googleapis.com/css?family=Cormorant+Garamond:400&display=swap");
-
-                    // Font Awesome assets are ~80kb - not huge but no reason to include for non-admins
-                    @ if user.is_some() {
-                        script (src = "https://use.fontawesome.com/195e7e8d92.js");
-                    }
                 }
 
                 body {
@@ -143,19 +138,19 @@ impl RenderOnce for Page {
                                 ul (id = "AdminLinks") {
                                     li {
                                         a (class = "icon-link", href = "/admin/posts") {
-                                            i (class = "fa fa-th-list");
+                                            img (class = "icon", src = "/public/images/layers.svg");
                                             : " Manage Posts";
                                         }
                                     }
                                     li {
                                         a (class = "icon-link", href = "/admin/posts/new") {
-                                            i (class = "fa fa-file-text-o");
+                                            img (class = "icon", src = "/public/images/file-plus.svg");
                                             : " New Post";
                                         }
                                     }
                                     li {
                                         a (class = "icon-link", href = "/auth/clear") {
-                                            i (class = "fa fa-lock");
+                                            img (class = "icon", src = "/public/images/log-out.svg");
                                             : " Sign Out";
                                         }
                                     }

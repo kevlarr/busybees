@@ -29,11 +29,11 @@ impl RenderOnce for PostView {
                     );
                     post-changes {
                         a (class = "icon-link", href = format!("/admin/posts/edit/{}", key)) {
-                            i (class = "fa fa-pencil-square-o");
+                            img (class = "icon", src = "/public/images/edit.svg");
                             : " Edit";
                         }
                         a (class = "icon-link", href = format!("/admin/posts/delete/{}", key)) {
-                            i (class = "fa fa-trash-o");
+                            img (class = "icon", src = "/public/images/trash-2.svg");
                             : " Delete";
                         }
                     }
