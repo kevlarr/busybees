@@ -1,0 +1,212 @@
+/*
+ * Styles for page template elements
+ */
+
+html {
+    background: white;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+@media screen and (min-width: 50em) {
+    body {
+        flex-direction: row-reverse;
+        height: 100%;
+    }
+}
+
+main {
+    background: white;
+    box-shadow: 0 0 20px 5px #999;
+    display: flex;
+    flex: 4;
+    flex-direction: column;
+    overflow: scroll;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+@media screen and (min-width: 70em) {
+    main {
+        flex: 3;
+        padding: 45px 65px;
+    }
+}
+
+main-nav {
+    background-image: url('/public/images/hive-gs-rot.svg');
+    background-size: cover;
+    display: flex;
+    flex: 2;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 0;
+}
+
+main-nav footer {
+    display: none;
+}
+
+@media screen and (min-width: 70em) {
+    main-nav {
+        flex: 1;
+    }
+}
+
+@media screen and (min-width: 50em) {
+    main-nav footer {
+        display: block;
+    }
+}
+
+main-nav > header summary {
+    font-size: 14px;
+    padding: 10px;
+}
+
+bio {
+    align-items: center;
+    display: flex;
+}
+
+bio > snapshot {
+    padding: 5px;
+}
+
+bio > snapshot img {
+    align-self: flex-start;
+    border-radius: 50%;
+    max-width: 25vw;
+}
+
+@media screen and (min-width: 50em) {
+    bio {
+        display: block;
+    }
+    bio > snapshot {
+        align-items: center;
+        display: flex;
+        padding: 15px 5px;
+    }
+
+    bio > snapshot img {
+        max-height: 20vh;
+    }
+}
+
+bio > snapshot dl {
+    display: none;
+}
+
+@media screen and (min-width: 50em) {
+    bio > summary small-display {
+        display: none;
+    }
+
+    bio > snapshot dl {
+        display: block;
+    }
+}
+
+bio > snapshot dl {
+    padding: 0px 5px 0 10px;
+}
+
+bio > snapshot > dl dt {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+bio > snapshot > dl div:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+bio > snapshot > dl dd {
+    font-size: 12px;
+}
+
+bio > snapshot > dl dd a {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+bio > snapshot > dl dd a,
+bio > snapshot > dl dd a:visited {
+    color: var(--color-text);
+}
+
+bio > snapshot > dl dd a:hover {
+    color: var(--color-blue);
+}
+
+bio > snapshot dd a img {
+    margin-right: 0.25em;
+    transform: translatey(-1px);
+    vertical-align: middle;
+    width: 1em;
+}
+
+main-nav > section {
+    flex: 1;
+}
+
+media-links {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 30px;
+    transition: transform 0.05s;
+}
+
+media-links a:hover {
+    transform: scale(1.1);
+    transition: transform 0.05s;
+}
+
+media-links img {
+    background: white;
+    border-radius: 50%;
+    width: 32px;
+}
+
+main-nav > footer {
+    margin: 0;
+    padding: 15px 25px;
+    background: white;
+}
+
+logotype a,
+logotype a:active,
+logotype a:focus,
+logotype a:hover,
+logotype a:visited {
+    border: 0;
+    color: white;
+    display: block;
+}
+
+logotype a {
+    background-image: url('/public/images/header-bee-gold.jpg');
+    background-position: right;
+    background-size: cover;
+    font-family: 'Dancing Script', cursive;
+    font-size: 36px;
+    padding: 0px 10px 10px 20px;
+    z-index: 1;
+}
+
+logotype img#Logo {
+    height: 1.2em;
+    transform: rotate(5deg) translate(2px, 10px);
+}
+
+ul#AdminLinks {
+    background: rgba(88, 86, 80, .75);
+    list-style-type: none;
+    margin: 0;
+    padding: 15px 15px 15px 30px;
+}
