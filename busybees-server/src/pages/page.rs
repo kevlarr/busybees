@@ -191,23 +191,31 @@ impl RenderOnce for Page {
 
                     @ if user.is_some() {
                         nav (id = "adminNav") {
-                            ul (id = "adminLinks") {
+                            ul {
                                 li {
-                                    a (class = "icon-link", href = "/admin/posts") {
-                                        img (class = "icon", src = "/public/images/layers.svg");
-                                        : " Manage Posts";
+                                    a (href = "/admin/posts") {
+                                        img (
+                                            src = "/public/images/layers.svg",
+                                            title = "Manage Posts"
+                                        );
                                     }
                                 }
                                 li {
-                                    a (class = "icon-link", href = "/admin/posts/new") {
-                                        img (class = "icon", src = "/public/images/file-plus.svg");
-                                        : " New Post";
+                                    a (href = "/admin/posts/new") {
+                                        img (
+                                            src = "/public/images/file-plus.svg",
+                                            title = "New Post"
+                                        );
                                     }
                                 }
+                            }
+                            ul {
                                 li {
-                                    a (class = "icon-link", href = "/auth/clear") {
-                                        img (class = "icon", src = "/public/images/log-out.svg");
-                                        : " Sign Out";
+                                    a (href = "/auth/clear") {
+                                        img (
+                                            src = "/public/images/log-out.svg",
+                                            title = "Sign Out"
+                                        );
                                     }
                                 }
                             }

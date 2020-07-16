@@ -2,6 +2,7 @@
  * Styles for page template elements
  */
 @import 'page/main-nav.css';
+@import 'page/admin-nav.css';
 @import 'page/bio.css';
 
 body {
@@ -82,13 +83,4 @@ main {
 #logotype img {
     height: 1.2em;
     transform: rotate(5deg) translate(2px, 10px);
-}
-
-#AdminLinks {
-    /*background: rgba(88, 86, 80, .75);*/
-    background: var(--color-gold);
-    background: #333;
-    list-style-type: none;
-    margin: 0;
-    padding: 15px 15px 15px 30px;
 }
