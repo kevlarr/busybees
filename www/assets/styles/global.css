@@ -23,6 +23,10 @@
     padding: 0;
 }
 
+html {
+    height: 100%;
+}
+
 p, ol, ul {
     margin-bottom: 1.5em;
     padding-left: 20px;
