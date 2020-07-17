@@ -21,7 +21,18 @@ pub async fn get_post(page: Page, path: Path<(String, String)>, state: Data<Stat
             .id("Post")
             .title(post.title.clone())
             .image(post.preview_image_filename.clone())
-            .content(PostView { auth, post }),
+            .content(PostView { auth, post })
+            .admin_links(vec![
+                (
+                    format!("/admin/posts/edit/{}", path.0),
+                    "/public/images/edit.svg".into(),
+                    "Edit Post".into(),
+                ), (
+                    format!("/admin/posts/delete/{}", path.0),
+                    "/public/images/x-square.svg".into(),
+                    "Delete Post".into(),
+                ),
+            ]),
 
         Err(_) => not_found(page).await,
     }

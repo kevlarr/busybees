@@ -34,23 +34,9 @@ post-status[type="published"]::before {
     content: "public";
 }
 
-post-controls {
-    background-color: var(--color-gray-dark);
-    display: flex;
-    height: 65px;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    padding: 10px 20px;
-    width: 100%;
-}
-
-post-controls post-status::before {
-    box-shadow: 0 0 10px 0 var(--color-gray-dark);
-    margin-right: 20px;
-}
-
-post-controls post-changes a:not(:last-child) {
-    margin-right: 20px;
+post-status::before {
+    box-shadow: 0 0 5px 0 var(--color-gray-light);
+    margin-right: 10px;
 }
 
 /*
@@ -108,9 +94,9 @@ main#PostForm {
     transition: transform 0.1s;
 }
 
-#post-images img:hover,
-#post-images img:focus {
-    transform: scale(1.2);
+#post-images .post-image:hover,
+#post-images .post-image:focus {
+    transform: scale(2.5);
     transition: transform 0.1s;
 }
 

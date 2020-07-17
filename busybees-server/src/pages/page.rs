@@ -8,6 +8,7 @@ use horrorshow::{helper::doctype, html, Raw, RenderOnce, Template, TemplateBuffe
 
 pub struct Page {
     pub user: Option<AuthorWithoutPassword>,
+    admin_links: Option<Vec<(String, String, String)>>,
     content: Option<String>,
     main_id: Option<String>,
     og_image: Option<String>,
@@ -20,6 +21,7 @@ impl Page {
         Page {
             url,
             user,
+            admin_links: None,
             content: None,
             main_id: None,
             og_image: None,
@@ -27,13 +29,13 @@ impl Page {
         }
     }
 
-    pub fn content(mut self, content: impl RenderOnce) -> Self {
-        self.content = Some(content.into_string().unwrap_or_else(|e| e.to_string()));
+    pub fn admin_links(mut self, links: Vec<(String, String, String)>) -> Self {
+        self.admin_links = Some(links);
         self
     }
 
-    pub fn title(mut self, title: impl Into<String>) -> Self {
-        self.title = Some(title.into());
+    pub fn content(mut self, content: impl RenderOnce) -> Self {
+        self.content = Some(content.into_string().unwrap_or_else(|e| e.to_string()));
         self
     }
 
@@ -46,6 +48,11 @@ impl Page {
         if let Some(i) = image {
             self.og_image = Some(i.into());
         }
+        self
+    }
+
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.title = Some(title.into());
         self
     }
 }
@@ -78,6 +85,7 @@ impl FromRequest for Page {
 impl RenderOnce for Page {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         let Page {
+            admin_links,
             content,
             main_id,
             og_image,
@@ -206,6 +214,17 @@ impl RenderOnce for Page {
                                             src = "/public/images/file-plus.svg",
                                             title = "New Post"
                                         );
+                                    }
+                                }
+                            }
+                            @ if let Some(links) = admin_links {
+                                ul {
+                                    @ for (href, src, title) in links {
+                                        li {
+                                            a (href = href) {
+                                                img (src = src, title = title);
+                                            }
+                                        }
                                     }
                                 }
                             }
