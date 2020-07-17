@@ -2,7 +2,10 @@ use actix_web::{
     web::{Data, Path},
     HttpResponse,
 };
-use busybees::store::{self, posts::PostParams};
+use busybees::store::{
+    self,
+    posts::{PostParams, PostLink},
+};
 use crate::{
     handlers::not_found,
     pages::admin::{PostForm, Posts},
@@ -30,10 +33,24 @@ pub async fn new(state: Data<State>) -> ActixResult {
 
 pub async fn edit(page: Page, path: Path<(String,)>, state: Data<State>) -> Page {
     match store::posts::get(&state.pool, path.0.clone()).await {
-        Ok(post) => page
-            .id("PostForm")
-            .title("Edit Post")
-            .content(PostForm { post }),
+        Ok(post) => {
+            let href = post.href();
+
+            page.id("PostForm")
+                .title("Edit Post")
+                .content(PostForm { post })
+                .admin_links(vec![
+                    (
+                        href,
+                        "/public/images/file-text.svg".into(),
+                        "Preview Post".into(),
+                    ), (
+                        format!("/admin/posts/delete/{}", path.0),
+                        "/public/images/x-square.svg".into(),
+                        "Delete Post".into(),
+                    ),
+                ])
+        },
 
         Err(e) => {
             eprintln!("{}", e.to_string());

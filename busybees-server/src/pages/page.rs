@@ -199,36 +199,38 @@ impl RenderOnce for Page {
 
                     @ if user.is_some() {
                         nav (id = "adminNav") {
-                            ul {
-                                li {
-                                    a (href = "/admin/posts") {
-                                        img (
-                                            src = "/public/images/layers.svg",
-                                            title = "Manage Posts"
-                                        );
-                                    }
-                                }
-                                li {
-                                    a (href = "/admin/posts/new") {
-                                        img (
-                                            src = "/public/images/file-plus.svg",
-                                            title = "New Post"
-                                        );
-                                    }
-                                }
-                            }
-                            @ if let Some(links) = admin_links {
+                            div {
                                 ul {
-                                    @ for (href, src, title) in links {
-                                        li {
-                                            a (href = href) {
-                                                img (src = src, title = title);
+                                    li {
+                                        a (href = "/admin/posts") {
+                                            img (
+                                                src = "/public/images/layers.svg",
+                                                title = "Manage Posts"
+                                            );
+                                        }
+                                    }
+                                    li {
+                                        a (href = "/admin/posts/new") {
+                                            img (
+                                                src = "/public/images/file-plus.svg",
+                                                title = "New Post"
+                                            );
+                                        }
+                                    }
+                                }
+                                @ if let Some(links) = admin_links {
+                                    ul {
+                                        @ for (href, src, title) in links {
+                                            li {
+                                                a (href = href) {
+                                                    img (src = src, title = title);
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
-                            ul {
+                            ul (id = "signOut") {
                                 li {
                                     a (href = "/auth/clear") {
                                         img (

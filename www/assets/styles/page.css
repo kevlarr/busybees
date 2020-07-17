@@ -66,7 +66,7 @@ main {
 #logotype a:hover,
 #logotype a:visited {
     border: 0;
-    color: white;
+    color: #fff;
     display: block;
 }
 
