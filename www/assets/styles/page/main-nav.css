@@ -1,0 +1,32 @@
+#mainNav {
+    background-image: url('/public/images/hive-gs-rot.svg');
+    background-size: cover;
+    display: flex;
+    flex: 2;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 0;
+}
+
+@media screen and (min-width: 70em) {
+    #mainNav {
+        flex: 1;
+    }
+}
+
+#mainNav > section {
+    flex: 1;
+}
+
+#mainNav > footer {
+    display: none;
+    margin: 0;
+    padding: 15px 25px;
+    background: white;
+}
+
+@media screen and (min-width: 50em) {
+    #mainNav > footer {
+        display: block;
+    }
+}

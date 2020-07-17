@@ -1,0 +1,148 @@
+/*
+ * Global variables
+ */
+
+:root {
+    --color-text: #504B40;
+    --color-text-light: #868178;
+    --color-gold: #B98100;
+    --color-gold-light: #F0A200;
+    --color-blue: #005D8F;
+    --color-gray-mid: #BFBBB4;
+    --color-gray-light: #E3E0DB;
+    --color-gray-dark: #958E81;
+}
+
+/*
+ * Resets and standardization
+ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+}
+
+p, ol, ul {
+    margin-bottom: 1.5em;
+    padding-left: 20px;
+}
+
+ol, ul {
+    margin-left: 20px;
+}
+
+body, input {
+    color: var(--color-text);
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    line-height: 1.15em;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+h1 { font-size: 40px; }
+h2 { font-size: 28px; }
+h3 { font-size: 24px; }
+h4 { font-size: 22px; }
+h5 { font-size: 20px; }
+h6 { font-size: 18px; }
+
+p, ol, ul {
+    line-height: 1.5em;
+}
+
+strong {
+    font-weight: 600;
+}
+
+footer {
+    font-size: 12px;
+}
+
+/*
+ * Default link and button styles
+ */
+
+a, button:not([disabled]) {
+    cursor: pointer;
+}
+
+a {
+    color: var(--color-gold);
+    font-weight: 400;
+    text-decoration: none;
+}
+
+a, a:hover, a:active, a:focus, a:visited {
+    transition: color 0.1s;
+}
+
+a:hover, a:active, a:focus {
+    color: var(--color-blue);
+}
+
+button,
+button:hover,
+button:focus,
+button:active,
+button.note-btn,
+button.note-btn.focus,
+button.note-btn.active,
+button.note-btn:hover,
+button.note-btn:focus,
+button.note-btn:active {
+    border: 0;
+    color: white;
+    transition: background-color 0.1s, scale 0.05s;
+}
+
+button, button.note-btn {
+    background-color: var(--color-gray-mid);
+    border: 0;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 16px;
+}
+
+button[disabled] {
+    background-color: var(--color-gray-light);
+}
+
+button:not(.note-btn) {
+    font-weight: 600;
+    margin: 0 10px;
+    padding: 10px 20px;
+}
+
+button:not([disabled]):active {
+    transform: scale(0.95);
+}
+
+button.note-btn {
+    font-size: 12px;
+}
+
+button.note-btn:not([disabled]):active {
+    transform: scale(0.9);
+}
+
+button:not([disabled]):active,
+button:not([disabled]):focus,
+button:not([disabled]):hover,
+button.note-btn.active,
+button.note-btn.focus,
+button.note-btn:active,
+button.note-btn:focus,
+button.note-btn:hover {
+    background-color: var(--color-gray-dark);
+}

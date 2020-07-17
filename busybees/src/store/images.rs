@@ -67,6 +67,7 @@ pub async fn for_post(pool: &PgPool, post_key: &str) -> StoreResult<Vec<PostImag
         join image on image.id = post_image.image_id
         join post on post.id = post_image.post_id
         where post.key = $1
+        order by image_id
         ",
         post_key
     ).fetch_all(pool).await

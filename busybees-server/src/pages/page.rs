@@ -8,6 +8,7 @@ use horrorshow::{helper::doctype, html, Raw, RenderOnce, Template, TemplateBuffe
 
 pub struct Page {
     pub user: Option<AuthorWithoutPassword>,
+    admin_links: Option<Vec<(String, String, String)>>,
     content: Option<String>,
     main_id: Option<String>,
     og_image: Option<String>,
@@ -20,6 +21,7 @@ impl Page {
         Page {
             url,
             user,
+            admin_links: None,
             content: None,
             main_id: None,
             og_image: None,
@@ -27,13 +29,13 @@ impl Page {
         }
     }
 
-    pub fn content(mut self, content: impl RenderOnce) -> Self {
-        self.content = Some(content.into_string().unwrap_or_else(|e| e.to_string()));
+    pub fn admin_links(mut self, links: Vec<(String, String, String)>) -> Self {
+        self.admin_links = Some(links);
         self
     }
 
-    pub fn title(mut self, title: impl Into<String>) -> Self {
-        self.title = Some(title.into());
+    pub fn content(mut self, content: impl RenderOnce) -> Self {
+        self.content = Some(content.into_string().unwrap_or_else(|e| e.to_string()));
         self
     }
 
@@ -46,6 +48,11 @@ impl Page {
         if let Some(i) = image {
             self.og_image = Some(i.into());
         }
+        self
+    }
+
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.title = Some(title.into());
         self
     }
 }
@@ -78,6 +85,7 @@ impl FromRequest for Page {
 impl RenderOnce for Page {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
         let Page {
+            admin_links,
             content,
             main_id,
             og_image,
@@ -125,47 +133,24 @@ impl RenderOnce for Page {
                 }
 
                 body {
-                    main-nav {
+                    nav (id = "mainNav") {
                         header {
-                            logotype {
+                            div (id = "logotype") {
                                 a (href = "/") {
-                                    img (id = "Logo", src = "/public/images/b-logo-white.svg");
+                                    img (src = "/public/images/b-logo-white.svg");
                                     : "usy bee life";
                                 }
                             }
-
-                            @ if user.is_some() {
-                                ul (id = "AdminLinks") {
-                                    li {
-                                        a (class = "icon-link", href = "/admin/posts") {
-                                            img (class = "icon", src = "/public/images/layers.svg");
-                                            : " Manage Posts";
-                                        }
-                                    }
-                                    li {
-                                        a (class = "icon-link", href = "/admin/posts/new") {
-                                            img (class = "icon", src = "/public/images/file-plus.svg");
-                                            : " New Post";
-                                        }
-                                    }
-                                    li {
-                                        a (class = "icon-link", href = "/auth/clear") {
-                                            img (class = "icon", src = "/public/images/log-out.svg");
-                                            : " Sign Out";
-                                        }
-                                    }
-                                }
-                            }
-                            bio {
-                                snapshot {
+                            div (id = "bio") {
+                                div (id = "bioSnapshot") {
                                     img (src = "/public/images/pose-crop.jpg");
                                     dl {
                                         div { dt : "Stacey"; dd : "Attorney"; }
                                         div { dt : "Kevin"; dd : "Software Engineer"; }
                                     }
                                 }
-                                summary {
-                                    small-display {
+                                p (id = "bioSummary") {
+                                    span (id = "bioSummaryNames") {
                                         strong: "Stacey";
                                         : " (attorney) and ";
                                         strong: "Kevin";
@@ -181,15 +166,21 @@ impl RenderOnce for Page {
                             // Author links, tags, etc.
                         }
 
-                        media-links {
-                            a (aria-label = "Visit busy bee life on Facebook", href = "https://www.facebook.com/ourbusybeelife/", target = "_blank", rel = "noreferrer noopener") {
-                                img (src = "/public/images/f_logo_RGB-Blue_1024.svg", alt = "facebook logo");
+                        ul (id = "mediaLinks") {
+                            li {
+                                a (aria-label = "Visit busy bee life on Facebook", href = "https://www.facebook.com/ourbusybeelife/", target = "_blank", rel = "noreferrer noopener") {
+                                    img (src = "/public/images/f_logo_RGB-Blue_1024.svg", alt = "facebook logo");
+                                }
                             }
-                            a (aria-label = "Visit busy bee life on Twitter", href = "https://twitter.com/busy_bee_life", target = "_blank", rel = "noreferrer noopener") {
-                                img (src = "/public/images/Twitter_Logo_WhiteOnBlue.svg", alt = "twitter logo");
+                            li {
+                                a (aria-label = "Visit busy bee life on Twitter", href = "https://twitter.com/busy_bee_life", target = "_blank", rel = "noreferrer noopener") {
+                                    img (src = "/public/images/Twitter_Logo_WhiteOnBlue.svg", alt = "twitter logo");
+                                }
                             }
-                            a (aria-label = "View source code on GitHub", href = "https://github.com/kevlarr/busybees", target = "_blank", rel = "noreferrer noopener") {
-                                img (src = "/public/images/GitHub-Mark.svg", alt = "github logo");
+                            li {
+                                a (aria-label = "View source code on GitHub", href = "https://github.com/kevlarr/busybees", target = "_blank", rel = "noreferrer noopener") {
+                                    img (src = "/public/images/GitHub-Mark.svg", alt = "github logo");
+                                }
                             }
                         }
 
@@ -204,7 +195,53 @@ impl RenderOnce for Page {
                         }
                     }
 
-                    main(id = main_id) : Raw(if let Some(c) = content { c } else { String::new() });
+                    main (id = main_id) : Raw(if let Some(c) = content { c } else { String::new() });
+
+                    @ if user.is_some() {
+                        nav (id = "adminNav") {
+                            div {
+                                ul {
+                                    li {
+                                        a (href = "/admin/posts") {
+                                            img (
+                                                src = "/public/images/layers.svg",
+                                                title = "Manage Posts"
+                                            );
+                                        }
+                                    }
+                                    li {
+                                        a (href = "/admin/posts/new") {
+                                            img (
+                                                src = "/public/images/file-plus.svg",
+                                                title = "New Post"
+                                            );
+                                        }
+                                    }
+                                }
+                                @ if let Some(links) = admin_links {
+                                    ul {
+                                        @ for (href, src, title) in links {
+                                            li {
+                                                a (href = href) {
+                                                    img (src = src, title = title);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            ul (id = "signOut") {
+                                li {
+                                    a (href = "/auth/clear") {
+                                        img (
+                                            src = "/public/images/log-out.svg",
+                                            title = "Sign Out"
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         };

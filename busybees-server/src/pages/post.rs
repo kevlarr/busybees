@@ -21,27 +21,14 @@ impl RenderOnce for PostView {
         } = self.post;
 
         tmpl << html! {
-            @ if auth {
-                post-controls {
+            h1 : title;
+            post-meta {
+                @ if auth {
                     post-status (
                         type = if published { "published" } else { "unlisted" },
                         data-post-key = &key
                     );
-                    post-changes {
-                        a (class = "icon-link", href = format!("/admin/posts/edit/{}", key)) {
-                            img (class = "icon", src = "/public/images/edit.svg");
-                            : " Edit";
-                        }
-                        a (class = "icon-link", href = format!("/admin/posts/delete/{}", key)) {
-                            img (class = "icon", src = "/public/images/trash-2.svg");
-                            : " Delete";
-                        }
-                    }
                 }
-            }
-
-            h1 : title;
-            post-meta {
                 @ if let Some(name) = author {
                     : "by ";
                     post-author : name;

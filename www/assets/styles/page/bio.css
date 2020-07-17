@@ -1,0 +1,84 @@
+#bio {
+    align-items: center;
+    display: flex;
+}
+
+#bio #bioSnapshot {
+    padding: 5px;
+}
+
+#bio #bioSnapshot img {
+    align-self: flex-start;
+    border-radius: 50%;
+    max-width: 25vw;
+}
+
+@media screen and (min-width: 50em) {
+    #bio {
+        display: block;
+    }
+
+    #bio #bioSnapshot {
+        align-items: center;
+        display: flex;
+        padding: 15px 5px;
+    }
+
+    #bio #bioSnapshot img {
+        max-height: 20vh;
+    }
+}
+
+#bio #bioSnapshot dl {
+    display: none;
+    padding: 0px 5px 0 10px;
+}
+
+@media screen and (min-width: 50em) {
+    #bio #bioSummaryNames {
+        display: none;
+    }
+
+    #bio #bioSnapshot dl {
+        display: block;
+    }
+}
+
+#bio #bioSnapshot dl dt {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#bio #bioSnapshot dl div:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+#bio #bioSnapshot dl dd {
+    font-size: 12px;
+}
+
+#bio #bioSnapshot dl dd a {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#bio #bioSnapshot dl dd a,
+#bio #bioSnapshot dl dd a:visited {
+    color: var(--color-text);
+}
+
+#bio #bioSnapshot dl dd a:hover {
+    color: var(--color-blue);
+}
+
+#bio #bioSnapshot dd a img {
+    margin-right: 0.25em;
+    transform: translatey(-1px);
+    vertical-align: middle;
+    width: 1em;
+}
+
+#bio #bioSummary {
+    font-size: 14px;
+    padding: 10px;
+}
