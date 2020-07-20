@@ -29,11 +29,9 @@ impl RenderOnce for PostView {
                         data-post-key = &key
                     );
                 }
-                @ if let Some(name) = author {
-                    : "by ";
-                    post-author : name;
-                    : " on ";
-                }
+                : "by ";
+                post-author : author;
+                : " on ";
                 post-published : created_at.format("%a %b %e, %Y").to_string();
             }
 

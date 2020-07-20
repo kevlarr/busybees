@@ -23,11 +23,9 @@ impl RenderOnce for Home {
                                 });
                                 footer {
                                     h1 : &preview.title;
-                                    @ if let Some(name) = &preview.author {
-                                        : "by ";
-                                        post-author : name;
-                                        : " on ";
-                                    }
+                                    : "by ";
+                                    post-author : &preview.author;
+                                    : " on ";
                                     post-published : &preview.created_at.format("%a %b %e, %Y").to_string();
                                 }
                             }
@@ -46,11 +44,9 @@ impl RenderOnce for Home {
                                     footer {
                                         h2 : &preview.title;
                                         post-meta {
-                                            @ if let Some(name) = &preview.author {
-                                                : "by ";
-                                                post-author : name;
-                                                : " on ";
-                                            }
+                                            : "by ";
+                                            post-author : &preview.author;
+                                            : " on ";
                                             post-published : &preview.created_at.format("%a %b %e, %Y").to_string();
                                         }
                                     }

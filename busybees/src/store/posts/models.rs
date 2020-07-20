@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 pub struct PostDetail {
-    pub author: Option<String>,
+    pub author: String,
     pub key: String,
     pub title: String,
     pub content: String,
@@ -13,7 +13,7 @@ pub struct PostDetail {
 }
 
 pub struct PostMeta {
-    pub author: Option<String>,
+    pub author: String,
     pub key: String,
     pub title: String,
     pub created_at: DateTime<Utc>,
