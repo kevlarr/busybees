@@ -19,8 +19,13 @@ pub async fn get(page: Page, state: Data<State>) -> Page {
     })
 }
 
-pub async fn new(state: Data<State>) -> ActixResult {
+pub async fn new(page: Page, state: Data<State>) -> ActixResult {
+    let author_id = page.user
+        .ok_or_else(|| HttpResponse::BadRequest().body("No user present".to_owned()))?
+        .id;
+
     let new_post = PostParams {
+        author_id,
         title: "New post".into(),
         content: String::new(),
     };

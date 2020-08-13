@@ -31,6 +31,7 @@ pub struct AdminPostMeta {
 
 #[derive(Clone, Deserialize)]
 pub struct PostParams {
+    pub author_id: i32,
     pub title: String,
     pub content: String,
 }

@@ -6,10 +6,19 @@ use crate::store::{posts::models::*, StoreResult};
 pub async fn create(pool: &PgPool, params: PostParams) -> StoreResult<String> {
     sqlx::query!(
         "
-        insert into post (title, content, published, created_at, updated_at)
-            values ($1, $2, false, now(), now())
-            returning key
+        insert into post (
+                author_id,
+                title,
+                content,
+                published,
+                created_at,
+                updated_at
+        )
+            values ($1, $2, $3, false, now(), now())
+
+        returning key
         ",
+        params.author_id,
         params.title,
         params.content,
     ).fetch_one(pool).await.map(|row| row.key)
@@ -74,7 +83,7 @@ pub async fn update_post(
     params: UpdatePostParams,
 ) -> StoreResult<()> {
     let UpdatePostParams { post, linked_uploads, preview_image_id } = params;
-    let PostParams { title, content } = post;
+    let PostParams { title, content, .. } = post;
 
     let post = sqlx::query!(
         "
