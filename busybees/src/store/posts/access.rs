@@ -3,7 +3,7 @@ use sqlx::pool::PoolConnection;
 use sqlx::{PgConnection, PgPool, Transaction};
 use crate::store::{posts::models::*, StoreResult};
 
-pub async fn create(pool: &PgPool, params: PostParams) -> StoreResult<String> {
+pub async fn create(pool: &PgPool, params: NewPostParams) -> StoreResult<String> {
     sqlx::query!(
         "
         insert into post (
@@ -83,7 +83,7 @@ pub async fn update_post(
     params: UpdatePostParams,
 ) -> StoreResult<()> {
     let UpdatePostParams { post, linked_uploads, preview_image_id } = params;
-    let PostParams { title, content, .. } = post;
+    let PostParams { title, content } = post;
 
     let post = sqlx::query!(
         "

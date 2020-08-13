@@ -29,9 +29,14 @@ pub struct AdminPostMeta {
     pub updated_at: DateTime<Utc>,
 }
 
+pub struct NewPostParams {
+    pub author_id: i32,
+    pub title: String,
+    pub content: String,
+}
+
 #[derive(Clone, Deserialize)]
 pub struct PostParams {
-    pub author_id: i32,
     pub title: String,
     pub content: String,
 }

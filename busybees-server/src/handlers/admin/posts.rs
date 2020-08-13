@@ -4,7 +4,7 @@ use actix_web::{
 };
 use busybees::store::{
     self,
-    posts::{PostParams, PostLink},
+    posts::{NewPostParams, PostLink},
 };
 use crate::{
     handlers::not_found,
@@ -24,7 +24,7 @@ pub async fn new(page: Page, state: Data<State>) -> ActixResult {
         .ok_or_else(|| HttpResponse::BadRequest().body("No user present".to_owned()))?
         .id;
 
-    let new_post = PostParams {
+    let new_post = NewPostParams {
         author_id,
         title: "New post".into(),
         content: String::new(),
