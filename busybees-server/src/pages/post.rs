@@ -16,7 +16,7 @@ impl RenderOnce for PostView {
             title,
             content,
             published,
-            created_at,
+            published_at,
             ..
         } = self.post;
 
@@ -31,8 +31,11 @@ impl RenderOnce for PostView {
                 }
                 : "by ";
                 post-author : author;
-                : " on ";
-                post-published : created_at.format("%a %b %e, %Y").to_string();
+
+                @ if let Some(p) = published_at {
+                    : " on ";
+                    post-published : p.format("%a %b %e, %Y").to_string();
+                }
             }
 
             post-content : Raw(content);

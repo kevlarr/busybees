@@ -1,5 +1,5 @@
 use actix_web::{http::header, Error as ActixError, HttpResponse};
-use busybees::deps::{chrono::Utc, lazy_static::lazy_static};
+use busybees::deps::{chrono::{DateTime, Utc}, lazy_static::lazy_static};
 
 pub mod error;
 pub mod extensions;

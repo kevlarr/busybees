@@ -1,4 +1,4 @@
-
+use chrono::{DateTime, NaiveTime, Utc};
 use sqlx::pool::PoolConnection;
 use sqlx::{PgConnection, PgPool, Transaction};
 use crate::store::{posts::models::*, StoreResult};
@@ -24,18 +24,19 @@ pub async fn create(pool: &PgPool, params: NewPostParams) -> StoreResult<String>
     ).fetch_one(pool).await.map(|row| row.key)
 }
 
-pub async fn recent_published(pool: &PgPool) -> StoreResult<Vec<PostMeta>> {
+pub async fn recent_published(pool: &PgPool) -> StoreResult<Vec<PublishedPostMeta>> {
     sqlx::query_as!(
-        PostMeta,
+        PublishedPostMeta,
         "
         select
             author,
             key,
             title,
-            created_at,
+            published_at,
             preview_image_filename,
             preview_image_alt_text
         from post_published_by_date_vw
+        where published_at <= now() -- view includes all published
         limit 4
         ",
     ).fetch_all(pool).await
@@ -66,8 +67,8 @@ pub async fn get(pool: &PgPool, key: String) -> StoreResult<PostDetail> {
             key,
             title,
             content,
-            created_at,
             published,
+            published_at,
             preview_image_filename,
             preview_image_alt_text
         from post_detail_vw
@@ -83,7 +84,15 @@ pub async fn update_post(
     params: UpdatePostParams,
 ) -> StoreResult<()> {
     let UpdatePostParams { post, linked_uploads, preview_image_id } = params;
-    let PostParams { title, content } = post;
+    let PostParams { title, content, published_at_date } = post;
+
+    // Hacky, but times aren't displayed anywhere for now, so just
+    // default every publish date to midday EST.
+    // 17 UTC -> 12-13 EST depending on DST
+    let t = NaiveTime::from_hms(17, 0, 0);
+    let published_at: Option<DateTime<Utc>> = published_at_date
+        .map(|dt| dt.and_time(t))
+        .map(|dt| DateTime::from_utc(dt, Utc));
 
     let post = sqlx::query!(
         "
@@ -91,13 +100,15 @@ pub async fn update_post(
         set
             title = $2,
             content = $3,
+            published_at = $4,
             updated_at = now()
         where key = $1
         returning id
         ",
         key,
         title,
-        content
+        content,
+        published_at,
     ).fetch_one(&mut *tx).await?;
 
     sqlx::query!(

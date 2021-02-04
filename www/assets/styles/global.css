@@ -7,7 +7,8 @@
     --color-text-light: #868178;
     --color-gold: #B98100;
     --color-gold-light: #F0A200;
-    --color-blue: #005D8F;
+    /*--color-blue: #005D8F;*/
+    --color-blue: 0, 93, 143;
     --color-gray-mid: #BFBBB4;
     --color-gray-light: #E3E0DB;
     --color-gray-dark: #958E81;
