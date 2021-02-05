@@ -1,6 +1,6 @@
 [package]
 name = "busybees-reimager"
-version = "0.7.0"
+version = "0.8.0"
 authors = ["kevlarr <6306496+kevlarr@users.noreply.github.com>"]
 edition = "2018"
 

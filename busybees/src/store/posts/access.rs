@@ -36,7 +36,7 @@ pub async fn recent_published(pool: &PgPool) -> StoreResult<Vec<PublishedPostMet
             preview_image_filename,
             preview_image_alt_text
         from post_published_by_date_vw
-        where published_at <= now() -- view includes all published
+        where published_at <= now() -- view includes all `published`
         limit 4
         ",
     ).fetch_all(pool).await
@@ -53,6 +53,7 @@ pub async fn admin_list(pool: &PgPool) -> StoreResult<Vec<AdminPostMeta>> {
             created_at,
             updated_at
         from post
+        where not deleted
         order by created_at desc
         ",
     ).fetch_all(pool).await
@@ -193,7 +194,7 @@ pub async fn update_status(pool: &PgPool, key: String, published: bool) -> Store
 pub async fn delete(pool: &PgPool, key: &str) -> StoreResult<()> {
     sqlx::query!(
         "
-        delete from post where key = $1
+        update post set deleted = true where key = $1
         ",
         key.to_string(),
     ).execute(pool).await?;

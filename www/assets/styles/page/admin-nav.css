@@ -5,6 +5,7 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 5px;
+    width: 55px;
 }
 
 #adminNav ul {
@@ -37,7 +38,7 @@
     border-radius: 5px;
     display: block;
     padding: 5px;
-    width: 30px;
+    width: 40px;
 }
 
 #adminNav li:hover a {
