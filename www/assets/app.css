@@ -112,11 +112,6 @@ main#Auth > form {
     padding: 50px;
 }
 
-main#Auth > form input {
-    font-size: 20px;
-    margin-bottom: 40px;
-}
-
 box-cursor {
     border: 3px solid var(--color-gray-mid);
     display: inline-block;

@@ -5,3 +5,4 @@ members = [
     "busybees-reimager",
     "busybees-server",
 ]
+default-members = ["busybees-server"]

@@ -62,17 +62,20 @@ pub struct PostForm {
 
 impl RenderOnce for PostForm {
     fn render_once(self, tmpl: &mut TemplateBuffer) {
+        let pub_date = &self.post.published_at.map(|dt| dt.format("%F").to_string());
+
         tmpl << html! {
-            form(id = "editor-form", data-post-key = &self.post.key) {
-                input(id = "post-title", name = "title", placeholder = "Title", autofocus = "true", value = &self.post.title);
-                textarea(id = "summernote-editor", name = "content") : &self.post.content;
-
-                fieldset {
-                    legend : "Cover Image";
-                    div(id = "post-images");
+            form (id = "editorForm", data-post-key = &self.post.key) {
+                div (id = "postMeta") {
+                    input (id = "postTitle", name = "title", placeholder = "Title", autofocus = "true", value = &self.post.title);
+                    input (id = "postPublishedDate", name = "published_at_date", type = "date", value = pub_date);
                 }
+                fieldset (id = "postImagesSet") {
+                    legend : "Cover Image";
+                    div (id = "postImages");
+                }
+                textarea (id = "summernoteEditor", name = "content") : &self.post.content;
             }
-
             div (id = "form-meta") {
                 div (id = "save-status") {
                     span (id = "save-status-text") : "Saved";
@@ -80,10 +83,8 @@ impl RenderOnce for PostForm {
                         circle (class="spinner-path", fill="none", stroke-width="6", stroke-linecap="round", cx="33", cy="33", r="30");
                     }
                 }
-                a (id = "preview-link", href = self.post.href()) : Raw("View post &rarr;");
             }
 
-            // WYSIWYG editor
             link (rel = "stylesheet", type = "text/css", href = "https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-lite.min.css");
 
             script (src = "https://code.jquery.com/jquery-3.4.1.min.js");

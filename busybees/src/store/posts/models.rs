@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use serde::Deserialize;
 
 pub struct PostDetail {
@@ -6,17 +6,17 @@ pub struct PostDetail {
     pub key: String,
     pub title: String,
     pub content: String,
-    pub created_at: DateTime<Utc>,
     pub published: bool,
+    pub published_at: Option<DateTime<Utc>>,
     pub preview_image_filename: Option<String>,
     pub preview_image_alt_text: Option<String>,
 }
 
-pub struct PostMeta {
+pub struct PublishedPostMeta {
     pub author: String,
     pub key: String,
     pub title: String,
-    pub created_at: DateTime<Utc>,
+    pub published_at: DateTime<Utc>,
     pub preview_image_filename: Option<String>,
     pub preview_image_alt_text: Option<String>,
 }
@@ -39,6 +39,7 @@ pub struct NewPostParams {
 pub struct PostParams {
     pub title: String,
     pub content: String,
+    pub published_at_date: Option<NaiveDate>,
 }
 
 #[derive(Deserialize)]

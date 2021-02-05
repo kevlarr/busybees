@@ -21,7 +21,7 @@ impl PostSlug for PostDetail {
     fn slug_field(&self) -> &str { &self.title }
 }
 
-impl PostSlug for PostMeta {
+impl PostSlug for PublishedPostMeta {
     fn slug_field(&self) -> &str { &self.title }
 }
 
@@ -46,6 +46,6 @@ impl PostLink for PostDetail {
     fn key_field(&self) -> &str { &self.key }
 }
 
-impl PostLink for PostMeta {
+impl PostLink for PublishedPostMeta {
     fn key_field(&self) -> &str { &self.key }
 }

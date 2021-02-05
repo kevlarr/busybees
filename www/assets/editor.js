@@ -9,14 +9,14 @@
       this.autosaveTimeout = null;
       this.uploading = 0;
 
-      this.form = document.getElementById('editor-form');
-      this.postImages = document.getElementById('post-images');
+      this.form = document.getElementById('editorForm');
+      this.postImages = document.getElementById('postImages');
 
       this.saveStatusSpinner = document.querySelector('#save-status .spinner');
       this.saveStatusText = document.getElementById('save-status-text');
 
       // Need to use jquery for the editor node
-      this.editor = $('#summernote-editor');
+      this.editor = $('#summernoteEditor');
       this.editor.summernote({
         toolbar: [
           ['style', ['style']],
@@ -41,10 +41,15 @@
       this.textDisplay = document.getElementsByClassName('note-editable')[0];
 
       this.postTitle.addEventListener('input', _evt => this.scheduleSave());
+      this.postPublishedDate.addEventListener('input', _evt => this.scheduleSave());
     }
 
     get postTitle() {
-      return this.form['post-title'];
+      return this.form.postTitle;
+    }
+
+    get postPublishedDate() {
+      return this.form.postPublishedDate;
     }
 
     get postKey() {
@@ -75,7 +80,7 @@
     }
 
     createImagesList() {
-      let ul = HTML.Ul({ id: 'post-images-list' });
+      let ul = HTML.Ul({ id: 'postImagesList' });
       this.postImages.append(ul);
       return ul;
     }
@@ -198,7 +203,8 @@
           body: {
             post: {
               title: this.postTitle.value,
-              content: this.form['summernote-editor'].value,
+              content: this.form.summernoteEditor.value,
+              published_at_date: this.postPublishedDate.value || null,
             },
             previewImageId,
             linkedUploads,
@@ -242,7 +248,7 @@
     }
 
     addNewImages({ images }) {
-      let imagesList = document.getElementById('post-images-list');
+      let imagesList = document.getElementById('postImagesList');
 
       if (!imagesList) {
         // Clear content in case there was an error message present

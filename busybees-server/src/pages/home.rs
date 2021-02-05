@@ -1,9 +1,9 @@
-use busybees::store::posts::{PostMeta, PostLink};
+use busybees::store::posts::{PublishedPostMeta, PostLink};
 use crate::upload_path;
 use horrorshow::{html, RenderOnce, TemplateBuffer};
 
 pub struct Home {
-    pub posts: Vec<PostMeta>,
+    pub posts: Vec<PublishedPostMeta>,
 }
 
 impl RenderOnce for Home {
@@ -26,7 +26,7 @@ impl RenderOnce for Home {
                                     : "by ";
                                     post-author : &preview.author;
                                     : " on ";
-                                    post-published : &preview.created_at.format("%a %b %e, %Y").to_string();
+                                    post-published : &preview.published_at.format("%a %b %e, %Y").to_string();
                                 }
                             }
                         }
@@ -47,7 +47,7 @@ impl RenderOnce for Home {
                                             : "by ";
                                             post-author : &preview.author;
                                             : " on ";
-                                            post-published : &preview.created_at.format("%a %b %e, %Y").to_string();
+                                            post-published : &preview.published_at.format("%a %b %e, %Y").to_string();
                                         }
                                     }
                                 }
