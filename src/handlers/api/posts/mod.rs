@@ -14,12 +14,11 @@ pub struct UpdatePublishedParams {
 }
 
 pub async fn update(
-    path: Path<(String,)>,
+    Path((key,)): Path<(String,)>,
     props: Json<UpdatePostParams>,
     state: Data<State>,
 ) -> ApiResult<HttpResponse> {
     let mut tx = state.pool.begin().await?;
-    let key = &path.0;
 
     store::posts::update_post(&mut tx, key.clone(), props.into_inner()).await?;
     tx.commit().await?;
@@ -28,10 +27,10 @@ pub async fn update(
 }
 
 pub async fn update_published(
-    path: Path<(String,)>,
+    Path((key,)): Path<(String,)>,
     props: Json<UpdatePublishedParams>,
     state: Data<State>,
 ) -> ApiResult<HttpResponse> {
-    store::posts::update_status(&state.pool, path.0.clone(), props.published).await?;
+    store::posts::update_status(&state.pool, key.clone(), props.published).await?;
     Ok(HttpResponse::NoContent().finish())
 }

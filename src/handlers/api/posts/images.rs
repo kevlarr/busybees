@@ -36,10 +36,10 @@ pub struct UploadedImage {
 /// Retrieves uploaded images associated with the post matching
 /// the given key.
 pub async fn list(
-    path: web::Path<(String,)>,
+    web::Path((key,)): web::Path<(String,)>,
     state: web::Data<State>,
 ) -> ApiResult<web::Json<PostImages>> {
-    let post_images = store::images::for_post(&state.pool, &path.0).await?;
+    let post_images = store::images::for_post(&state.pool, &key).await?;
 
     Ok(web::Json(PostImages{ images: post_images }))
 }
@@ -49,7 +49,7 @@ pub async fn list(
 /// post.  Each image will be resized and thumbnailed as appropriate.
 pub async fn upload(
     mut payload: Multipart,
-    path: web::Path<(String,)>,
+    web::Path((key,)): web::Path<(String,)>,
     state: web::Data<State>,
 ) -> ApiResult<web::Json<UploadResponse>> {
     let mut images = Vec::new();
@@ -75,7 +75,7 @@ pub async fn upload(
         save_file(&mut field, filepath).await?;
 
         let image = imaging::process(&filepath)?;
-        let image_id = store::images::create(&state.pool, &path.0, image.clone())
+        let image_id = store::images::create(&state.pool, &key, image.clone())
             .await?;
 
         images.push(UploadedImage {

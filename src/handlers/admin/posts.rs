@@ -33,8 +33,12 @@ pub async fn new(page: Page, state: Data<State>) -> ActixResult {
     }
 }
 
-pub async fn edit(page: Page, path: Path<(String,)>, state: Data<State>) -> Page {
-    match store::posts::get(&state.pool, path.0.clone()).await {
+pub async fn edit(
+    page: Page,
+    Path((key,)): Path<(String,)>,
+    state: Data<State>,
+) -> Page {
+    match store::posts::get(&state.pool, key.clone()).await {
         Ok(post) => {
             let href = post.href();
 
@@ -47,7 +51,7 @@ pub async fn edit(page: Page, path: Path<(String,)>, state: Data<State>) -> Page
                         "/public/images/file-text.svg".into(),
                         "Preview Post".into(),
                     ), (
-                        format!("/admin/posts/delete/{}", path.0),
+                        format!("/admin/posts/delete/{}", key),
                         "/public/images/x-square.svg".into(),
                         "Delete Post".into(),
                     ),
@@ -61,8 +65,11 @@ pub async fn edit(page: Page, path: Path<(String,)>, state: Data<State>) -> Page
     }
 }
 
-pub async fn delete(path: Path<(String,)>, state: Data<State>) -> ActixResult {
-    match store::posts::delete(&state.pool, &path.0).await {
+pub async fn delete(
+    Path((key,)): Path<(String,)>,
+    state: Data<State>,
+) -> ActixResult {
+    match store::posts::delete(&state.pool, &key).await {
         Ok(()) => Ok(redirect("/admin/posts")),
         Err(e) => Ok(HttpResponse::BadRequest().body(e.to_string())),
     }
