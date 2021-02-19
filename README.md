@@ -90,12 +90,9 @@ The application relies on `pgcrypto` to generate random post keys.
 
 ## So, why Rust?
 
-I know a lot of people say Rust is ridiculous for web development because "we don't need that level of performance". That's a fair viewpoint -
-it's also a complicated language,
-the compiler is harder to please than my dad with report cards,
-and it can be tough to build the same kind of 'feature momentum' compared to using common web languages.
+Rust [is more than just performance](https://blog.rocketinsights.com/rust-is-more-than-performance/)
+and is perfect for web services.
 
-Well, *"Butts to that,"* I say - Rust is perfect for the web.
 This started as a proof-of-concept, and the experience continues to be enjoyable.
 
 **tl;dr: 10/10 would choose again.**
