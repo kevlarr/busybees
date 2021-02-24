@@ -15,7 +15,7 @@ pub fn resource(path: &str) -> Scope {
 
 pub async fn get_post(
     page: Page,
-    Path((key, slug)): Path<(String, String)>,
+    Path((key, _slug)): Path<(String, String)>,
     state: Data<State>,
 ) -> Page {
     let auth = page.user.is_some();
