@@ -7,8 +7,8 @@ use actix_web::{
 };
 
 use busybees::{
-    handlers,
     middleware,
+    routes,
     State,
 };
 
@@ -26,7 +26,7 @@ async fn main() -> io::Result<()> {
             .http_only(true)
             .secure(true);
 
-        let routes = handlers::routes(&state);
+        let routes_ = routes::routes(&state);
 
         App::new()
             .data(state)
@@ -38,7 +38,7 @@ async fn main() -> io::Result<()> {
             .wrap(cookie_session)
             .wrap(Logger::default())
 
-            .service(routes)
+            .service(routes_)
     };
 
     HttpServer::new(app)

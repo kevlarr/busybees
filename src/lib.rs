@@ -2,13 +2,15 @@ use actix_web::{http::header, Error as ActixError, HttpResponse};
 use chrono::Utc;
 use lazy_static::lazy_static;
 
+pub mod actions;
 pub mod encryption;
 pub mod error;
 pub mod extensions;
-pub mod handlers;
+pub mod guards;
 pub mod imaging;
 pub mod middleware;
 pub mod pages;
+pub mod routes;
 pub mod state;
 pub mod store;
 

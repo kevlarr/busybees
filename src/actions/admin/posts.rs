@@ -3,7 +3,7 @@ use actix_web::{
     HttpResponse,
 };
 use crate::{
-    handlers::not_found,
+    actions::not_found,
     pages::admin::{PostForm, Posts},
     pages::Page,
     store::{self, posts::{NewPostParams, PostLink}},
