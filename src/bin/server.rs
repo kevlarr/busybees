@@ -3,7 +3,6 @@ use std::{env, io};
 use actix_session::CookieSession;
 use actix_web::{
     middleware::Logger,
-    web::route,
     App, HttpServer,
 };
 
@@ -27,7 +26,7 @@ async fn main() -> io::Result<()> {
             .http_only(true)
             .secure(true);
 
-        let router = handlers::router(&state);
+        let routes = handlers::routes(&state);
 
         App::new()
             .data(state)
@@ -39,9 +38,7 @@ async fn main() -> io::Result<()> {
             .wrap(cookie_session)
             .wrap(Logger::default())
 
-            // Render "not found" page (200 response)
-            .default_service(route().to(handlers::not_found))
-            .service(router)
+            .service(routes)
     };
 
     HttpServer::new(app)

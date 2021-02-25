@@ -65,6 +65,7 @@ pub async fn edit(
     }
 }
 
+#[deprecated(note = "Don't use GET for delete")]
 pub async fn delete(
     Path((key,)): Path<(String,)>,
     state: Data<State>,

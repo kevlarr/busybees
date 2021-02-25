@@ -1,8 +1,8 @@
 use actix_session::Session;
 use actix_web::{
     http::header::LOCATION,
-    web::{self, Data, Form},
-    Either, Error, HttpResponse, Scope,
+    web::{Data, Form},
+    Either,Error, HttpResponse,
 };
 use crate::{
     encryption,
@@ -17,13 +17,6 @@ use serde::Deserialize;
 pub struct Credentials {
     email: String,
     password: String,
-}
-
-pub fn resource(path: &str) -> Scope {
-    web::scope(path)
-        .route("", web::get().to(get))
-        .route("", web::post().to(post))
-        .route("/clear", web::get().to(delete))
 }
 
 pub async fn get(page: Page) -> Page {

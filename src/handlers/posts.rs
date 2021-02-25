@@ -1,6 +1,5 @@
 use actix_web::{
-    web::{self, Data, Path},
-    Scope,
+    web::{Data, Path},
 };
 use crate::{
     handlers::not_found,
@@ -8,10 +7,6 @@ use crate::{
     store,
     State,
 };
-
-pub fn resource(path: &str) -> Scope {
-    web::scope(path).route("/{key}/read/{slug}", web::get().to(get_post))
-}
 
 pub async fn get_post(
     page: Page,
