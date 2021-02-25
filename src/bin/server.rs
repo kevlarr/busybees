@@ -30,15 +30,24 @@ async fn main() -> io::Result<()> {
             .secure(true);
 
         let routes = Routes::new("/")
-            .map_files(&ASSET_BASEPATH, "www/assets", |files| files.wrap(
-                DefaultHeaders::new().header("Cache-Control", "max-age=31536000")
-            ))
-            .map_files("/public", "www/public", |files| files.wrap(
-                DefaultHeaders::new().header("Cache-Control", "max-age=31536000")
-            ))
-            .map_files("/uploads", &state.upload_path, |files| files.wrap(
-                DefaultHeaders::new().header("Cache-Control", "max-age=31536000")
-            ))
+            .map_files(
+                &ASSET_BASEPATH,
+                "www/assets",
+                |files| files
+                    .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000"))
+            )
+            .map_files(
+                "/public",
+                "www/public",
+                |files| files
+                    .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000"))
+            )
+            .map_files(
+                "/uploads",
+                &state.upload_path,
+                |files| files
+                    .wrap(DefaultHeaders::new().header("Cache-Control", "max-age=31536000"))
+            )
             .get("", ax::home)
             .get("/about", ax::about)
             .get("/sandbox", ax::sandbox)
