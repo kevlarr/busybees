@@ -26,7 +26,7 @@ async fn main() -> io::Result<()> {
             .http_only(true)
             .secure(true);
 
-        let routes_ = routes::routes(&state);
+        let routes_ = routes::from_state(&state);
 
         App::new()
             .data(state)
