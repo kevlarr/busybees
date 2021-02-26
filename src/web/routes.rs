@@ -4,12 +4,12 @@ use actix_web::{
 };
 
 use crate::{
-    actions as ax,
     guards::auth_guard,
     router::Router,
     ASSET_BASEPATH,
     State,
 };
+use super::actions as ax;
 
 pub fn service(state: &State) -> Scope {
     let cache_headers = DefaultHeaders::new().header("Cache-Control", "max-age=31536000");

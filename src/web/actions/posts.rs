@@ -2,8 +2,8 @@ use actix_web::{
     web::{Data, Path},
 };
 use crate::{
-    actions::not_found,
     pages::{Page, PostView},
+    web::actions::not_found,
     store,
     State,
 };
