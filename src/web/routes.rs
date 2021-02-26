@@ -8,6 +8,7 @@ use crate::{
     web::{
         actions as ax,
         guards::auth_guard,
+        views as vw,
     },
     ASSET_BASEPATH,
     State,
@@ -18,6 +19,7 @@ pub fn service(state: &State) -> Scope {
     
     Router::new("/")
         .default(ax::not_found)
+        //.get("/test", vw::html::render)
         .get("", ax::home)
         .get("/about", ax::about)
         .get("/sandbox", ax::sandbox)
