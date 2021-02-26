@@ -7,8 +7,7 @@ use actix_web::{
 };
 
 use busybees::{
-    middleware,
-    web::routes,
+    web::{middleware, routes},
     State,
 };
 

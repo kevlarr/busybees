@@ -3,10 +3,14 @@ use actix_web::{
     HttpResponse,
 };
 use crate::{
-    pages::admin::{PostForm, Posts},
-    pages::Page,
     store::{self, posts::{NewPostParams, PostLink}},
-    web::actions::not_found,
+    web::{
+        actions::not_found,
+        pages::{
+            admin::{PostForm, Posts},
+            Page,
+        },
+    },
     redirect, ActixResult, State,
 };
 

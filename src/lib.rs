@@ -4,11 +4,7 @@ use lazy_static::lazy_static;
 
 pub mod encryption;
 pub mod error;
-pub mod extensions;
-pub mod guards;
 pub mod imaging;
-pub mod middleware;
-pub mod pages;
 pub mod router;
 pub mod state;
 pub mod store;

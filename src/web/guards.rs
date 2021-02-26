@@ -1,8 +1,8 @@
 use actix_web::dev::RequestHead;
 
 use crate::{
-    extensions::Assigns,
     store::authors::AuthorWithoutPassword,
+    web::extensions::Assigns,
 };
 
 pub fn auth_guard(head: &RequestHead) -> bool {

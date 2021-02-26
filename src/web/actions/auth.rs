@@ -6,8 +6,8 @@ use actix_web::{
 };
 use crate::{
     encryption,
-    pages::{Auth, Page},
     store::{self, authors::AuthorWithoutPassword},
+    web::pages::{Auth, Page},
     redirect,
     ActixResult, State,
 };

@@ -5,8 +5,8 @@ use actix_web::{
 };
 
 use crate::{
-    pages::{About, Home, NotFound, Page, Sandbox},
     store,
+    web::pages::{About, Home, NotFound, Page, Sandbox},
     ActixResult,
     State,
 };
