@@ -17,11 +17,11 @@ use actix_web::{
 };
 
 
-pub struct Routes {
+pub struct Router {
     pub service: Scope,
 }
 
-impl Routes {
+impl Router {
     pub fn new(path: &str) -> Self {
         Self {
             service: web::scope(path),
@@ -39,8 +39,8 @@ impl Routes {
         self
     }
 
-    pub fn scope(mut self, path: &str, cb: impl Fn(Routes) -> Routes) -> Self {
-        let routes = Routes { service: web::scope(path) };
+    pub fn scope(mut self, path: &str, cb: impl Fn(Self) -> Self) -> Self {
+        let routes = Self { service: web::scope(path) };
 
         self.service = self.service.service(cb(routes).service);
         self

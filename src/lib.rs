@@ -10,9 +10,10 @@ pub mod guards;
 pub mod imaging;
 pub mod middleware;
 pub mod pages;
-pub mod routes;
+pub mod router;
 pub mod state;
 pub mod store;
+pub mod web;
 
 pub use error::ApiError;
 pub use state::State;
