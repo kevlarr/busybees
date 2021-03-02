@@ -19,8 +19,7 @@ pub fn service(state: &State) -> Scope {
     
     Router::new("/")
         .default(ax::not_found)
-        //.get("/test", vw::html::render)
-        .get("", ax::home)
+        /*.get("", ax::home)*/
         .get("/about", ax::about)
         .get("/sandbox", ax::sandbox)
         .scope("/admin", |admin| admin

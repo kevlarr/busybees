@@ -39,7 +39,13 @@ async fn main() -> io::Result<()> {
             .wrap(Logger::default())
 
             .service(route_service)
-            .route("/test", web::get().to(vw::html::render))
+            .route("/", web::get().to(|| {
+                use busybees::{actions as ax, views as vw};
+
+                vw::html::root::Root::from_action(
+                    ax::root(state: Data<State>)
+                )
+            }))
     };
 
     HttpServer::new(app)

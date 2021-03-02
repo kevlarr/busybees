@@ -5,8 +5,8 @@ use actix_web::{
 };
 
 use crate::{
-    store,
-    web::pages::{About, Home, NotFound, Page, Sandbox},
+    store::{self, posts::PublishedPostMeta},
+    web::pages::{About, NotFound, Page, Sandbox},
     ActixResult,
     State,
 };
@@ -16,18 +16,10 @@ pub mod api;
 pub mod auth;
 pub mod posts;
 
-pub async fn home(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
-    match store::posts::recent_published(&state.pool).await {
-        Ok(previews) => Either::A(
-            page.id("Home")
-                .title("Latest Posts")
-                .content(Home { posts: previews }),
-        ),
-        Err(_) => Either::B(
-            // FIXME This should be an actual page
-            Ok(HttpResponse::InternalServerError().finish()),
-        ),
-    }
+//pub async fn home(page: Page, state: Data<State>) -> Either<Page, ActixResult> {
+pub async fn root(state: Data<State>) -> Result<Vec<PublishedPostMeta>, String> {
+    store::posts::recent_published(&state.pool).await
+        .map_err(|e| e.to_string())
 }
 
 pub async fn about(page: Page) -> Page {
