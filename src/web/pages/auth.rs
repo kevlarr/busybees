@@ -1,5 +1,9 @@
-use crate::{asset_path, pages::Page};
 use horrorshow::{html, RenderOnce, TemplateBuffer};
+
+use crate::{
+    web::pages::Page,
+    asset_path,
+};
 
 #[derive(Default)]
 pub struct Auth {

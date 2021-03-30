@@ -1,21 +1,18 @@
 use actix_web::{
-    web::{self, Data, Path},
-    Scope,
+    web::{Data, Path},
 };
 use crate::{
-    handlers::not_found,
-    pages::{Page, PostView},
     store,
+    web::{
+        actions::not_found,
+        pages::{Page, PostView},
+    },
     State,
 };
 
-pub fn resource(path: &str) -> Scope {
-    web::scope(path).route("/{key}/read/{slug}", web::get().to(get_post))
-}
-
 pub async fn get_post(
     page: Page,
-    Path((key, slug)): Path<(String, String)>,
+    Path((key, _slug)): Path<(String, String)>,
     state: Data<State>,
 ) -> Page {
     let auth = page.user.is_some();

@@ -1,8 +1,26 @@
-use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, HttpResponse, Responder};
-use crate::store::authors::AuthorWithoutPassword;
+use actix_web::{
+    dev::Payload,
+    Error,
+    FromRequest,
+    HttpRequest,
+    HttpResponse,
+    Responder,
+};
 use futures::future::{ok, Ready};
-use crate::{asset_path, extensions::Assigns};
-use horrorshow::{helper::doctype, html, Raw, RenderOnce, Template, TemplateBuffer};
+use horrorshow::{
+    helper::doctype,
+    html,
+    Raw,
+    RenderOnce,
+    Template,
+    TemplateBuffer,
+};
+
+use crate::{
+    store::authors::AuthorWithoutPassword,
+    web::extensions::Assigns,
+    asset_path,
+};
 
 pub struct Page {
     pub user: Option<AuthorWithoutPassword>,

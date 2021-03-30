@@ -1,11 +1,15 @@
 //! Server middleware
-use crate::extensions::Assigns;
-use crate::store::authors::AuthorWithoutPassword;
-
 use actix_service::Service;
 use actix_session::UserSession;
-use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::Error;
+use actix_web::{
+    dev::{ServiceRequest, ServiceResponse},
+    Error,
+};
+
+use crate::{
+    store::authors::AuthorWithoutPassword,
+    web::extensions::Assigns,
+};
 
 /// Adds a new `Assigns` to the request extensions.
 pub fn set_assigns<S, B>(req: ServiceRequest, service: &mut S) -> S::Future

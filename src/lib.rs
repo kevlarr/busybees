@@ -4,13 +4,11 @@ use lazy_static::lazy_static;
 
 pub mod encryption;
 pub mod error;
-pub mod extensions;
-pub mod handlers;
 pub mod imaging;
-pub mod middleware;
-pub mod pages;
+pub mod router;
 pub mod state;
 pub mod store;
+pub mod web;
 
 pub use error::ApiError;
 pub use state::State;

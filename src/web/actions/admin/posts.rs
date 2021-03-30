@@ -3,10 +3,14 @@ use actix_web::{
     HttpResponse,
 };
 use crate::{
-    handlers::not_found,
-    pages::admin::{PostForm, Posts},
-    pages::Page,
     store::{self, posts::{NewPostParams, PostLink}},
+    web::{
+        actions::not_found,
+        pages::{
+            admin::{PostForm, Posts},
+            Page,
+        },
+    },
     redirect, ActixResult, State,
 };
 
@@ -65,6 +69,8 @@ pub async fn edit(
     }
 }
 
+//#[deprecated(note = "Don't use GET for delete")]
+// FIXME Don't use GET for delete
 pub async fn delete(
     Path((key,)): Path<(String,)>,
     state: Data<State>,

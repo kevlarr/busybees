@@ -30,7 +30,8 @@ impl PostSlug for PostParams {
 }
 
 /// Generates an anchor HREF from key field and slug.
-#[deprecated(note = "this is page-specific and doesn't belong in store")]
+//#[deprecated(note = "this is page-specific and doesn't belong in store")]
+// FIXME this is page-specific and doesn't belong in store
 pub trait PostLink : PostSlug {
     fn href(&self) -> String {
         format!("/posts/{}/read/{}", &self.key_field(), self.to_slug())
