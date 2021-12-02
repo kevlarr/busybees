@@ -1,7 +1,5 @@
 # busybees
 
-Server for [Busy Bee Life](https://www.busybee.life).
-
 ## Features
 
 ### 100% tracker and (effectively) cookie free
