@@ -1,5 +1,7 @@
 # busybees
 
+Blog server with admin CMS & WYSIWYG editor.
+
 ## Features
 
 ### 100% tracker and (effectively) cookie free
