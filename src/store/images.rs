@@ -54,7 +54,8 @@ pub async fn create(pool: &PgPool, post_key: &str, props: Image) -> StoreResult<
     Ok(image_id.id)
 }
 
-#[deprecated(note = "use a view")]
+//#[deprecated(note = "use a view")]
+// FIXME use a view
 pub async fn for_post(pool: &PgPool, post_key: &str) -> StoreResult<Vec<PostImage>> {
     sqlx::query_as!(
         PostImage,
