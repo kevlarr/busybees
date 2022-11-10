@@ -1,6 +1,6 @@
 # Busybees
 
-Hobby blog engine including basic CMS & WYSIWYG editor.
+Hobby blog engine including basic WYSIWYG editor & image uploads/processing.
 
 This project is written in Rust because the language offers [more than just performance](https://blog.rocketinsights.com/rust-is-more-than-performance/)
 and is a great choice for server-side applications,
