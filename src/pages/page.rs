@@ -140,21 +140,13 @@ impl RenderOnce for Page {
                                 }
                             }
                             div (id = "bio") {
-                                div (id = "bioSnapshot") {
-                                    img (src = "/public/images/pose-crop.jpg");
-                                    dl {
-                                        div { dt : "Stacey"; dd : "Attorney"; }
-                                        div { dt : "Kevin"; dd : "Software Engineer"; }
-                                    }
-                                }
-                                p (id = "bioSummary") {
-                                    span (id = "bioSummaryNames") {
-                                        strong: "Stacey";
-                                        : " (attorney) and ";
-                                        strong: "Kevin";
-                                        : " (software engineer). "
-                                    }
-                                    : "Parents, DIY home-renovators, budding environmentalists, and all around busy bees. ";
+                                img (src = "/public/images/we-are-fine.jpg");
+                                p {
+                                    : " We're ";
+                                    strong: "Stacey";
+                                    : " and ";
+                                    strong: "Kevin";
+                                    : " - parents, DIY home-renovators, budding environmentalists, and all around busy bees. ";
                                     a (href = "/about") : "More about us ➝";
                                 }
                             }
@@ -164,6 +156,7 @@ impl RenderOnce for Page {
                             // Author links, tags, etc.
                         }
 
+                        /*
                         ul (id = "mediaLinks") {
                             li {
                                 a (aria-label = "Visit busy bee life on Facebook", href = "https://www.facebook.com/ourbusybeelife/", target = "_blank", rel = "noreferrer noopener") {
@@ -181,6 +174,7 @@ impl RenderOnce for Page {
                                 }
                             }
                         }
+                        */
 
                         footer {
                             :"© 2020. Powered by ";

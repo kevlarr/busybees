@@ -8,8 +8,8 @@ impl RenderOnce for About {
             h1 : "Hey there!";
             p : "Stacey and Kevin of New England, here.";
 
-            p : "We are a practicing attorney, a software engineer, parents of a (curious, independent,
-                 and, ahem, spirited) toddler, renovators of our nearly 200-year-old new-to-us home,
+            p : "Aside from our jobs, we are parents of a (curious, independent,
+                 and, ahem, spirited) preschooler, renovators of our nearly 200-year-old new-to-us home,
                  increasingly eco-conscious fanatics, and all around busy bees.";
             p {
                 : "We have each spent decades working, evolving, and often struggling
